@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { setRecommendationStatus, type NsqfMapping, type ProgramRecommendation } from '@/lib/api';
 import { UI_STRINGS } from '@/constants/languages';
-import { getLastResult } from '@/lib/session';
+import { getIntent, getLastResult } from '@/lib/session';
 import { speak, stopSpeaking } from '@/lib/speech';
 import { useStore } from '@/lib/store';
 import { useTheme } from '@/theme';
@@ -16,7 +16,9 @@ export default function ResultsScreen() {
   const { language } = useStore();
   const { c, radius } = useTheme();
   const result = getLastResult();
+  const intent = getIntent();
   const t = language ? UI_STRINGS[language] : UI_STRINGS.hi;
+  const sectionTitle = intent === 'jobs' ? t.jobsTitle : intent === 'certificate' ? t.certTitle : t.recommended;
 
   useEffect(() => {
     if (result?.reply.text && language) {
@@ -31,14 +33,19 @@ export default function ResultsScreen() {
   if (!language) return <Redirect href="/" />;
   if (!result) return <Redirect href="/main/speak" />;
 
-  const known = result.mappings.filter((m) => m.title);
+  // multiple spoken phrases can map to the same NSQF qualification (e.g.
+  // "tailoring" and "embroidery" both point at the Self Employed Tailor QP) —
+  // dedupe so it isn't shown twice.
+  const known = result.mappings
+    .filter((m) => m.title)
+    .filter((m, i, arr) => arr.findIndex((x) => x.qpCode === m.qpCode) === i);
 
   return (
     <Screen edges={['top']}>
       {/* header */}
       <View style={styles.header}>
         <Pressable
-          onPress={() => router.replace('/main/speak')}
+          onPress={() => (router.canGoBack() ? router.back() : router.replace('/main/speak'))}
           hitSlop={12}
           style={[styles.iconBtn, { backgroundColor: c.surfaceAlt }]}>
           <Ionicons name="arrow-back" size={20} color={c.text} />
@@ -82,7 +89,7 @@ export default function ResultsScreen() {
           <View style={{ gap: 12, marginTop: 4 }}>
             <View style={styles.sectionHead}>
               <Ionicons name="school" size={18} color={c.primary} />
-              <Txt variant="h2">{t.recommended}</Txt>
+              <Txt variant="h2">{sectionTitle}</Txt>
               <View style={[styles.countPill, { backgroundColor: c.primarySoft }]}>
                 <Txt variant="caption" style={{ color: c.primary }}>
                   {result.recommendations.length}

@@ -129,6 +129,7 @@ export default function AuthScreen() {
               label={tab === 'login' ? t.loginBtn : t.signupBtn}
               onPress={submit}
               loading={busy}
+              variant="green"
               style={{ marginTop: 6 }}
             />
           </View>

@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "icon": "./assets/images/icon.png",
       "infoPlist": {
-        "NSMicrophoneUsageDescription": "Saksham needs the microphone so you can speak your skill in your own language."
+        "NSMicrophoneUsageDescription": "Saksham needs the microphone so you can speak your skill in your own language.",
+        "NSLocationWhenInUseUsageDescription": "Saksham uses your location to find PM-AJAY training programmes near you."
       }
     },
     "android": {
@@ -21,7 +22,7 @@
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "permissions": ["RECORD_AUDIO"],
+      "permissions": ["RECORD_AUDIO", "ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"],
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -31,6 +32,12 @@
     "plugins": [
       "expo-router",
       "expo-audio",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Saksham uses your location to find PM-AJAY training programmes near you."
+        }
+      ],
       [
         "expo-splash-screen",
         {

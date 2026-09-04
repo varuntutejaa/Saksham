@@ -28,6 +28,7 @@ export default function RootLayout() {
                 <Stack.Screen name="language" />
                 <Stack.Screen name="auth" />
                 <Stack.Screen name="main" options={{ animation: 'fade' }} />
+                <Stack.Screen name="confirm" />
                 <Stack.Screen name="results" />
               </Stack>
               <StatusBar style="dark" />

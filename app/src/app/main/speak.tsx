@@ -75,7 +75,7 @@ export default function SpeakScreen() {
       setLastResult(result);
       setShowType(false);
       setTyped('');
-      router.push('/results');
+      router.push('/confirm');
     } catch (e) {
       Alert.alert(t.tryAgain, String(e));
     } finally {

@@ -91,6 +91,21 @@ export interface Strings {
   logout: string;
   languageLabel: string;
   phoneLabel: string;
+  // confirm screen (post-speech, pre-results)
+  youSaid: string;
+  confirmUnderstood: string; // must contain "{skill}"
+  whatNext: string;
+  optionJobs: string;
+  optionTraining: string;
+  optionCertificate: string;
+  jobsTitle: string;
+  certTitle: string;
+  // location
+  enableLocation: string;
+  enableLocationHint: string;
+  locating: string;
+  locationDenied: string;
+  changeLocation: string;
 }
 
 const hi: Strings = {
@@ -158,6 +173,19 @@ const hi: Strings = {
   logout: 'लॉग आउट',
   languageLabel: 'भाषा',
   phoneLabel: 'मोबाइल नंबर',
+  youSaid: 'आपने कहा',
+  confirmUnderstood: 'समझ गया। आपको {skill} का अनुभव है।',
+  whatNext: 'आप क्या करना चाहेंगे?',
+  optionJobs: 'काम / रोज़गार ढूंढना',
+  optionTraining: 'ट्रेनिंग करना चाहता हूँ',
+  optionCertificate: 'स्किल सर्टिफिकेट चाहिए',
+  jobsTitle: 'आपके लिए रोज़गार के अवसर',
+  certTitle: 'प्रमाणन के लिए प्रशिक्षण केंद्र',
+  enableLocation: 'लोकेशन चालू करें',
+  enableLocationHint: 'अपने पास के प्रशिक्षण कार्यक्रम खोजने के लिए',
+  locating: 'लोकेशन खोज रहे हैं…',
+  locationDenied: 'लोकेशन की अनुमति नहीं मिली',
+  changeLocation: 'लोकेशन बदलें',
 };
 
 const en: Strings = {
@@ -225,6 +253,19 @@ const en: Strings = {
   logout: 'Log out',
   languageLabel: 'Language',
   phoneLabel: 'Mobile number',
+  youSaid: 'You said',
+  confirmUnderstood: 'Got it. You have experience in {skill}.',
+  whatNext: 'What would you like to do?',
+  optionJobs: 'Find work / employment',
+  optionTraining: 'I want training',
+  optionCertificate: 'I want a skill certificate',
+  jobsTitle: 'Employment opportunities for you',
+  certTitle: 'Training centres for certification',
+  enableLocation: 'Enable location',
+  enableLocationHint: 'To find training programmes near you',
+  locating: 'Finding your location…',
+  locationDenied: 'Location permission was not granted',
+  changeLocation: 'Change location',
 };
 
 const bn: Strings = {
