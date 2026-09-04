@@ -7,7 +7,7 @@ services:
     repo: https://github.com/varuntutejaa/Saksham
     rootDir: server
     branch: main
-    buildCommand: npm install && npm run prisma:generate && npm run build
+    buildCommand: npm install --include=dev && npm run prisma:generate && npm run build
     startCommand: npm run start:render
     healthCheckPath: /health
     autoDeploy: true
