@@ -8,11 +8,13 @@ import { authRouter } from "./routes/auth.js";
 import { assistantRouter } from "./routes/assistant.js";
 import { catalogRouter } from "./routes/catalog.js";
 import { adminRouter } from "./routes/admin.js";
+import { whatsappRouter } from "./routes/whatsapp.js";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ extended: false })); // Twilio webhooks POST form-encoded, not JSON
 app.use(morgan("dev"));
 
 app.get("/health", async (_req, res) => {
@@ -28,6 +30,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/assistant", assistantRouter);
 app.use("/api", catalogRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/whatsapp", whatsappRouter);
 
 app.use((_req, res) => res.status(404).json({ error: "Route not found" }));
 

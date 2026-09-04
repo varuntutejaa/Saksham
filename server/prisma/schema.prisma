@@ -32,6 +32,7 @@ enum SessionChannel {
   APP
   WEB
   IVR
+  WHATSAPP
 }
 
 enum RecommendationStatus {

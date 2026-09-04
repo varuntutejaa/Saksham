@@ -10,6 +10,9 @@ export const env = {
   bhashiniApiKey: process.env.BHASHINI_API_KEY ?? "",
   bhashiniUserId: process.env.BHASHINI_USER_ID ?? "",
   smsApiKey: process.env.SMS_API_KEY ?? "",
+  twilioAccountSid: process.env.TWILIO_ACCOUNT_SID ?? "",
+  twilioAuthToken: process.env.TWILIO_AUTH_TOKEN ?? "",
+  twilioWhatsappNumber: process.env.TWILIO_WHATSAPP_NUMBER ?? "",
 };
 
 export const hasLLM = Boolean(env.anthropicApiKey);
@@ -17,3 +20,4 @@ export const hasSarvam = Boolean(env.sarvamApiKey);
 export const hasGroq = Boolean(env.groqApiKey);
 export const hasBhashini = Boolean(env.bhashiniApiKey && env.bhashiniUserId);
 export const hasSms = Boolean(env.smsApiKey);
+export const hasTwilio = Boolean(env.twilioAccountSid && env.twilioAuthToken);

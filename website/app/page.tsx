@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MessageCircle } from "lucide-react";
 import { SkillTryout } from "./skill-tryout";
 import { ProgramList } from "./program-list";
 
@@ -45,6 +46,21 @@ export default function Home() {
             </span>
           ))}
         </div>
+      </section>
+
+      <section className="mt-10 flex items-center gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 dark:border-emerald-900 dark:bg-emerald-950/30">
+        <MessageCircle className="h-8 w-8 shrink-0 text-emerald-600 dark:text-emerald-400" />
+        <div className="flex-1">
+          <p className="font-semibold text-emerald-900 dark:text-emerald-200">
+            Saksham AI is now on WhatsApp
+          </p>
+          <p className="text-sm text-emerald-800/80 dark:text-emerald-300/80">
+            Chat or send a voice note describing your skill — no app download needed.
+          </p>
+        </div>
+        <span className="shrink-0 rounded-full border border-emerald-300 px-3 py-1 text-xs font-medium text-emerald-700 dark:border-emerald-800 dark:text-emerald-300">
+          Coming soon
+        </span>
       </section>
 
       <section className="mt-16">
