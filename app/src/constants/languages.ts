@@ -10,9 +10,12 @@ export interface LanguageOption {
   speechTag: string;
 }
 
+// 9 native Indian languages — English is deliberately excluded here since the
+// point of Saksham is voice access in the beneficiary's own language. `en`
+// still exists as a LanguageCode (server, fallback strings) but isn't offered
+// as a choice on this screen.
 export const LANGUAGES: LanguageOption[] = [
   { code: 'hi', native: 'हिन्दी', english: 'Hindi', speechTag: 'hi-IN' },
-  { code: 'en', native: 'English', english: 'English', speechTag: 'en-IN' },
   { code: 'bn', native: 'বাংলা', english: 'Bengali', speechTag: 'bn-IN' },
   { code: 'ta', native: 'தமிழ்', english: 'Tamil', speechTag: 'ta-IN' },
   { code: 'te', native: 'తెలుగు', english: 'Telugu', speechTag: 'te-IN' },
@@ -28,6 +31,22 @@ export function speechTagFor(code: LanguageCode): string {
 }
 
 export interface Strings {
+  // splash
+  welcomeTitle: string;
+  welcomeTagline: string;
+  getStarted: string;
+  // auth
+  loginTab: string;
+  signupTab: string;
+  namePlaceholder: string;
+  phonePlaceholder: string;
+  passwordPlaceholder: string;
+  loginBtn: string;
+  signupBtn: string;
+  continueGuest: string;
+  authError: string;
+  changeLanguageLink: string;
+  // core flow
   tagline: string;
   tapToSpeak: string;
   tapHint: string;
@@ -56,6 +75,19 @@ export interface Strings {
 }
 
 const hi: Strings = {
+  welcomeTitle: 'सक्षम',
+  welcomeTagline: 'अपनी भाषा में अपना हुनर बताइए और सरकारी प्रशिक्षण पाइए',
+  getStarted: 'शुरू करें',
+  loginTab: 'लॉग इन',
+  signupTab: 'नया खाता',
+  namePlaceholder: 'आपका नाम',
+  phonePlaceholder: 'मोबाइल नंबर',
+  passwordPlaceholder: 'पासवर्ड',
+  loginBtn: 'लॉग इन करें',
+  signupBtn: 'खाता बनाएं',
+  continueGuest: 'बिना खाते के जारी रखें',
+  authError: 'कुछ गलत हुआ, कृपया फिर से कोशिश करें',
+  changeLanguageLink: 'भाषा बदलें',
   tagline: 'अपनी भाषा में अपना हुनर बताइए',
   tapToSpeak: 'बोलने के लिए दबाएँ',
   tapHint: 'अपना काम या हुनर सरल भाषा में बताइए',
@@ -89,6 +121,19 @@ const hi: Strings = {
 };
 
 const en: Strings = {
+  welcomeTitle: 'Saksham',
+  welcomeTagline: 'Tell us your skill in your own language and find government training',
+  getStarted: 'Get Started',
+  loginTab: 'Log in',
+  signupTab: 'Sign up',
+  namePlaceholder: 'Your name',
+  phonePlaceholder: 'Mobile number',
+  passwordPlaceholder: 'Password',
+  loginBtn: 'Log in',
+  signupBtn: 'Create account',
+  continueGuest: 'Continue without an account',
+  authError: 'Something went wrong, please try again',
+  changeLanguageLink: 'Change language',
   tagline: 'Tell us your skill, in your own language',
   tapToSpeak: 'Press to speak',
   tapHint: 'Describe your work or skill in simple words',

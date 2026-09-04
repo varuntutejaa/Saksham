@@ -67,8 +67,14 @@ The one flow that matters. Code in
 - Website keeps the token in `localStorage` (`saksham.admin.token`) —
   [`website/lib/auth.ts`](../website/lib/auth.ts). `AdminShell` redirects to
   `/admin/login` when it's missing.
-- Beneficiary auth exists in the API but the app currently runs anonymously
-  (sessions with `userId: null`).
+- The app's flow is splash (`/`) → language (`/language`, 9 languages) → auth
+  (`/auth`, login or sign up) → assistant (`/home`). "Continue without an
+  account" on the auth screen skips straight to `/home` — sessions from a
+  guest have `userId: null`; sessions from a signed-in beneficiary carry their
+  `user.id`. Token + user are cached on-device (`app/src/lib/auth.tsx`,
+  AsyncStorage key `saksham.auth.v1`) alongside the language/location profile
+  (`app/src/lib/store.tsx`, key `saksham.profile.v1`) so a returning user skips
+  straight past the splash to `/home`.
 
 ## Error behaviour
 

@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "saksham",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "backgroundColor": "#F3F6FC",
     "ios": {
       "supportsTablet": true,
@@ -36,8 +36,7 @@
         {
           "backgroundColor": "#1462C6",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 140,
-          "dark": { "backgroundColor": "#0B1120", "image": "./assets/images/splash-icon.png" }
+          "imageWidth": 140
         }
       ]
     ],

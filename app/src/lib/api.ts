@@ -112,6 +112,50 @@ export async function setRecommendationStatus(id: string, status: string): Promi
   });
 }
 
+export interface AuthUser {
+  id: string;
+  name: string | null;
+  phone: string | null;
+  role: 'BENEFICIARY' | 'ADMIN';
+  language: LanguageCode;
+}
+
+interface AuthResponse {
+  token: string;
+  user: AuthUser;
+}
+
+export async function login(phone: string, password: string): Promise<AuthResponse> {
+  const res = await fetch(`${API_BASE}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone, password }),
+  });
+  if (!res.ok) throw new Error(await extractError(res, 'Invalid phone or password'));
+  return res.json();
+}
+
+export async function register(input: {
+  phone: string;
+  password: string;
+  name?: string;
+  language: LanguageCode;
+}): Promise<AuthResponse> {
+  const res = await fetch(`${API_BASE}/api/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...input, role: 'BENEFICIARY' }),
+  });
+  if (!res.ok) throw new Error(await extractError(res, 'Could not create account'));
+  return res.json();
+}
+
+async function extractError(res: Response, fallback: string): Promise<string> {
+  const body = await res.json().catch(() => null);
+  const e = body?.error;
+  return typeof e === 'string' ? e : fallback;
+}
+
 export async function checkHealth(): Promise<boolean> {
   try {
     const res = await fetch(`${API_BASE}/health`);

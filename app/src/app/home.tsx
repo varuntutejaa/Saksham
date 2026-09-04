@@ -24,12 +24,14 @@ import { checkHealth, converse } from '@/lib/api';
 import { LANGUAGES, UI_STRINGS } from '@/constants/languages';
 import { setLastResult } from '@/lib/session';
 import { speak } from '@/lib/speech';
+import { useAuth } from '@/lib/auth';
 import { useStore } from '@/lib/store';
 import { useTheme } from '@/theme';
 import { BrandMark, Button, MicOrb, Screen, Txt, type MicState } from '@/ui';
 
 export default function HomeScreen() {
-  const { language, state, district, reset } = useStore();
+  const { language, state, district } = useStore();
+  const { user } = useAuth();
   const { c, radius, elevation } = useTheme();
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const recState = useAudioRecorderState(recorder);
@@ -62,7 +64,14 @@ export default function HomeScreen() {
         Alert.alert(t.noConnection);
         return;
       }
-      const result = await converse({ ...payload, language: language!, state, district, channel: 'APP' });
+      const result = await converse({
+        ...payload,
+        language: language!,
+        state,
+        district,
+        channel: 'APP',
+        userId: user?.id,
+      });
       setLastResult(result);
       setShowType(false);
       setTyped('');
@@ -92,10 +101,7 @@ export default function HomeScreen() {
   }
 
   function changeLanguage() {
-    Alert.alert(t.changeLanguage, undefined, [
-      { text: '✕', style: 'cancel' },
-      { text: '✓', onPress: () => reset() },
-    ]);
+    router.push('/language');
   }
 
   return (

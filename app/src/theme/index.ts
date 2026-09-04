@@ -1,4 +1,3 @@
-import { useColorScheme } from 'react-native';
 import {
   palette,
   gradients,
@@ -21,7 +20,11 @@ export interface Theme {
 }
 
 export function useTheme(): Theme {
-  const scheme: Scheme = useColorScheme() === 'dark' ? 'dark' : 'light';
+  // Saksham runs a single light theme by design (app.json pins
+  // userInterfaceStyle to "light" too) — simplest and most legible for
+  // low-literacy, outdoor/bright-sunlight use. Dark tokens stay in tokens.ts
+  // for whenever that changes.
+  const scheme: Scheme = 'light';
   return {
     scheme,
     c: palette[scheme],
