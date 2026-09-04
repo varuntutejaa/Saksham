@@ -1,4 +1,4 @@
-import { hasBhashini } from "../lib/env.js";
+import { env, hasBhashini, hasSarvam } from "../lib/env.js";
 import type { Language } from "@prisma/client";
 
 /**
@@ -13,7 +13,7 @@ import type { Language } from "@prisma/client";
 export interface TranscribeResult {
   transcript: string;
   language: Language;
-  provider: "bhashini" | "mock";
+  provider: "sarvam" | "bhashini" | "mock";
   confidence: number;
 }
 
@@ -31,18 +31,91 @@ const MOCK_TRANSCRIPTS: Record<string, string> = {
   en: "i make clay pots and matka in my village and i also know tailoring",
 };
 
+const SARVAM_STT_URL = "https://api.sarvam.ai/speech-to-text";
+
+const SARVAM_LANGUAGE_CODES: Record<Language, string> = {
+  en: "en-IN",
+  hi: "hi-IN",
+  bn: "bn-IN",
+  ta: "ta-IN",
+  te: "te-IN",
+  mr: "mr-IN",
+  kn: "kn-IN",
+  gu: "gu-IN",
+  pa: "pa-IN",
+  or: "od-IN",
+};
+
+const LANGUAGE_BY_SARVAM_CODE: Record<string, Language> = Object.fromEntries(
+  Object.entries(SARVAM_LANGUAGE_CODES).map(([language, sarvamCode]) => [sarvamCode, language as Language]),
+) as Record<string, Language>;
+
+interface SarvamSpeechResponse {
+  transcript?: string;
+  language_code?: string | null;
+  language_probability?: number | null;
+}
+
+interface TranscribeOptions {
+  autoDetect?: boolean;
+  mimeType?: string;
+  fileName?: string;
+}
+
 export async function transcribeAudio(
-  _audio: Buffer | undefined,
+  audio: Buffer | undefined,
   language: Language = "hi",
+  options: TranscribeOptions = {},
 ): Promise<TranscribeResult> {
+  if (hasSarvam && audio?.length) {
+    return callSarvamASR(audio, language, options);
+  }
   if (hasBhashini) {
-    // return callBhashiniASR(_audio, language)
+    // return callBhashiniASR(audio, language)
   }
   return {
     transcript: MOCK_TRANSCRIPTS[language] ?? MOCK_TRANSCRIPTS.hi,
     language,
     provider: "mock",
     confidence: 0.82,
+  };
+}
+
+async function callSarvamASR(
+  audio: Buffer,
+  language: Language,
+  options: TranscribeOptions,
+): Promise<TranscribeResult> {
+  const form = new FormData();
+  const mimeType = options.mimeType ?? "audio/m4a";
+  const fileName = options.fileName ?? "speech.m4a";
+  const audioCopy = new Uint8Array(audio.byteLength);
+  audioCopy.set(audio);
+  form.append("file", new Blob([audioCopy.buffer], { type: mimeType }), fileName);
+  form.append("model", "saaras:v3");
+  form.append("mode", "transcribe");
+  form.append("language_code", options.autoDetect ? "unknown" : SARVAM_LANGUAGE_CODES[language]);
+
+  const res = await fetch(SARVAM_STT_URL, {
+    method: "POST",
+    headers: { "api-subscription-key": env.sarvamApiKey },
+    body: form,
+  });
+
+  if (!res.ok) {
+    throw new Error(`Sarvam transcription failed ${res.status}: ${await res.text()}`);
+  }
+
+  const body = (await res.json()) as SarvamSpeechResponse;
+  const transcript = body.transcript?.trim();
+  if (!transcript) throw new Error("Sarvam returned an empty transcript");
+
+  const detectedLanguage = body.language_code ? LANGUAGE_BY_SARVAM_CODE[body.language_code] : undefined;
+  return {
+    transcript,
+    language: detectedLanguage ?? language,
+    provider: "sarvam",
+    confidence: body.language_probability ?? 0.9,
   };
 }
 

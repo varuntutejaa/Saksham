@@ -20,7 +20,7 @@ import {
   useAudioRecorderState,
 } from 'expo-audio';
 
-import { converse } from '@/lib/api';
+import { converse, type LanguageCode } from '@/lib/api';
 import { LANGUAGES, UI_STRINGS } from '@/constants/languages';
 import { setLastResult } from '@/lib/session';
 import { speak, stopSpeaking } from '@/lib/speech';
@@ -36,7 +36,7 @@ type AgentMessage = {
 };
 
 export default function SpeakScreen() {
-  const { language, state, district } = useStore();
+  const { language, setLanguage, state, district } = useStore();
   const { user } = useAuth();
   const { c, radius, elevation } = useTheme();
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
@@ -74,17 +74,20 @@ export default function SpeakScreen() {
           ? t.agentTapToTalk
           : t.tapToSpeak;
 
-  async function submit(payload: { transcript?: string; audioUri?: string }) {
+  async function submit(payload: { transcript?: string; audioUri?: string }, turnLanguage: LanguageCode = language!) {
     setBusy(true);
     try {
       const result = await converse({
         ...payload,
-        language: language!,
+        language: turnLanguage,
         state,
         district,
         channel: 'APP',
         userId: user?.id,
+        history: agentMessages,
+        autoDetectLanguage: true,
       });
+      if (result.language && result.language !== language) await setLanguage(result.language);
       setLastResult(result);
       setShowType(false);
       setTyped('');
@@ -109,7 +112,7 @@ export default function SpeakScreen() {
     await submit({ transcript: clean });
   }
 
-  async function runAgentTurn(text: string) {
+  async function runAgentTurn(text: string, turnLanguage: LanguageCode = language!) {
     const clean = text.trim();
     if (!clean) return;
 
@@ -121,16 +124,20 @@ export default function SpeakScreen() {
     try {
       const result = await converse({
         transcript: clean,
-        language: language!,
+        language: turnLanguage,
         state,
         district,
         channel: 'APP',
         userId: user?.id,
+        history: agentMessages,
+        autoDetectLanguage: true,
       });
+      const replyLanguage = result.language ?? turnLanguage;
+      if (result.language && result.language !== language) await setLanguage(result.language);
       setLastResult(result);
       const replyText = result.reply.text || t.agentFallbackReply;
       setAgentMessages((messages) => messages.concat({ role: 'assistant', text: replyText }));
-      speak(replyText, language!);
+      speak(replyText, replyLanguage);
     } catch (e) {
       Alert.alert(t.tryAgain, String(e));
     } finally {
@@ -150,7 +157,9 @@ export default function SpeakScreen() {
       setTranscribing(true);
       try {
         const result = await transcribeWithSarvam(audioUri, language!);
-        if (agentMode) await runAgentTurn(result.transcript);
+        const detectedLanguage = result.languageCode ?? language!;
+        if (result.languageCode && result.languageCode !== language) await setLanguage(result.languageCode);
+        if (agentMode) await runAgentTurn(result.transcript, detectedLanguage);
         else {
           setTranscript(result.transcript);
           setShowType(false);

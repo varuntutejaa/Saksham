@@ -11,6 +11,30 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 *
 
 const LANGS = ["hi", "en", "bn", "ta", "te", "mr", "kn", "gu", "pa", "or"] as const;
 
+type ConversationMessage = {
+  role: "user" | "assistant";
+  text: string;
+};
+
+function parseHistory(raw: unknown): ConversationMessage[] {
+  if (typeof raw !== "string" || !raw.trim()) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter(
+        (message): message is ConversationMessage =>
+          message &&
+          (message.role === "user" || message.role === "assistant") &&
+          typeof message.text === "string" &&
+          message.text.trim().length > 0,
+      )
+      .slice(-8);
+  } catch {
+    return [];
+  }
+}
+
 /**
  * POST /api/assistant/converse
  * The full voice-first pipeline in one round trip (keeps requests low on a weak
@@ -28,34 +52,48 @@ assistantRouter.post("/converse", upload.single("audio"), async (req, res) => {
     userId: z.string().optional(),
     channel: z.enum(["APP", "WEB", "IVR"]).default("APP"),
     bandwidthKbps: z.coerce.number().int().positive().optional(),
+    history: z.string().optional(),
+    autoDetectLanguage: z.coerce.boolean().default(true),
   });
   const parsed = schema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
-  const { language, state, district, userId, channel, bandwidthKbps } = parsed.data;
+  const { language, state, district, userId, channel, bandwidthKbps, autoDetectLanguage } = parsed.data;
+  const history = parseHistory(parsed.data.history);
+  let effectiveLanguage = language;
 
   // 1. Speech -> text
   let transcript = parsed.data.transcript;
   let sttProvider: string | undefined;
   let sttConfidence: number | undefined;
   if (!transcript) {
-    const stt = await transcribeAudio(req.file?.buffer, language);
+    const stt = await transcribeAudio(req.file?.buffer, language, {
+      autoDetect: autoDetectLanguage,
+      mimeType: req.file?.mimetype,
+      fileName: req.file?.originalname,
+    });
     transcript = stt.transcript;
+    effectiveLanguage = stt.language;
     sttProvider = stt.provider;
     sttConfidence = stt.confidence;
   }
 
   // 2. Text -> NSQF qualifications
-  const mappings = await mapTranscriptToNsqf(transcript);
+  const recentUserContext = history
+    .filter((message) => message.role === "user")
+    .map((message) => message.text)
+    .join(" ");
+  const mappingTranscript = [recentUserContext, transcript].filter(Boolean).join(" ");
+  const mappings = await mapTranscriptToNsqf(mappingTranscript);
 
   // 3. NSQF + location -> PM-AJAY programmes
-  const recommendations = await recommendPrograms({ mappings, state, district, language });
+  const recommendations = await recommendPrograms({ mappings, state, district, language: effectiveLanguage });
 
   // 4. Persist the session for the admin dashboard
   const session = await prisma.voiceSession.create({
     data: {
       userId: userId || null,
       channel,
-      language,
+      language: effectiveLanguage,
       rawTranscript: transcript,
       detectedSkills: mappings.map((m) => m.normalizedSkill).filter((s) => s !== "unknown"),
       bandwidthKbps: bandwidthKbps ?? null,
@@ -85,19 +123,49 @@ assistantRouter.post("/converse", upload.single("audio"), async (req, res) => {
   });
 
   // 5. Build the spoken reply
-  const spokenText = buildSpokenReply(language, mappings, recommendations);
-  const audio = await synthesizeSpeech(spokenText, language);
+  const spokenText = buildSpokenReply(effectiveLanguage, mappings, recommendations);
+  const audio = await synthesizeSpeech(spokenText, effectiveLanguage);
 
   res.json({
     sessionId: session.id,
     transcript,
-    stt: sttProvider ? { provider: sttProvider, confidence: sttConfidence } : undefined,
+    language: effectiveLanguage,
+    stt: sttProvider ? { provider: sttProvider, confidence: sttConfidence, language: effectiveLanguage } : undefined,
     mappings,
     recommendations: recommendations.map((r, i) => ({
       ...r,
       recommendationId: session.recommendations[i]?.id,
     })),
     reply: { text: spokenText, audioUrl: audio.audioUrl, format: audio.format },
+  });
+});
+
+/**
+ * POST /api/assistant/transcribe
+ * Transcribes one uploaded recording. The mobile app uses this so the Sarvam
+ * secret can live on the server instead of being baked into the Expo bundle.
+ */
+assistantRouter.post("/transcribe", upload.single("audio"), async (req, res) => {
+  const schema = z.object({
+    language: z.enum(LANGS).default("hi"),
+    autoDetectLanguage: z.coerce.boolean().default(true),
+  });
+  const parsed = schema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  if (!req.file?.buffer) return res.status(400).json({ error: "Audio file is required" });
+
+  const stt = await transcribeAudio(req.file.buffer, parsed.data.language, {
+    autoDetect: parsed.data.autoDetectLanguage,
+    mimeType: req.file?.mimetype,
+    fileName: req.file?.originalname,
+  });
+
+  res.json({
+    transcript: stt.transcript,
+    language: stt.language,
+    languageCode: stt.language,
+    languageProbability: stt.confidence,
+    stt: { provider: stt.provider, confidence: stt.confidence, language: stt.language },
   });
 });
 

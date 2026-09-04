@@ -88,10 +88,16 @@ export async function getPrograms(params: { state?: string; district?: string } 
 export interface ConverseResponse {
   sessionId: string;
   transcript: string;
-  stt?: { provider: string; confidence: number };
+  language?: LanguageCode;
+  stt?: { provider: string; confidence: number; language?: LanguageCode };
   mappings: NsqfMapping[];
   recommendations: ProgramRecommendation[];
   reply: { text: string; audioUrl: string; format: string };
+}
+
+export interface ConversationMessage {
+  role: 'user' | 'assistant';
+  text: string;
 }
 
 interface ConverseInput {
@@ -103,6 +109,8 @@ interface ConverseInput {
   userId?: string;
   channel?: 'APP' | 'WEB' | 'IVR';
   bandwidthKbps?: number;
+  history?: ConversationMessage[];
+  autoDetectLanguage?: boolean;
 }
 
 export async function converse(input: ConverseInput): Promise<ConverseResponse> {
@@ -114,6 +122,8 @@ export async function converse(input: ConverseInput): Promise<ConverseResponse> 
   if (input.district) form.append('district', input.district);
   if (input.userId) form.append('userId', input.userId);
   if (input.bandwidthKbps) form.append('bandwidthKbps', String(input.bandwidthKbps));
+  if (input.history?.length) form.append('history', JSON.stringify(input.history.slice(-8)));
+  form.append('autoDetectLanguage', String(input.autoDetectLanguage ?? true));
   if (input.audioUri) {
     // React Native's FormData accepts a { uri, name, type } file descriptor.
     form.append('audio', {
@@ -132,7 +142,7 @@ export async function converse(input: ConverseInput): Promise<ConverseResponse> 
     return res.json();
   } catch {
     if (!input.transcript) throw new Error('Assistant server is unavailable');
-    return localConverse(input.transcript, input.language, input.state, input.district);
+    return localConverse(input.transcript, input.language, input.state, input.district, input.history);
   }
 }
 
@@ -238,8 +248,13 @@ function localConverse(
   language: LanguageCode,
   state?: string,
   district?: string,
+  history: ConversationMessage[] = [],
 ): ConverseResponse {
-  const text = transcript.toLowerCase();
+  const historyText = history
+    .filter((message) => message.role === 'user')
+    .map((message) => message.text)
+    .join(' ');
+  const text = `${historyText} ${transcript}`.toLowerCase();
   const matches = LOCAL_SKILLS.filter((skill) =>
     skill.patterns.some((pattern) => text.includes(pattern.toLowerCase())),
   );
