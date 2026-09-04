@@ -7,7 +7,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-na
 import { useTheme } from '@/theme';
 import { Txt } from './Txt';
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'success' | 'green';
+type Variant = 'primary' | 'secondary' | 'ghost' | 'success' | 'green' | 'danger';
 type Size = 'md' | 'lg';
 
 // Matches the leaves in the Saksham mark.
@@ -49,14 +49,18 @@ export function Button({
       ? c.onPrimary
       : variant === 'ghost'
         ? c.primary
-        : c.text;
+        : variant === 'danger'
+          ? c.danger
+          : c.text;
 
   const surface: ViewStyle =
     variant === 'secondary'
       ? { backgroundColor: c.surfaceAlt, borderWidth: 1, borderColor: c.border }
       : variant === 'ghost'
         ? { backgroundColor: 'transparent' }
-        : {};
+        : variant === 'danger'
+          ? { backgroundColor: c.dangerSoft, borderWidth: 1, borderColor: c.danger }
+          : {};
 
   function press() {
     if (disabled || loading) return;

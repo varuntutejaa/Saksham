@@ -57,6 +57,27 @@ authRouter.get("/me", authenticate, async (req, res) => {
   res.json({ user: safeUser(user) });
 });
 
+const profileSchema = z.object({
+  gender: z.enum(["male", "female", "other"]).optional(),
+  age: z.number().int().min(10).max(100).optional(),
+  education: z
+    .enum(["below_10th", "10th", "12th", "iti_diploma", "undergrad", "postgrad"])
+    .optional(),
+  onboarded: z.boolean().optional(),
+});
+
+/** PATCH /api/auth/profile — fill in the post-signup gender/age/education questions. */
+authRouter.patch("/profile", authenticate, async (req, res) => {
+  const parsed = profileSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+
+  const user = await prisma.user.update({
+    where: { id: req.auth!.userId },
+    data: parsed.data,
+  });
+  res.json({ user: safeUser(user) });
+});
+
 function safeUser<T extends { passwordHash: string | null }>(user: T) {
   const { passwordHash, ...rest } = user;
   return rest;

@@ -52,6 +52,8 @@ model User {
   language      Language @default(hi)
   gender        String?
   age           Int?
+  education     String? // below_10th | 10th | 12th | iti_diploma | undergrad | postgrad — self-declared
+  onboarded     Boolean  @default(false) // has completed the post-signup profile questions
   category      String? // SC / ST / OBC / GEN — self-declared
   state         String?
   district      String?

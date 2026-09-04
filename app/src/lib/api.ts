@@ -139,12 +139,19 @@ export async function setRecommendationStatus(id: string, status: string): Promi
   });
 }
 
+export type Gender = 'male' | 'female' | 'other';
+export type Education = 'below_10th' | '10th' | '12th' | 'iti_diploma' | 'undergrad' | 'postgrad';
+
 export interface AuthUser {
   id: string;
   name: string | null;
   phone: string | null;
   role: 'BENEFICIARY' | 'ADMIN';
   language: LanguageCode;
+  gender?: Gender | null;
+  age?: number | null;
+  education?: Education | null;
+  onboarded?: boolean;
 }
 
 interface AuthResponse {
@@ -174,6 +181,19 @@ export async function register(input: {
     body: JSON.stringify({ ...input, role: 'BENEFICIARY' }),
   });
   if (!res.ok) throw new Error(await extractError(res, 'Could not create account'));
+  return res.json();
+}
+
+export async function updateProfile(
+  token: string,
+  input: { gender?: Gender; age?: number; education?: Education; onboarded?: boolean },
+): Promise<{ user: AuthUser }> {
+  const res = await fetch(`${API_BASE}/api/auth/profile`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(input),
+  });
+  if (!res.ok) throw new Error(await extractError(res, 'Could not save your answer'));
   return res.json();
 }
 

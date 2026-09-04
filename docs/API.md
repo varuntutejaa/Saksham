@@ -39,6 +39,18 @@ stores the token in `localStorage` under `saksham.admin.token`
 ### `GET /api/auth/me`  *(bearer)*
 `200 { "user": { ... } }`
 
+### `PATCH /api/auth/profile`  *(bearer)*
+Fills in the post-signup onboarding questions (gender/age/education) asked by
+the app right after login/register. All fields optional so each of the three
+onboarding screens can call it incrementally, or send all three + `onboarded`
+at once (what the app actually does, on the last screen).
+```jsonc
+// request
+{ "gender": "female", "age": 30, "education": "undergrad", "onboarded": true }
+// 200 { "user": { ...gender, age, education, onboarded... } }
+```
+`gender`: `male|female|other`. `education`: `below_10th|10th|12th|iti_diploma|undergrad|postgrad`.
+
 ---
 
 ## Assistant (the core pipeline)

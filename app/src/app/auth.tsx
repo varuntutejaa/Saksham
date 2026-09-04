@@ -13,7 +13,7 @@ type Tab = 'login' | 'signup';
 
 export default function AuthScreen() {
   const { language } = useStore();
-  const { token, login, register } = useAuth();
+  const { token, user, login, register } = useAuth();
   const { c, radius } = useTheme();
   const t = language ? UI_STRINGS[language] : UI_STRINGS.hi;
 
@@ -25,7 +25,10 @@ export default function AuthScreen() {
   const [error, setError] = useState<string | null>(null);
 
   if (!language) return <Redirect href="/language" />;
-  if (token) return <Redirect href="/main" />;
+  // once signed in, send new/incomplete profiles through onboarding once —
+  // handled here (not with an imperative router call in submit()) so it can
+  // never race the login/register state update.
+  if (token) return <Redirect href={user?.onboarded ? '/main' : '/onboarding'} />;
 
   async function submit() {
     setError(null);
@@ -40,7 +43,6 @@ export default function AuthScreen() {
       } else {
         await register({ phone: phone.trim(), password, name: name.trim() || undefined, language: language! });
       }
-      router.replace('/main');
     } catch (e) {
       setError(e instanceof Error ? e.message : t.authError);
     } finally {

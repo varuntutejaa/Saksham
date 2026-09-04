@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import * as api from '@/lib/api';
-import type { AuthUser, LanguageCode } from '@/lib/api';
+import type { AuthUser, Education, Gender, LanguageCode } from '@/lib/api';
 
 interface Session {
   token: string;
@@ -14,6 +14,7 @@ interface AuthValue {
   user: AuthUser | null;
   login: (phone: string, password: string) => Promise<void>;
   register: (input: { phone: string; password: string; name?: string; language: LanguageCode }) => Promise<void>;
+  updateProfile: (input: { gender?: Gender; age?: number; education?: Education; onboarded?: boolean }) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -49,6 +50,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       register: async (input) => {
         const res = await api.register(input);
         await persist(res);
+      },
+      updateProfile: async (input) => {
+        if (!session) throw new Error('Not signed in');
+        const res = await api.updateProfile(session.token, input);
+        await persist({ token: session.token, user: res.user });
       },
       logout: () => persist(null),
     }),

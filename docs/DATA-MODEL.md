@@ -32,6 +32,12 @@ bcrypt. Carries `language`, `category` (SC/ST/…, self-declared), and
 can be created implicitly-free (a session may have `userId: null` for anonymous
 walk-up use).
 
+`gender`, `age`, `education` (`below_10th|10th|12th|iti_diploma|undergrad|postgrad`)
+are filled in by the app's post-signup onboarding screens
+(`app/src/app/onboarding/`) via `PATCH /api/auth/profile`, which also flips
+`onboarded` to `true`. The app checks that flag right after login/register to
+decide whether to route through onboarding or straight to `/main`.
+
 ### `VoiceSession`
 One conversation with the assistant. `rawTranscript` = STT output,
 `detectedSkills` = normalized skill tokens found in it, `bandwidthKbps` = measured

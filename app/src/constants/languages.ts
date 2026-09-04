@@ -106,6 +106,30 @@ export interface Strings {
   locating: string;
   locationDenied: string;
   changeLocation: string;
+  // onboarding (post-signup profile questions)
+  onboardIntroTitle: string;
+  onboardIntroBody: string;
+  onboardStart: string;
+  onboardSkip: string;
+  stepLabel: string; // must contain "{n}"
+  genderQuestion: string;
+  genderMale: string;
+  genderFemale: string;
+  genderOther: string;
+  ageQuestion: string;
+  yearsSuffix: string;
+  eduQuestion: string;
+  eduBelow10th: string;
+  edu10th: string;
+  edu12th: string;
+  eduIti: string;
+  eduUndergrad: string;
+  eduPostgrad: string;
+  onboardDoneTitle: string;
+  onboardDoneBody: string;
+  onboardContinue: string;
+  next: string;
+  back: string;
 }
 
 const hi: Strings = {
@@ -186,6 +210,29 @@ const hi: Strings = {
   locating: 'लोकेशन खोज रहे हैं…',
   locationDenied: 'लोकेशन की अनुमति नहीं मिली',
   changeLocation: 'लोकेशन बदलें',
+  onboardIntroTitle: 'आपको बेहतर तरीके से जानना चाहते हैं',
+  onboardIntroBody: 'बस 3 छोटे सवाल — इससे हम आपके लिए सही प्रशिक्षण और योजनाएं ढूंढ पाएंगे।',
+  onboardStart: 'शुरू करें',
+  onboardSkip: 'अभी छोड़ें',
+  stepLabel: 'चरण {n} / 3',
+  genderQuestion: 'आपका लिंग?',
+  genderMale: 'पुरुष',
+  genderFemale: 'महिला',
+  genderOther: 'अन्य',
+  ageQuestion: 'आपकी उम्र?',
+  yearsSuffix: 'वर्ष',
+  eduQuestion: 'आप कहाँ तक पढ़े हैं?',
+  eduBelow10th: '10वीं से कम',
+  edu10th: '10वीं पास',
+  edu12th: '12वीं पास',
+  eduIti: 'आईटीआई / डिप्लोमा',
+  eduUndergrad: 'स्नातक (UG)',
+  eduPostgrad: 'स्नातकोत्तर (PG)',
+  onboardDoneTitle: 'सब तैयार है!',
+  onboardDoneBody: 'अब हम आपके लिए सही प्रशिक्षण सुझा सकते हैं।',
+  onboardContinue: 'आगे बढ़ें',
+  next: 'आगे',
+  back: 'पीछे',
 };
 
 const en: Strings = {
@@ -266,6 +313,29 @@ const en: Strings = {
   locating: 'Finding your location…',
   locationDenied: 'Location permission was not granted',
   changeLocation: 'Change location',
+  onboardIntroTitle: "Let's get to know you",
+  onboardIntroBody: 'Just 3 quick questions — this helps us find the right training and schemes for you.',
+  onboardStart: 'Start',
+  onboardSkip: 'Skip for now',
+  stepLabel: 'Step {n} of 3',
+  genderQuestion: 'What is your gender?',
+  genderMale: 'Male',
+  genderFemale: 'Female',
+  genderOther: 'Other',
+  ageQuestion: 'What is your age?',
+  yearsSuffix: 'years',
+  eduQuestion: 'How far did you study?',
+  eduBelow10th: 'Below 10th',
+  edu10th: '10th pass',
+  edu12th: '12th pass',
+  eduIti: 'ITI / Diploma',
+  eduUndergrad: 'Undergraduate',
+  eduPostgrad: 'Postgraduate',
+  onboardDoneTitle: "You're all set!",
+  onboardDoneBody: 'Now we can suggest the right training for you.',
+  onboardContinue: 'Continue',
+  next: 'Next',
+  back: 'Back',
 };
 
 const bn: Strings = {
