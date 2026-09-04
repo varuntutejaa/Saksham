@@ -123,7 +123,26 @@ export default function DashboardScreen() {
           )}
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(200).duration(400)}>
+        <Animated.View entering={FadeInDown.delay(180).duration(400)}>
+          <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12, borderColor: '#B7E4C7', backgroundColor: '#EAFBF1' }}>
+            <Ionicons name="logo-whatsapp" size={26} color="#149B63" />
+            <View style={{ flex: 1 }}>
+              <Txt variant="label" style={{ color: '#0F6B47' }}>
+                {t.whatsappTitle}
+              </Txt>
+              <Txt variant="caption" style={{ color: '#0F6B47', opacity: 0.85 }}>
+                {t.whatsappBody}
+              </Txt>
+            </View>
+            <View style={styles.comingSoonPill}>
+              <Txt variant="caption" style={{ color: '#0F6B47' }}>
+                {t.comingSoon}
+              </Txt>
+            </View>
+          </Card>
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.delay(220).duration(400)}>
           <Card index={2} style={{ gap: 10 }}>
             <View style={styles.row}>
               <Ionicons name="school-outline" size={20} color={c.primary} />
@@ -164,4 +183,11 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   locCardInner: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, flex: 1 },
   locBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  comingSoonPill: {
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: '#B7E4C7',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
 });

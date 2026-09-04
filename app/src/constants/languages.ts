@@ -162,6 +162,9 @@ export interface Strings {
   removePhoto: string;
   cancel: string;
   photoPermissionDenied: string;
+  whatsappTitle: string;
+  whatsappBody: string;
+  comingSoon: string;
 }
 
 const hi: Strings = {
@@ -296,6 +299,9 @@ const hi: Strings = {
   removePhoto: 'फ़ोटो हटाएं',
   cancel: 'रद्द करें',
   photoPermissionDenied: 'फ़ोटो एक्सेस की अनुमति नहीं मिली',
+  whatsappTitle: 'साक्षम AI अब व्हाट्सएप पर',
+  whatsappBody: 'व्हाट्सएप पर चैट करें या वॉइस नोट भेजें — ऐप की ज़रूरत नहीं',
+  comingSoon: 'जल्द आ रहा है',
 };
 
 const en: Strings = {
@@ -430,6 +436,9 @@ const en: Strings = {
   removePhoto: 'Remove photo',
   cancel: 'Cancel',
   photoPermissionDenied: 'Permission to access photos was not granted',
+  whatsappTitle: 'Saksham AI is now on WhatsApp',
+  whatsappBody: 'Chat or send a voice note — no app needed',
+  comingSoon: 'Coming soon',
 };
 
 const bn: Strings = {
@@ -564,6 +573,9 @@ const bn: Strings = {
   removePhoto: 'ছবি সরান',
   cancel: 'বাতিল করুন',
   photoPermissionDenied: 'ছবি অ্যাক্সেসের অনুমতি পাওয়া যায়নি',
+  whatsappTitle: 'সাক্ষম AI এখন হোয়াটসঅ্যাপে',
+  whatsappBody: 'চ্যাট করুন বা ভয়েস নোট পাঠান — অ্যাপের প্রয়োজন নেই',
+  comingSoon: 'শীঘ্রই আসছে',
 };
 
 const ta: Strings = {
@@ -698,6 +710,9 @@ const ta: Strings = {
   removePhoto: 'புகைப்படத்தை அகற்று',
   cancel: 'ரத்து செய்',
   photoPermissionDenied: 'புகைப்படங்களை அணுக அனுமதி கிடைக்கவில்லை',
+  whatsappTitle: 'சாக்ஷம் AI இப்போது வாட்ஸ்அப்பில்',
+  whatsappBody: 'அரட்டையடிக்கவும் அல்லது குரல் குறிப்பு அனுப்பவும் — ஆப் தேவையில்லை',
+  comingSoon: 'விரைவில் வருகிறது',
 };
 
 const te: Strings = {
@@ -832,6 +847,9 @@ const te: Strings = {
   removePhoto: 'ఫోటో తొలగించండి',
   cancel: 'రద్దు చేయండి',
   photoPermissionDenied: 'ఫోటోలను యాక్సెస్ చేయడానికి అనుమతి లభించలేదు',
+  whatsappTitle: 'సాక్షమ్ AI ఇప్పుడు వాట్సాప్‌లో',
+  whatsappBody: 'చాట్ చేయండి లేదా వాయిస్ నోట్ పంపండి — యాప్ అవసరం లేదు',
+  comingSoon: 'త్వరలో వస్తుంది',
 };
 
 const mr: Strings = {
@@ -966,6 +984,9 @@ const mr: Strings = {
   removePhoto: 'फोटो काढून टाका',
   cancel: 'रद्द करा',
   photoPermissionDenied: 'फोटो अ‍ॅक्सेस करण्याची परवानगी मिळाली नाही',
+  whatsappTitle: 'साक्षम AI आता व्हॉट्सअ‍ॅपवर',
+  whatsappBody: 'चॅट करा किंवा व्हॉइस नोट पाठवा — अ‍ॅपची गरज नाही',
+  comingSoon: 'लवकरच येत आहे',
 };
 
 const kn: Strings = {
@@ -1100,6 +1121,9 @@ const kn: Strings = {
   removePhoto: 'ಫೋಟೋ ತೆಗೆದುಹಾಕಿ',
   cancel: 'ರದ್ದುಮಾಡಿ',
   photoPermissionDenied: 'ಫೋಟೋಗಳನ್ನು ಪ್ರವೇಶಿಸಲು ಅನುಮತಿ ಸಿಗಲಿಲ್ಲ',
+  whatsappTitle: 'ಸಕ್ಷಮ್ AI ಈಗ ವಾಟ್ಸಾಪ್‌ನಲ್ಲಿ',
+  whatsappBody: 'ಚಾಟ್ ಮಾಡಿ ಅಥವಾ ಧ್ವನಿ ಸಂದೇಶ ಕಳುಹಿಸಿ — ಆಪ್ ಅಗತ್ಯವಿಲ್ಲ',
+  comingSoon: 'ಶೀಘ್ರದಲ್ಲೇ ಬರುತ್ತಿದೆ',
 };
 
 const gu: Strings = {
@@ -1234,6 +1258,9 @@ const gu: Strings = {
   removePhoto: 'ફોટો દૂર કરો',
   cancel: 'રદ કરો',
   photoPermissionDenied: 'ફોટો ઍક્સેસ કરવાની પરવાનગી મળી નહીં',
+  whatsappTitle: 'સક્ષમ AI હવે વોટ્સએપ પર',
+  whatsappBody: 'ચેટ કરો અથવા વોઇસ નોટ મોકલો — ઍપની જરૂર નથી',
+  comingSoon: 'જલ્દી આવી રહ્યું છે',
 };
 
 const pa: Strings = {
@@ -1368,6 +1395,9 @@ const pa: Strings = {
   removePhoto: 'ਫੋਟੋ ਹਟਾਓ',
   cancel: 'ਰੱਦ ਕਰੋ',
   photoPermissionDenied: 'ਫੋਟੋਆਂ ਤੱਕ ਪਹੁੰਚ ਦੀ ਇਜਾਜ਼ਤ ਨਹੀਂ ਮਿਲੀ',
+  whatsappTitle: 'ਸਕਸ਼ਮ AI ਹੁਣ ਵਟਸਐਪ ਤੇ',
+  whatsappBody: 'ਚੈਟ ਕਰੋ ਜਾਂ ਵੌਇਸ ਨੋਟ ਭੇਜੋ — ਐਪ ਦੀ ਲੋੜ ਨਹੀਂ',
+  comingSoon: 'ਜਲਦੀ ਆ ਰਿਹਾ ਹੈ',
 };
 
 const or: Strings = {
@@ -1502,6 +1532,9 @@ const or: Strings = {
   removePhoto: 'ଫଟୋ ହଟାନ୍ତୁ',
   cancel: 'ବାତିଲ୍ କରନ୍ତୁ',
   photoPermissionDenied: 'ଫଟୋ ଆକ୍ସେସ୍ ପାଇଁ ଅନୁମତି ମିଳିଲା ନାହିଁ',
+  whatsappTitle: 'ସକ୍ଷମ AI ବର୍ତ୍ତମାନ ହ୍ୱାଟସଆପ୍‌ରେ',
+  whatsappBody: 'ଚାଟ୍ କରନ୍ତୁ କିମ୍ବା ଭଏସ୍ ନୋଟ୍ ପଠାନ୍ତୁ — ଆପ୍ ଆବଶ୍ୟକ ନାହିଁ',
+  comingSoon: 'ଶୀଘ୍ର ଆସୁଛି',
 };
 
 export const UI_STRINGS: Record<LanguageCode, Strings> = {
