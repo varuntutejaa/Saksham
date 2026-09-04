@@ -20,6 +20,11 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: [
       "mitti ke bartan", "matka", "kumhar", "pottery", "clay pot", "ghara",
       "मिट्टी के बर्तन", "मटका", "कुम्हार", "chak", "potter",
+      "terracotta", "earthen pot", "diya banana", "kulhad", "bartan banata",
+      "মাটির হাঁড়ি", "মাটির বাসন", "কুমোর", "பானை", "மண் பானை", "குயவர்",
+      "మట్టి కుండ", "కుమ్మరి", "मातीची भांडी", "कुंभार", "ಮಣ್ಣಿನ ಪಾತ್ರೆ",
+      "ಕುಂಬಾರ", "માટીના વાસણ", "કુંભાર", "ਮਿੱਟੀ ਦੇ ਭਾਂਡੇ", "ਘੁਮਿਆਰ",
+      "ମାଟି ପାତ୍ର", "କୁମ୍ଭାର",
     ],
   },
   {
@@ -27,6 +32,11 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: [
       "silai", "silaai", "kapda silna", "darzi", "tailor", "stitching",
       "sewing", "सिलाई", "दर्जी", "blouse", "kurta silna",
+      "stiching", "stitch", "kapde silna", "kapde banana", "dress making",
+      "alteration", "embroidery machine", "सिलाई मशीन", "कपड़े सिलना",
+      "সেলাই", "দর্জি", "தையல்", "தையல்காரர்", "కుట్టు", "దర్జీ",
+      "शिलाई", "शिंपी", "ಹೊಲಿಗೆ", "ಟೈಲರ್", "સિલાઈ", "દરજી",
+      "ਸਿਲਾਈ", "ਦਰਜ਼ੀ", "ସିଲାଇ", "ଦରଜି",
     ],
   },
   {
@@ -34,6 +44,9 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: [
       "bunkar", "kapda bunna", "handloom", "weaving", "julaha", "loom",
       "बुनकर", "बुनाई", "saree bunna", "chadar bunna",
+      "weaver", "cloth weaving", "তাঁত", "তাঁতি", "நெசவு", "கைத்தறி",
+      "నేయడం", "చేనేత", "विणकाम", "हातमाग", "ನೇಯ್ಗೆ", "ಕೈಮಗ್ಗ",
+      "વણાટ", "હાથવણાટ", "ਬੁਣਾਈ", "ਹੱਥਕੱਤਾ", "ବୁଣା", "ହସ୍ତତନ୍ତ",
     ],
   },
   {
@@ -41,6 +54,9 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: [
       "chamda", "chamar", "jooti banana", "leather", "cobbler", "mochi",
       "चमड़ा", "मोची", "shoe making", "footwear",
+      "chappal banana", "shoe repair", "জুতো", "চামড়া", "தோல் வேலை",
+      "செருப்பு", "తోలు పని", "చెప్పులు", "चामडे", "चप्पल", "ಚರ್ಮ ಕೆಲಸ",
+      "ಚಪ್ಪಲಿ", "ચામડું", "ચંપલ", "ਚਮੜਾ", "ਜੁੱਤੀ", "ଚମଡ଼ା", "ଜୋତା",
     ],
   },
   {
@@ -48,6 +64,10 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: [
       "badhai", "lakdi ka kaam", "carpenter", "furniture banana", "wood work",
       "बढ़ई", "लकड़ी", "carpentry",
+      "woodwork", "furniture repair", "काठ", "সুতোার", "কাঠের কাজ",
+      "தச்சு", "மர வேலை", "వడ్రంగి", "చెక్క పని", "सुतार", "लाकडी काम",
+      "ಬಡಗಿ", "ಮರದ ಕೆಲಸ", "સુથાર", "લાકડાનું કામ", "ਤਰਖਾਣ", "ਲੱਕੜ ਦਾ ਕੰਮ",
+      "ବଢ଼େଇ", "କାଠ କାମ",
     ],
   },
   {
@@ -55,6 +75,10 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: [
       "raj mistri", "mistri", "diwar banana", "mason", "masonry", "construction",
       "राज मिस्त्री", "मिस्त्री", "brick", "plaster",
+      "brickwork", "cement ka kaam", "building work", "दीवार", "प्लास्टर",
+      "রাজমিস্ত্রি", "ইটের কাজ", "கட்டிட வேலை", "மேஸ்திரி", "తాపీ మేస్త్రీ",
+      "ఇటుక పని", "गवंडी", "बांधकाम", "ಮೇಸ್ತ್ರಿ", "ಕಟ್ಟಡ ಕೆಲಸ",
+      "કડિયો", "બાંધકામ", "ਰਾਜ ਮਿਸਤਰੀ", "ਇੱਟਾਂ ਦਾ ਕੰਮ", "ରାଜମିସ୍ତ୍ରୀ", "ଇଟା କାମ",
     ],
   },
   {
@@ -62,6 +86,9 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: [
       "kheti", "kisan", "farming", "fasal", "khet", "agriculture", "farmer",
       "खेती", "किसान", "फसल", "crop",
+      "खेती बाड़ी", "জমি চাষ", "কৃষক", "விவசாயம்", "விவசாயி",
+      "వ్యవసాయం", "రైతు", "शेती", "शेतकरी", "ಕೃಷಿ", "ರೈತ",
+      "ખેતી", "ખેડૂત", "ਖੇਤੀ", "ਕਿਸਾਨ", "ଚାଷ", "ଚାଷୀ",
     ],
   },
   {
@@ -69,6 +96,9 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: [
       "pashu palan", "gaay bhains", "doodh", "dairy", "cattle", "livestock",
       "पशुपालन", "दूध", "goat", "bakri palan",
+      "milk selling", "buffalo", "cow", "গরু", "দুধ", "மாடு", "பால்",
+      "పాలు", "ఆవు", "दूध विकतो", "गाय म्हैस", "ಹಾಲು", "ಹಸು",
+      "દૂધ", "ગાય ભેંસ", "ਦੁੱਧ", "ਗਾਂ ਮੱਝ", "ଦୁଧ", "ଗାଈ",
     ],
   },
   {
@@ -76,6 +106,10 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: [
       "parlour", "beauty parlour", "mehndi", "beautician", "salon",
       "पार्लर", "मेहंदी",
+      "makeup", "facial", "hair cutting", "বিউটি পার্লার", "মেহেদি",
+      "அழகு நிலையம்", "மெஹந்தி", "బ్యూటీ పార్లర్", "మెహందీ", "ब्यूटी पार्लर",
+      "मेंदी", "ಬ್ಯೂಟಿ ಪಾರ್ಲರ್", "ಮೆಹಂದಿ", "બ્યુટી પાર્લર", "મેહંદી",
+      "ਬਿਊਟੀ ਪਾਰਲਰ", "ਮੇਹੰਦੀ", "ବ୍ୟୁଟି ପାର୍ଲର", "ମେହେନ୍ଦି",
     ],
   },
   {
@@ -83,6 +117,11 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: [
       "achaar", "papad", "pickle", "food banana",
       "अचार", "पापड़", "catering", "halwai", "sweets", "namkeen",
+      "khana banana", "cooking", "snacks", "আচার", "পাঁপড়", "রান্না",
+      "ஊறுகாய்", "அப்பளம்", "சமையல்", "ఆవకాయ", "పప్పడం", "వంట",
+      "लोणचे", "पापड", "स्वयंपाक", "ಉಪ್ಪಿನಕಾಯಿ", "ಹಪ್ಪಳ", "ಅಡುಗೆ",
+      "અથાણું", "પાપડ", "રસોઈ", "ਅਚਾਰ", "ਪਾਪੜ", "ਰਸੋਈ",
+      "ଆଚାର", "ପାପଡ଼", "ରୋଷେଇ",
     ],
   },
   {
@@ -90,6 +129,10 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: [
       "bijli ka kaam", "electrician", "wiring", "bijli mistri", "electrical",
       "बिजली", "इलेक्ट्रीशियन", "motor repair",
+      "wire fitting", "house wiring", "electric repair", "বিদ্যুৎ", "ইলেকট্রিশিয়ান",
+      "மின்சாரம்", "எலக்ட்ரீஷியன்", "విద్యుత్", "ఎలక్ట్రీషియన్",
+      "वीज", "इलेक्ट्रिशियन", "ವಿದ್ಯುತ್", "ಎಲೆಕ್ಟ್ರಿಷಿಯನ್",
+      "વીજળી", "ઇલેક્ટ્રિશિયન", "ਬਿਜਲੀ", "ਇਲੈਕਟ੍ਰੀਸ਼ਨ", "ବିଦ୍ୟୁତ", "ଇଲେକ୍ଟ୍ରିସିଆନ",
     ],
   },
   {
@@ -97,6 +140,9 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: [
       "plumber", "nal ka kaam", "paip", "pipe fitting", "plumbing",
       "प्लंबर", "नल",
+      "water pipe", "tap fitting", "প্লাম্বার", "পাইপ", "பிளம்பர்", "குழாய்",
+      "ప్లంబర్", "పైపు", "नळ", "प्लंबिंग", "ಪ್ಲಂಬರ್", "ಪೈಪ್",
+      "પ્લમ્બર", "પાઈપ", "ਪਲੰਬਰ", "ਪਾਈਪ", "ପ୍ଲମ୍ବର", "ପାଇପ",
     ],
   },
   {
@@ -104,6 +150,8 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: [
       "welding", "welder", "loha jodna", "gate banana",
       "वेल्डिंग", "grill banana",
+      "iron welding", "metal joining", "ওয়েল্ডিং", "வெல்டிங்", "వెల్డింగ్",
+      "वेल्डर", "ವೆಲ್ಡಿಂಗ್", "વેલ્ડિંગ", "ਵੈਲਡਿੰਗ", "ୱେଲ୍ଡିଂ",
     ],
   },
   {
@@ -111,6 +159,9 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: [
       "mobile repair", "phone thik karna", "mobile theek", "handset repair",
       "मोबाइल रिपेयर",
+      "phone repair", "screen change", "মোবাইল মেরামত", "போன் ரிப்பேர்",
+      "మొబైల్ రిపేర్", "मोबाईल दुरुस्ती", "ಮೊಬೈಲ್ ರಿಪೇರಿ",
+      "મોબાઇલ રિપેર", "ਮੋਬਾਈਲ ਰਿਪੇਅਰ", "ମୋବାଇଲ ରିପେୟାର",
     ],
   },
   {
@@ -118,6 +169,10 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: [
       "driver", "gaadi chalana", "driving", "auto chalana", "taxi",
       "ड्राइवर", "गाड़ी चलाना",
+      "vehicle driving", "গাড়ি চালানো", "ড্রাইভার", "வண்டி ஓட்டுதல்",
+      "டிரைவர்", "డ్రైవింగ్", "డ్రైవర్", "गाडी चालवणे", "ಡ್ರೈವಿಂಗ್",
+      "ಚಾಲಕ", "ડ્રાઇવિંગ", "ડ્રાઇવર", "ਡਰਾਈਵਿੰਗ", "ਡਰਾਈਵਰ",
+      "ଗାଡ଼ି ଚଲାଇବା", "ଡ୍ରାଇଭର",
     ],
   },
   {
@@ -125,6 +180,9 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: [
       "baans", "bamboo", "tokri banana", "basket", "cane", "handicraft",
       "बांस", "टोकरी", "jute craft",
+      "basket weaving", "বাঁশ", "ঝুড়ি", "மூங்கில்", "கூடை", "వెదురు",
+      "బుట్ట", "बांबू", "टोपली", "ಬಿದಿರು", "ಬುಟ್ಟಿ", "વાંસ", "ટોપલી",
+      "ਬਾਂਸ", "ਟੋਕਰੀ", "ବାଂଶ", "ଟୋକେଇ",
     ],
   },
   {
@@ -132,6 +190,9 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: [
       "kadhai", "embroidery", "zari", "zardozi", "kaam wala kapda",
       "कढ़ाई", "जरी",
+      "hand embroidery", "সুচিকর্ম", "জরি", "எம்பிராய்டரி", "జరీ",
+      "ఎంబ్రాయిడరీ", "भरतकाम", "ಜರಿ", "ಕಸೂತಿ", "ભરતકામ", "જરી",
+      "ਕਢਾਈ", "ਜ਼ਰੀ", "ଏମ୍ବ୍ରୋଇଡରି", "ଜରି",
     ],
   },
   {
@@ -139,6 +200,10 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: [
       "safai", "ghar ka kaam", "housekeeping", "cleaning", "domestic work",
       "सफाई", "jhadu pocha",
+      "house cleaning", "घर की सफाई", "পরিষ্কার", "বাড়ির কাজ", "சுத்தம்",
+      "வீட்டு வேலை", "శుభ్రం", "ఇంటి పని", "घरकाम", "स्वच्छता",
+      "ಸ್ವಚ್ಛತೆ", "ಮನೆ ಕೆಲಸ", "સફાઈ", "ઘરકામ", "ਸਫਾਈ", "ਘਰ ਦਾ ਕੰਮ",
+      "ସଫା", "ଘର କାମ",
     ],
   },
   {
@@ -153,6 +218,9 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: [
       "dukan", "shop", "kirana", "retail", "sales", "billing",
       "दुकान", "किराना", "salesman",
+      "store work", "দোকান", "বিক্রি", "கடை", "விற்பனை", "దుకాణం",
+      "అమ్మకం", "दुकान", "विक्री", "ಅಂಗಡಿ", "ಮಾರಾಟ", "દુકાન",
+      "વેચાણ", "ਦੁਕਾਨ", "ਵਿਕਰੀ", "ଦୋକାନ", "ବିକ୍ରି",
     ],
   },
 
@@ -423,12 +491,60 @@ export const SKILL_LEXICON: LexiconEntry[] = [
 
 /** Extract normalized skill tokens from a free-text transcript. */
 export function extractSkills(transcript: string): string[] {
-  const hay = transcript.toLowerCase();
+  const hay = normalizeText(transcript);
   const found = new Set<string>();
   for (const entry of SKILL_LEXICON) {
-    if (entry.patterns.some((p) => hay.includes(p.toLowerCase()))) {
+    if (entry.patterns.some((p) => patternMatches(hay, normalizeText(p)))) {
       found.add(entry.normalized);
     }
   }
   return [...found];
+}
+
+function normalizeText(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFC")
+    .replace(/[^\p{L}\p{M}\p{N}\s]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function patternMatches(hay: string, pattern: string): boolean {
+  if (!pattern) return false;
+  if (hay.includes(pattern)) return true;
+  if (pattern.length < 6) return false;
+
+  const patternWords = pattern.split(" ").filter(Boolean);
+  if (patternWords.length > 1 && patternWords.every((word) => hay.includes(word))) return true;
+  if (!isLatinText(pattern)) return false;
+
+  const hayWords = hay.split(" ").filter((word) => word.length >= 4);
+  return hayWords.some((word) => isCloseWord(word, pattern));
+}
+
+function isLatinText(value: string): boolean {
+  return /^[a-z0-9\s]+$/.test(value);
+}
+
+function isCloseWord(word: string, pattern: string): boolean {
+  if (Math.abs(word.length - pattern.length) > 2) return false;
+  if (word.length < 5 || pattern.length < 5) return false;
+  return levenshtein(word, pattern) <= (pattern.length > 8 ? 2 : 1);
+}
+
+function levenshtein(a: string, b: string): number {
+  const dp = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+  for (let j = 1; j <= b.length; j += 1) dp[0][j] = j;
+  for (let i = 1; i <= a.length; i += 1) {
+    for (let j = 1; j <= b.length; j += 1) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      dp[i][j] = Math.min(
+        dp[i - 1][j] + 1,
+        dp[i][j - 1] + 1,
+        dp[i - 1][j - 1] + cost,
+      );
+    }
+  }
+  return dp[a.length][b.length];
 }
