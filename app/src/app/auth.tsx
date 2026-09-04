@@ -25,7 +25,7 @@ export default function AuthScreen() {
   const [error, setError] = useState<string | null>(null);
 
   if (!language) return <Redirect href="/language" />;
-  if (token) return <Redirect href="/home" />;
+  if (token) return <Redirect href="/main" />;
 
   async function submit() {
     setError(null);
@@ -40,7 +40,7 @@ export default function AuthScreen() {
       } else {
         await register({ phone: phone.trim(), password, name: name.trim() || undefined, language: language! });
       }
-      router.replace('/home');
+      router.replace('/main');
     } catch (e) {
       setError(e instanceof Error ? e.message : t.authError);
     } finally {
@@ -58,7 +58,7 @@ export default function AuthScreen() {
             style={[styles.iconBtn, { backgroundColor: c.surfaceAlt }]}>
             <Txt variant="h2">‹</Txt>
           </Pressable>
-          <Pressable onPress={() => router.replace('/home')} hitSlop={8}>
+          <Pressable onPress={() => router.replace('/main')} hitSlop={8}>
             <Txt variant="label" tone="primary">
               {t.continueGuest}
             </Txt>

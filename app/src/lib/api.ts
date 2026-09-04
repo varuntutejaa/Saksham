@@ -58,6 +58,33 @@ export interface ProgramRecommendation {
   rationale: string;
 }
 
+export interface Program {
+  id: string;
+  name: string;
+  nameHindi: string | null;
+  scheme: string;
+  component: string | null;
+  sector: string | null;
+  nsqfLevel: number | null;
+  mode: string;
+  durationWeeks: number | null;
+  stipend: boolean;
+  state: string | null;
+  district: string | null;
+  seatsAvailable: number | null;
+  contactPhone: string | null;
+  eligibilityNote: string | null;
+}
+
+export async function getPrograms(params: { state?: string; district?: string } = {}): Promise<Program[]> {
+  const qs = new URLSearchParams(
+    Object.entries(params).filter((e): e is [string, string] => Boolean(e[1])),
+  );
+  const res = await fetch(`${API_BASE}/api/programs${qs.toString() ? `?${qs}` : ''}`);
+  if (!res.ok) throw new Error(`programs ${res.status}`);
+  return res.json();
+}
+
 export interface ConverseResponse {
   sessionId: string;
   transcript: string;

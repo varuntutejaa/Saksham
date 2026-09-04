@@ -69,6 +69,28 @@ export interface Strings {
   seats: string;
   weeks: string;
   stipendYes: string;
+  // bottom nav + dashboard
+  navHome: string;
+  navSpeak: string;
+  navPrograms: string;
+  navProfile: string;
+  goodMorning: string;
+  goodAfternoon: string;
+  goodEvening: string;
+  guestLabel: string;
+  homeSubtitle: string;
+  speakCta: string;
+  speakCtaHint: string;
+  browsePrograms: string;
+  programsTitle: string;
+  programsSubtitle: string;
+  loadingPrograms: string;
+  profileTitle: string;
+  guestNotice: string;
+  createAccount: string;
+  logout: string;
+  languageLabel: string;
+  phoneLabel: string;
 }
 
 const hi: Strings = {
@@ -115,6 +137,27 @@ const hi: Strings = {
   seats: 'सीटें',
   weeks: 'सप्ताह',
   stipendYes: 'वजीफा',
+  navHome: 'होम',
+  navSpeak: 'बोलें',
+  navPrograms: 'प्रशिक्षण',
+  navProfile: 'प्रोफ़ाइल',
+  goodMorning: 'सुप्रभात',
+  goodAfternoon: 'नमस्कार',
+  goodEvening: 'शुभ संध्या',
+  guestLabel: 'साथी',
+  homeSubtitle: 'अपना हुनर बताइए और सरकारी प्रशिक्षण खोजिए',
+  speakCta: 'अपना हुनर बताएं',
+  speakCtaHint: 'बोलकर या लिखकर बताइए',
+  browsePrograms: 'सभी प्रशिक्षण देखें',
+  programsTitle: 'PM-AJAY प्रशिक्षण',
+  programsSubtitle: 'आपके लिए उपलब्ध कौशल प्रशिक्षण कार्यक्रम',
+  loadingPrograms: 'लोड हो रहा है…',
+  profileTitle: 'प्रोफ़ाइल',
+  guestNotice: 'आप बिना खाते के उपयोग कर रहे हैं',
+  createAccount: 'खाता बनाएं',
+  logout: 'लॉग आउट',
+  languageLabel: 'भाषा',
+  phoneLabel: 'मोबाइल नंबर',
 };
 
 const en: Strings = {
@@ -161,6 +204,27 @@ const en: Strings = {
   seats: 'seats',
   weeks: 'weeks',
   stipendYes: 'Stipend',
+  navHome: 'Home',
+  navSpeak: 'Speak',
+  navPrograms: 'Programs',
+  navProfile: 'Profile',
+  goodMorning: 'Good morning',
+  goodAfternoon: 'Good afternoon',
+  goodEvening: 'Good evening',
+  guestLabel: 'there',
+  homeSubtitle: 'Speak your skill and find government training',
+  speakCta: 'Tell us your skill',
+  speakCtaHint: 'Speak or type it in your language',
+  browsePrograms: 'Browse all programmes',
+  programsTitle: 'PM-AJAY Training',
+  programsSubtitle: 'Skilling programmes available for you',
+  loadingPrograms: 'Loading…',
+  profileTitle: 'Profile',
+  guestNotice: "You're using Saksham without an account",
+  createAccount: 'Create an account',
+  logout: 'Log out',
+  languageLabel: 'Language',
+  phoneLabel: 'Mobile number',
 };
 
 const bn: Strings = {

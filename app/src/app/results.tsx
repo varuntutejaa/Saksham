@@ -29,7 +29,7 @@ export default function ResultsScreen() {
   }, []);
 
   if (!language) return <Redirect href="/" />;
-  if (!result) return <Redirect href="/home" />;
+  if (!result) return <Redirect href="/main/speak" />;
 
   const known = result.mappings.filter((m) => m.title);
 
@@ -38,7 +38,7 @@ export default function ResultsScreen() {
       {/* header */}
       <View style={styles.header}>
         <Pressable
-          onPress={() => router.replace('/home')}
+          onPress={() => router.replace('/main/speak')}
           hitSlop={12}
           style={[styles.iconBtn, { backgroundColor: c.surfaceAlt }]}>
           <Ionicons name="arrow-back" size={20} color={c.text} />
@@ -110,7 +110,7 @@ export default function ResultsScreen() {
           />
         </View>
         <View style={{ flex: 1.2 }}>
-          <Button label={t.askAgain} size="md" icon="mic" onPress={() => router.replace('/home')} />
+          <Button label={t.askAgain} size="md" icon="mic" onPress={() => router.replace('/main/speak')} />
         </View>
       </View>
     </Screen>

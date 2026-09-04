@@ -17,11 +17,11 @@ export default function LanguageScreen() {
 
   if (!ready || !authReady) return null;
   // already onboarded — this screen is only for first pick or "change language"
-  if (language && token && !router.canGoBack()) return <Redirect href="/home" />;
+  if (language && token && !router.canGoBack()) return <Redirect href="/main" />;
 
   async function choose(code: (typeof LANGUAGES)[number]['code']) {
     await setLanguage(code);
-    router.replace(token ? '/home' : '/auth');
+    router.replace(token ? '/main' : '/auth');
   }
 
   return (

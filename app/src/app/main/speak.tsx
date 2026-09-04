@@ -1,4 +1,4 @@
-import { Redirect, router } from 'expo-router';
+import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
   Alert,
@@ -27,9 +27,9 @@ import { speak } from '@/lib/speech';
 import { useAuth } from '@/lib/auth';
 import { useStore } from '@/lib/store';
 import { useTheme } from '@/theme';
-import { BrandMark, Button, MicOrb, Screen, Txt, type MicState } from '@/ui';
+import { Button, MicOrb, Screen, Txt, type MicState } from '@/ui';
 
-export default function HomeScreen() {
+export default function SpeakScreen() {
   const { language, state, district } = useStore();
   const { user } = useAuth();
   const { c, radius, elevation } = useTheme();
@@ -51,7 +51,7 @@ export default function HomeScreen() {
     }
   }, [language]);
 
-  if (!language) return <Redirect href="/" />;
+  if (!language) return null;
 
   const micState: MicState = busy ? 'thinking' : recState.isRecording ? 'listening' : 'idle';
   const status = busy ? t.thinking : recState.isRecording ? t.listening : t.tapToSpeak;
@@ -105,18 +105,13 @@ export default function HomeScreen() {
   }
 
   return (
-    <Screen>
+    <Screen edges={['top']}>
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {/* top bar */}
         <View style={styles.topBar}>
-          <View style={styles.brandRow}>
-            <BrandMark size={26} color={c.primary} barColor="#fff" />
-            <Txt variant="h2" style={{ color: c.primary }}>
-              सक्षम
-            </Txt>
-          </View>
+          <Txt variant="h2">{t.navSpeak}</Txt>
           <Pressable
             onPress={changeLanguage}
             style={[styles.langChip, { backgroundColor: c.surfaceAlt, borderColor: c.border }]}>

@@ -19,7 +19,7 @@ export default function WelcomeScreen() {
     if (!ready) return;
     SplashScreen.hideAsync().catch(() => {});
     // returning, fully-onboarded user — skip straight to the assistant
-    if (language && token) router.replace('/home');
+    if (language && token) router.replace('/main');
   }, [ready, language, token]);
 
   if (!ready) return null;
