@@ -38,7 +38,7 @@ function audioMimeType(uri: string): string {
   if (lower.includes('.mp3')) return 'audio/mpeg';
   if (lower.includes('.wav')) return 'audio/wav';
   if (lower.includes('.aac')) return 'audio/aac';
-  return 'audio/m4a';
+  return 'audio/x-m4a';
 }
 
 function audioFileName(uri: string): string {

@@ -81,13 +81,20 @@ export async function transcribeAudio(
   };
 }
 
+/** `audio/m4a` isn't in Sarvam's accepted MIME list (it wants `audio/x-m4a`), but
+ *  that's exactly what iOS/Android report for m4a recordings — normalize it. */
+function normalizeMimeType(mimeType: string | undefined): string | undefined {
+  if (mimeType === "audio/m4a") return "audio/x-m4a";
+  return mimeType;
+}
+
 async function callSarvamASR(
   audio: Buffer,
   language: Language,
   options: TranscribeOptions,
 ): Promise<TranscribeResult> {
   const form = new FormData();
-  const mimeType = options.mimeType ?? "audio/m4a";
+  const mimeType = normalizeMimeType(options.mimeType) ?? "audio/x-m4a";
   const fileName = options.fileName ?? "speech.m4a";
   const audioCopy = new Uint8Array(audio.byteLength);
   audioCopy.set(audio);
