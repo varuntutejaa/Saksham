@@ -39,8 +39,13 @@ export default function SpeakScreen() {
   const { language, setLanguage, state, district } = useStore();
   const { user } = useAuth();
   const { c, radius, elevation } = useTheme();
-  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
-  const recState = useAudioRecorderState(recorder);
+  const recorder = useAudioRecorder({ ...RecordingPresets.HIGH_QUALITY, isMeteringEnabled: true });
+  const recState = useAudioRecorderState(recorder, 100);
+  // metering is in dBFS (~-50 quiet room floor to 0 clipping) — normalize to 0-1
+  // so the mic orb's swirl/pulse can react to the beneficiary's actual voice.
+  const micLevel = recState.isRecording
+    ? Math.min(1, Math.max(0, ((recState.metering ?? -50) + 50) / 50))
+    : 0;
   const [busy, setBusy] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -232,7 +237,7 @@ export default function SpeakScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
           <Animated.View entering={FadeIn.duration(500)} style={styles.micWrap}>
-            <MicOrb state={micState} onPress={toggleRecord} />
+            <MicOrb state={micState} onPress={toggleRecord} level={micLevel} />
             <View key={status}>
               <Txt variant="title" center style={{ marginTop: 4 }}>
                 {status}
