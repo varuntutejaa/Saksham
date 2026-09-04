@@ -129,7 +129,7 @@ export async function converse(input: ConverseInput): Promise<ConverseResponse> 
     form.append('audio', {
       uri: input.audioUri,
       name: 'speech.m4a',
-      type: 'audio/m4a',
+      type: 'audio/x-m4a',
     } as unknown as Blob);
   }
 

@@ -302,7 +302,7 @@ export default function SpeakScreen() {
             </Animated.View>
           )}
 
-          {transcript && !showType && (
+          {transcript.length > 0 && !showType && (
             <Animated.View
               entering={FadeInDown.duration(300)}
               style={[styles.transcriptBox, { backgroundColor: c.surface, borderColor: c.border }, elevation('card')]}>
