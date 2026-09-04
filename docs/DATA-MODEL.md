@@ -49,7 +49,26 @@ A National Skills Qualification Framework qualification pack. `qpCode` (e.g.
 `CON/Q0101`) is unique. `keywords: string[]` is the bridge from informal skills —
 the mapping engine matches a normalized skill token against this array. `sector`
 and `nsqfLevel` (1–10) also feed recommendation scoring. Seeded from
-[`server/prisma/seed.ts`](../server/prisma/seed.ts) (19 rows).
+[`server/prisma/data/nsqf-qualifications.ts`](../server/prisma/data/nsqf-qualifications.ts)
+— 78 qualification packs across 30 sectors. This is hand-curated reference
+data following NCVET's real QP-code convention (`<SSC-prefix>/Q<4 digits>`),
+**not a live sync with the government registry** — there is no public API for
+India's National Qualification Register (nqr.gov.in) to pull from. Every
+`keywords` token here must have a matching entry in
+[`server/src/services/skillLexicon.ts`](../server/src/services/skillLexicon.ts)
+that produces it (and vice versa) or the mapping breaks silently in one
+direction; there's no CI check for this — after editing either file, verify
+from `server/`:
+```bash
+node -e '
+const lex = require("fs").readFileSync("src/services/skillLexicon.ts","utf8");
+const nsqf = require("fs").readFileSync("prisma/data/nsqf-qualifications.ts","utf8");
+const lexTokens = new Set([...lex.matchAll(/normalized:\s*"([^"]+)"/g)].map(m=>m[1]));
+const kw = new Set([...nsqf.matchAll(/keywords:\s*\[([^\]]*)\]/g)].flatMap(m=>m[1].split(",").map(s=>s.trim().replace(/"/g,"")).filter(Boolean)));
+for (const t of lexTokens) if (!kw.has(t)) console.log("lexicon token with no qualification:", t);
+for (const k of kw) if (!lexTokens.has(k)) console.log("qualification keyword with no lexicon entry:", k);
+'
+```
 
 ### `SkillMapping`
 The recorded result of mapping one skill phrase in a session:
@@ -74,7 +93,7 @@ the funnel enum. The website's dashboard aggregates these.
 
 | What | Count | Where |
 |------|-------|-------|
-| NSQF qualifications | 19 | `seed.ts` `NSQF[]` |
+| NSQF qualifications | 78 (30 sectors) | `prisma/data/nsqf-qualifications.ts` |
 | PM-AJAY programmes | 12 | `seed.ts` `programs[]` |
 | Admin user | `9999900000` / `admin123` | `seed.ts` |
 | Beneficiary user | `9000000001` / `demo123` | `seed.ts` |

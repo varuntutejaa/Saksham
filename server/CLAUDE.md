@@ -27,7 +27,11 @@ src/
     i18n.ts          templated multilingual "why this" rationale
 prisma/
   schema.prisma    source of truth for the DB
-  seed.ts          19 NSQF quals + 12 PM-AJAY programmes + demo users (idempotent)
+  data/
+    nsqf-qualifications.ts   78 NSQF QPs across 30 sectors — every `keywords`
+                              token must round-trip with skillLexicon.ts (see
+                              the cross-check snippet in this file's header)
+  seed.ts          imports the above + 12 PM-AJAY programmes + demo users (idempotent)
 ```
 
 ## Rules
