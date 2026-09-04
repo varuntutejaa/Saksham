@@ -28,10 +28,13 @@ src/
 prisma/
   schema.prisma    source of truth for the DB
   data/
-    nsqf-qualifications.ts   78 NSQF QPs across 30 sectors — every `keywords`
-                              token must round-trip with skillLexicon.ts (see
-                              the cross-check snippet in this file's header)
-  seed.ts          imports the above + 12 PM-AJAY programmes + demo users (idempotent)
+    nsqf-qualifications.json  1,283 REAL NSQF QPs scraped from nqr.gov.in
+                               (see data/README.md for provenance) — only
+                               ~64 rows have a non-empty `keywords` (linked
+                               into skillLexicon.ts); most exist for
+                               breadth/browsing, not voice-mapping yet
+  seed.ts          wipes + reloads NsqfQualification from the above, then
+                   12 PM-AJAY programmes + demo users (idempotent)
 ```
 
 ## Rules

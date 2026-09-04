@@ -91,9 +91,11 @@ model NsqfQualification {
   titleHindi   String?
   sector       String // e.g. "Agriculture", "Handicrafts & Carpet"
   nsqfLevel    Int // 1–10
-  ssc          String? // Sector Skill Council
+  ssc          String? // Sector Skill Council / awarding body
   description  String?
   keywords     String[] // informal-skill keywords that map to this QP
+  notionalHours Int? // training duration per NQR, when known
+  nqrId        Int? @unique // nqr.gov.in qualification id, for traceability back to the source page
 
   mappings         SkillMapping[]
   trainingPrograms TrainingProgram[]

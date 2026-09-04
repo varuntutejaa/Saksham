@@ -45,30 +45,35 @@ client bandwidth (drives the "low-bandwidth sessions" KPI), `channel` = where it
 came from. Has many `SkillMapping` and `Recommendation`.
 
 ### `NsqfQualification`
-A National Skills Qualification Framework qualification pack. `qpCode` (e.g.
-`CON/Q0101`) is unique. `keywords: string[]` is the bridge from informal skills —
-the mapping engine matches a normalized skill token against this array. `sector`
-and `nsqfLevel` (1–10) also feed recommendation scoring. Seeded from
-[`server/prisma/data/nsqf-qualifications.ts`](../server/prisma/data/nsqf-qualifications.ts)
-— 78 qualification packs across 30 sectors. This is hand-curated reference
-data following NCVET's real QP-code convention (`<SSC-prefix>/Q<4 digits>`),
-**not a live sync with the government registry** — there is no public API for
-India's National Qualification Register (nqr.gov.in) to pull from. Every
-`keywords` token here must have a matching entry in
-[`server/src/services/skillLexicon.ts`](../server/src/services/skillLexicon.ts)
-that produces it (and vice versa) or the mapping breaks silently in one
-direction; there's no CI check for this — after editing either file, verify
-from `server/`:
-```bash
-node -e '
-const lex = require("fs").readFileSync("src/services/skillLexicon.ts","utf8");
-const nsqf = require("fs").readFileSync("prisma/data/nsqf-qualifications.ts","utf8");
-const lexTokens = new Set([...lex.matchAll(/normalized:\s*"([^"]+)"/g)].map(m=>m[1]));
-const kw = new Set([...nsqf.matchAll(/keywords:\s*\[([^\]]*)\]/g)].flatMap(m=>m[1].split(",").map(s=>s.trim().replace(/"/g,"")).filter(Boolean)));
-for (const t of lexTokens) if (!kw.has(t)) console.log("lexicon token with no qualification:", t);
-for (const k of kw) if (!lexTokens.has(k)) console.log("qualification keyword with no lexicon entry:", k);
-'
-```
+A National Skills Qualification Framework qualification pack. `qpCode` is
+unique. `keywords: string[]` is the bridge from informal skills — the mapping
+engine matches a normalized skill token against this array. `sector` and
+`nsqfLevel` (1–10) also feed recommendation scoring. `notionalHours` and `nqrId`
+(the qualification's numeric id on the source site) are extra fields from the
+real data, not used by the app logic yet.
+
+Seeded from
+[`server/prisma/data/nsqf-qualifications.json`](../server/prisma/data/nsqf-qualifications.json)
+— **1,283 real qualification packs**, scraped from India's official
+[National Qualification Register](https://www.nqr.gov.in) (nqr.gov.in, run by
+NCVET), across 29 livelihood-relevant sectors. Every `qpCode`, `title`,
+`sector`, `nsqfLevel`, `notionalHours` and `ssc` is real — see
+[`server/prisma/data/README.md`](../server/prisma/data/README.md) for exactly
+how it was captured (NQR has no API; the search UI is client-rendered but each
+qualification's own detail page is server-rendered, so it was scraped via a
+headless browser for the search results and a plain `fetch` per detail page
+for the code) and its known gaps (partial sector coverage, no Hindi titles,
+only ~64 rows linked into the voice-mapping lexicon).
+
+Only qualifications matched to one of
+[`server/src/services/skillLexicon.ts`](../server/src/services/skillLexicon.ts)'s
+normalized-skill tokens carry a non-empty `keywords` array — most of the 1,283
+rows exist for breadth/browsing/legitimacy but aren't (yet) reachable through
+the voice assistant's keyword match. Unlike the old hand-authored dataset,
+there's no invariant that every lexicon token has a matching qualification
+here — a token with no match simply falls through to "no confident match",
+same as any other unmapped skill; it doesn't mean the real qualification
+doesn't exist, only that this scrape didn't reach it.
 
 ### `SkillMapping`
 The recorded result of mapping one skill phrase in a session:
@@ -93,7 +98,7 @@ the funnel enum. The website's dashboard aggregates these.
 
 | What | Count | Where |
 |------|-------|-------|
-| NSQF qualifications | 78 (30 sectors) | `prisma/data/nsqf-qualifications.ts` |
+| NSQF qualifications | 1,283 real, scraped (29 sectors) | `prisma/data/nsqf-qualifications.json` |
 | PM-AJAY programmes | 12 | `seed.ts` `programs[]` |
 | Admin user | `9999900000` / `admin123` | `seed.ts` |
 | Beneficiary user | `9000000001` / `demo123` | `seed.ts` |

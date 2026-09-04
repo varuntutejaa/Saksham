@@ -1,13 +1,32 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { NSQF_QUALIFICATIONS } from "./data/nsqf-qualifications.js";
+import nsqfData from "./data/nsqf-qualifications.json" with { type: "json" };
 
 const prisma = new PrismaClient();
 
-/** NSQF qualifications keyed by the lexicon's normalized skill tokens. */
-const NSQF = NSQF_QUALIFICATIONS;
+/**
+ * 1,283 real NSQF qualifications scraped from nqr.gov.in — see
+ * prisma/data/README.md for provenance and known gaps.
+ */
+const NSQF = nsqfData as {
+  qpCode: string;
+  title: string;
+  titleHindi: string | null;
+  sector: string;
+  nsqfLevel: number;
+  ssc: string | null;
+  notionalHours: number | null;
+  keywords: string[];
+  nqrId: number;
+}[];
 
 async function main() {
+  console.log("Clearing old NSQF qualifications (replaced by the real nqr.gov.in scrape)…");
+  // qpCode formats differ from any earlier hand-authored batch, so upsert alone
+  // would leave stale rows behind — wipe the table first. Safe: both
+  // SkillMapping and TrainingProgram set their FK to null on delete.
+  await prisma.nsqfQualification.deleteMany({});
+
   console.log("Seeding NSQF qualifications…");
   const qualByKeyword = new Map<string, string>();
   for (const q of NSQF) {
