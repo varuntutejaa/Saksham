@@ -8,18 +8,26 @@ interface Props {
   children: ReactNode;
   /** 'plain' = flat background, 'hero' = gradient wash behind a curved header */
   variant?: 'plain' | 'hero';
+  /** override the hero wash colours (defaults to the theme's blue gradient) */
+  heroColors?: readonly [string, string, ...string[]];
   edges?: Edge[];
   style?: ViewStyle;
 }
 
-export function Screen({ children, variant = 'plain', edges = ['top', 'bottom'], style }: Props) {
+export function Screen({
+  children,
+  variant = 'plain',
+  heroColors,
+  edges = ['top', 'bottom'],
+  style,
+}: Props) {
   const { c, gradient } = useTheme();
 
   if (variant === 'hero') {
     return (
       <View style={[styles.flex, { backgroundColor: c.bg }]}>
         <LinearGradient
-          colors={gradient.hero}
+          colors={heroColors ?? gradient.hero}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.heroWash}

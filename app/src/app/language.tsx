@@ -8,7 +8,9 @@ import { speak } from '@/lib/speech';
 import { useAuth } from '@/lib/auth';
 import { useStore } from '@/lib/store';
 import { useTheme } from '@/theme';
-import { BrandMark, Screen, Txt } from '@/ui';
+import { Screen, Txt } from '@/ui';
+
+const HERO_GREEN = ['#2FAE60', '#1B7A43', '#0E4A29'] as const;
 
 export default function LanguageScreen() {
   const { ready, language, setLanguage } = useStore();
@@ -25,7 +27,7 @@ export default function LanguageScreen() {
   }
 
   return (
-    <Screen variant="hero" edges={['top']}>
+    <Screen variant="hero" heroColors={HERO_GREEN} edges={['top']}>
       <Animated.View entering={FadeIn.duration(450)} style={styles.hero}>
         {router.canGoBack() && (
           <Pressable
@@ -35,10 +37,7 @@ export default function LanguageScreen() {
             <Ionicons name="arrow-back" size={20} color="#fff" />
           </Pressable>
         )}
-        <View style={[styles.logoBadge, { backgroundColor: 'rgba(255,255,255,0.16)' }]}>
-          <BrandMark size={30} />
-        </View>
-        <Txt variant="title" tone="onPrimary" center>
+        <Txt variant="title" tone="onPrimary" center style={{ marginTop: 8 }}>
           Choose your language
         </Txt>
         <Txt variant="body" style={{ color: 'rgba(255,255,255,0.9)' }} center>
@@ -69,15 +68,10 @@ export default function LanguageScreen() {
                   },
                   elevation('card'),
                 ]}>
-                <Txt variant="caption" tone="faint" numberOfLines={1}>
+                <Txt variant="caption" tone="faint" style={styles.englishLabel}>
                   {l.english}
                 </Txt>
-                <Txt
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                  style={{ fontSize: 24, fontWeight: '600', color: c.text }}>
-                  {l.native}
-                </Txt>
+                <Txt style={[styles.nativeLabel, { color: c.text }]}>{l.native}</Txt>
               </Pressable>
             </Animated.View>
           ))}
@@ -99,14 +93,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  logoBadge: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 10,
-  },
   sheet: {
     flex: 1,
     borderTopLeftRadius: 30,
@@ -120,9 +106,13 @@ const styles = StyleSheet.create({
   langCard: {
     borderRadius: 18,
     borderWidth: 1.5,
-    paddingVertical: 20,
-    paddingHorizontal: 10,
+    paddingVertical: 18,
+    paddingHorizontal: 8,
     alignItems: 'center',
-    gap: 3,
+    justifyContent: 'center',
+    gap: 4,
+    minHeight: 92,
   },
+  englishLabel: { textAlign: 'center' },
+  nativeLabel: { fontSize: 22, fontWeight: '600', textAlign: 'center', lineHeight: 28 },
 });
