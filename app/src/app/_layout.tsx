@@ -27,6 +27,7 @@ export default function RootLayout() {
                 <Stack.Screen name="index" options={{ animation: 'fade' }} />
                 <Stack.Screen name="language" />
                 <Stack.Screen name="auth" />
+                <Stack.Screen name="forgot-password" />
                 <Stack.Screen name="onboarding" options={{ animation: 'fade' }} />
                 <Stack.Screen name="main" options={{ animation: 'fade' }} />
                 <Stack.Screen name="confirm" />

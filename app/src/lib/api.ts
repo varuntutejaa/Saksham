@@ -367,6 +367,33 @@ export async function register(input: {
   return res.json();
 }
 
+export interface ForgotPasswordResponse {
+  sent: boolean;
+  provider: 'mock' | 'sms';
+  /** only present when no SMS provider is configured server-side */
+  devOtp?: string;
+}
+
+export async function forgotPassword(phone: string): Promise<ForgotPasswordResponse> {
+  const res = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone }),
+  });
+  if (!res.ok) throw new Error(await extractError(res, 'No account found with this phone number'));
+  return res.json();
+}
+
+export async function resetPassword(phone: string, otp: string, newPassword: string): Promise<AuthResponse> {
+  const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone, otp, newPassword }),
+  });
+  if (!res.ok) throw new Error(await extractError(res, 'Incorrect code'));
+  return res.json();
+}
+
 export async function updateProfile(
   token: string,
   input: { gender?: Gender; age?: number; education?: Education; onboarded?: boolean },

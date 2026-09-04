@@ -14,6 +14,7 @@ interface AuthValue {
   user: AuthUser | null;
   login: (phone: string, password: string) => Promise<void>;
   register: (input: { phone: string; password: string; name?: string; language: LanguageCode }) => Promise<void>;
+  resetPassword: (phone: string, otp: string, newPassword: string) => Promise<void>;
   updateProfile: (input: { gender?: Gender; age?: number; education?: Education; onboarded?: boolean }) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -49,6 +50,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       register: async (input) => {
         const res = await api.register(input);
+        await persist(res);
+      },
+      resetPassword: async (phone, otp, newPassword) => {
+        const res = await api.resetPassword(phone, otp, newPassword);
         await persist(res);
       },
       updateProfile: async (input) => {

@@ -134,6 +134,17 @@ export default function AuthScreen() {
               variant="green"
               style={{ marginTop: 6 }}
             />
+
+            {tab === 'login' && (
+              <Pressable
+                onPress={() => router.push({ pathname: '/forgot-password', params: { phone } })}
+                hitSlop={8}
+                style={{ alignSelf: 'center', marginTop: 4 }}>
+                <Txt variant="label" tone="primary">
+                  {t.forgotPassword}
+                </Txt>
+              </Pressable>
+            )}
           </View>
         </Animated.View>
       </KeyboardAvoidingView>
