@@ -6,13 +6,11 @@ import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
 import { useAuth } from '@/lib/auth';
 import { useStore } from '@/lib/store';
-import { useTheme } from '@/theme';
 import { BrandMark, Button, Screen, Txt } from '@/ui';
 
 export default function WelcomeScreen() {
   const { ready: storeReady, language } = useStore();
   const { ready: authReady, token } = useAuth();
-  const { c, radius } = useTheme();
   const ready = storeReady && authReady;
 
   useEffect(() => {
@@ -28,11 +26,7 @@ export default function WelcomeScreen() {
     <Screen>
       <View style={styles.wrap}>
         <Animated.View entering={FadeIn.duration(600)} style={styles.brand}>
-          <View style={[styles.logoRing, { backgroundColor: c.primarySoft }]}>
-            <View style={[styles.logoBadge, { backgroundColor: c.primary }]}>
-              <BrandMark size={40} color="#fff" barColor={c.primary} />
-            </View>
-          </View>
+          <BrandMark size={168} />
           <Txt variant="display" center style={{ marginTop: 22 }}>
             Saksham
           </Txt>
@@ -61,13 +55,5 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   wrap: { flex: 1, paddingHorizontal: 28, justifyContent: 'space-between', paddingVertical: 32 },
   brand: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  logoRing: { width: 128, height: 128, borderRadius: 40, alignItems: 'center', justifyContent: 'center' },
-  logoBadge: {
-    width: 92,
-    height: 92,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   bottom: { gap: 8 },
 });

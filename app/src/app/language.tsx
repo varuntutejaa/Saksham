@@ -36,7 +36,7 @@ export default function LanguageScreen() {
           </Pressable>
         )}
         <View style={[styles.logoBadge, { backgroundColor: 'rgba(255,255,255,0.16)' }]}>
-          <BrandMark size={30} color="#fff" barColor="#2E8BFF" />
+          <BrandMark size={30} />
         </View>
         <Txt variant="title" tone="onPrimary" center>
           Choose your language

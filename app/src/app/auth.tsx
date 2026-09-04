@@ -66,9 +66,7 @@ export default function AuthScreen() {
         </View>
 
         <Animated.View entering={FadeInDown.duration(400)} style={styles.body}>
-          <View style={[styles.logo, { backgroundColor: c.primarySoft }]}>
-            <BrandMark size={26} color={c.primary} barColor="#fff" />
-          </View>
+          <BrandMark size={64} />
           <Txt variant="title" center style={{ marginTop: 14 }}>
             {t.welcomeTitle}
           </Txt>
