@@ -1,0 +1,158 @@
+// Saksham — AI-Driven Voice Assistant for Livelihood Mapping and
+// NSQF-Aligned Skilling Recommendations for SC Communities under PM-AJAY
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  BENEFICIARY
+  ADMIN
+}
+
+enum Language {
+  hi // Hindi
+  en // English
+  bn // Bengali
+  ta // Tamil
+  te // Telugu
+  mr // Marathi
+  kn // Kannada
+  gu // Gujarati
+  pa // Punjabi
+  or // Odia
+}
+
+enum SessionChannel {
+  APP
+  WEB
+  IVR
+}
+
+enum RecommendationStatus {
+  SUGGESTED
+  VIEWED
+  INTERESTED
+  APPLIED
+  ENROLLED
+  REJECTED
+}
+
+model User {
+  id            String   @id @default(cuid())
+  phone         String?  @unique
+  name          String?
+  passwordHash  String?
+  role          Role     @default(BENEFICIARY)
+  language      Language @default(hi)
+  gender        String?
+  age           Int?
+  category      String? // SC / ST / OBC / GEN — self-declared
+  state         String?
+  district      String?
+  pincode       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  sessions        VoiceSession[]
+  recommendations Recommendation[]
+}
+
+/// One conversation with the voice assistant.
+model VoiceSession {
+  id             String         @id @default(cuid())
+  userId         String?
+  user           User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  channel        SessionChannel @default(APP)
+  language       Language       @default(hi)
+  rawTranscript  String? // what the beneficiary said (STT output)
+  detectedSkills String[] // free-text skills extracted from the transcript
+  bandwidthKbps  Int? // measured client bandwidth, for low-bandwidth analytics
+  state          String?
+  district       String?
+  createdAt      DateTime       @default(now())
+
+  mappings        SkillMapping[]
+  recommendations Recommendation[]
+}
+
+/// NSQF-aligned qualification (National Skills Qualification Framework).
+model NsqfQualification {
+  id           String  @id @default(cuid())
+  qpCode       String  @unique // e.g. "AGR/Q0101"
+  title        String
+  titleHindi   String?
+  sector       String // e.g. "Agriculture", "Handicrafts & Carpet"
+  nsqfLevel    Int // 1–10
+  ssc          String? // Sector Skill Council
+  description  String?
+  keywords     String[] // informal-skill keywords that map to this QP
+
+  mappings         SkillMapping[]
+  trainingPrograms TrainingProgram[]
+}
+
+/// Result of mapping an informal skill phrase to an NSQF qualification.
+model SkillMapping {
+  id                 String            @id @default(cuid())
+  sessionId          String
+  session            VoiceSession      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  rawSkillText       String // "main mitti ke bartan banata hoon"
+  normalizedSkill    String // "pottery"
+  nsqfQualificationId String?
+  nsqfQualification  NsqfQualification? @relation(fields: [nsqfQualificationId], references: [id], onDelete: SetNull)
+  confidence         Float             @default(0) // 0–1
+  method             String            @default("keyword") // keyword | embedding | llm | manual
+  createdAt          DateTime          @default(now())
+}
+
+/// A PM-AJAY / partner skilling programme a beneficiary can be routed to.
+model TrainingProgram {
+  id                  String             @id @default(cuid())
+  name                String
+  nameHindi           String?
+  scheme              String             @default("PM-AJAY") // PM-AJAY component / partner scheme
+  component           String? // "Adarsh Gram" | "GIA" | "Hostel" | "Skill Development"
+  providerName        String?
+  nsqfQualificationId String?
+  nsqfQualification   NsqfQualification? @relation(fields: [nsqfQualificationId], references: [id], onDelete: SetNull)
+  sector              String?
+  nsqfLevel           Int?
+  mode                String             @default("OFFLINE") // OFFLINE | ONLINE | HYBRID
+  durationWeeks       Int?
+  stipend             Boolean            @default(false)
+  certification       String?
+  state               String?
+  district            String?
+  address             String?
+  contactPhone        String?
+  seatsTotal          Int?
+  seatsAvailable      Int?
+  eligibilityNote     String?
+  active              Boolean            @default(true)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  recommendations Recommendation[]
+}
+
+/// A programme recommended to a specific beneficiary in a session.
+model Recommendation {
+  id                String               @id @default(cuid())
+  sessionId         String
+  session           VoiceSession         @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  userId            String?
+  user              User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
+  trainingProgramId String
+  trainingProgram   TrainingProgram      @relation(fields: [trainingProgramId], references: [id], onDelete: Cascade)
+  score             Float                @default(0)
+  rationale         String? // human-readable "why this" in the user's language
+  status            RecommendationStatus @default(SUGGESTED)
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+}

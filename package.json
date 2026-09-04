@@ -1,0 +1,22 @@
+{
+  "name": "saksham",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Saksham — AI-driven voice assistant for livelihood mapping and NSQF-aligned skilling recommendations for SC communities under PM-AJAY (MoSJE). Monorepo: React Native app + Express/Prisma backend + Next.js website.",
+  "scripts": {
+    "setup": "npm run install:all && npm --prefix server run prisma:generate",
+    "install:all": "npm --prefix server install && npm --prefix website install && npm --prefix app install",
+    "db:push": "npm --prefix server run prisma:push",
+    "db:seed": "npm --prefix server run seed",
+    "db:setup": "npm run db:push && npm run db:seed",
+    "dev": "concurrently -n server,website -c blue,magenta \"npm:dev:server\" \"npm:dev:website\"",
+    "dev:server": "npm --prefix server run dev",
+    "dev:website": "npm --prefix website run dev",
+    "dev:app": "npm --prefix app run start",
+    "build": "npm --prefix server run build && npm --prefix website run build",
+    "typecheck": "npm --prefix server exec tsc -- --noEmit && npm --prefix website exec tsc -- --noEmit && npm --prefix app exec tsc -- --noEmit"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
