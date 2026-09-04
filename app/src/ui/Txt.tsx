@@ -11,7 +11,7 @@ interface Props extends TextProps {
   style?: TextStyle | TextStyle[];
 }
 
-export function Txt({ variant = 'body', tone = 'default', center, style, ...rest }: Props) {
+export function Txt({ variant = 'body', tone = 'default', center, style, children, ...rest }: Props) {
   const { c, type } = useTheme();
   const toneColor: Record<Tone, string> = {
     default: c.text,
@@ -31,6 +31,8 @@ export function Txt({ variant = 'body', tone = 'default', center, style, ...rest
         center && { textAlign: 'center' },
         style as TextStyle,
       ]}
-    />
+    >
+      {children}
+    </Text>
   );
 }

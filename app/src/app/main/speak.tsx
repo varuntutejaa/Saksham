@@ -10,7 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import {
   RecordingPresets,
@@ -20,14 +20,20 @@ import {
   useAudioRecorderState,
 } from 'expo-audio';
 
-import { checkHealth, converse } from '@/lib/api';
+import { converse } from '@/lib/api';
 import { LANGUAGES, UI_STRINGS } from '@/constants/languages';
 import { setLastResult } from '@/lib/session';
-import { speak } from '@/lib/speech';
+import { speak, stopSpeaking } from '@/lib/speech';
+import { transcribeWithSarvam } from '@/lib/transcription';
 import { useAuth } from '@/lib/auth';
 import { useStore } from '@/lib/store';
 import { useTheme } from '@/theme';
 import { Button, MicOrb, Screen, Txt, type MicState } from '@/ui';
+
+type AgentMessage = {
+  role: 'user' | 'assistant';
+  text: string;
+};
 
 export default function SpeakScreen() {
   const { language, state, district } = useStore();
@@ -36,6 +42,10 @@ export default function SpeakScreen() {
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const recState = useAudioRecorderState(recorder);
   const [busy, setBusy] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [agentMode, setAgentMode] = useState(false);
+  const [agentMessages, setAgentMessages] = useState<AgentMessage[]>([]);
   const [typed, setTyped] = useState('');
   const [showType, setShowType] = useState(false);
   const spoke = useRef(false);
@@ -53,17 +63,20 @@ export default function SpeakScreen() {
 
   if (!language) return null;
 
-  const micState: MicState = busy ? 'thinking' : recState.isRecording ? 'listening' : 'idle';
-  const status = busy ? t.thinking : recState.isRecording ? t.listening : t.tapToSpeak;
+  const micState: MicState = busy || transcribing ? 'thinking' : recState.isRecording ? 'listening' : 'idle';
+  const status = busy
+    ? agentMode ? t.agentThinking : t.thinking
+    : transcribing
+      ? t.transcribing
+      : recState.isRecording
+        ? t.listening
+        : agentMode
+          ? t.agentTapToTalk
+          : t.tapToSpeak;
 
   async function submit(payload: { transcript?: string; audioUri?: string }) {
     setBusy(true);
     try {
-      if (!(await checkHealth())) {
-        speak(t.noConnection, language!);
-        Alert.alert(t.noConnection);
-        return;
-      }
       const result = await converse({
         ...payload,
         language: language!,
@@ -83,11 +96,70 @@ export default function SpeakScreen() {
     }
   }
 
+  async function sendTranscript(text = transcript) {
+    const clean = text.trim();
+    if (!clean) {
+      Alert.alert(t.noSpeechDetected);
+      return;
+    }
+    if (agentMode) {
+      await runAgentTurn(clean);
+      return;
+    }
+    await submit({ transcript: clean });
+  }
+
+  async function runAgentTurn(text: string) {
+    const clean = text.trim();
+    if (!clean) return;
+
+    setBusy(true);
+    setTranscript('');
+    setShowType(false);
+    setTyped('');
+    setAgentMessages((messages) => messages.concat({ role: 'user', text: clean }));
+    try {
+      const result = await converse({
+        transcript: clean,
+        language: language!,
+        state,
+        district,
+        channel: 'APP',
+        userId: user?.id,
+      });
+      setLastResult(result);
+      const replyText = result.reply.text || t.agentFallbackReply;
+      setAgentMessages((messages) => messages.concat({ role: 'assistant', text: replyText }));
+      speak(replyText, language!);
+    } catch (e) {
+      Alert.alert(t.tryAgain, String(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function toggleRecord() {
-    if (busy) return;
+    if (busy || transcribing) return;
     if (recState.isRecording) {
       await recorder.stop();
-      await submit({ audioUri: recorder.uri ?? undefined });
+      const audioUri = recorder.uri;
+      if (!audioUri) {
+        Alert.alert(t.noSpeechDetected);
+        return;
+      }
+      setTranscribing(true);
+      try {
+        const result = await transcribeWithSarvam(audioUri, language!);
+        if (agentMode) await runAgentTurn(result.transcript);
+        else {
+          setTranscript(result.transcript);
+          setShowType(false);
+        }
+      } catch (e) {
+        Alert.alert(t.transcriptionError, e instanceof Error ? e.message : String(e));
+      } finally {
+        setTranscribing(false);
+      }
       return;
     }
     const { granted } = await requestRecordingPermissionsAsync();
@@ -95,6 +167,9 @@ export default function SpeakScreen() {
       Alert.alert('Microphone permission needed', undefined);
       return;
     }
+    stopSpeaking();
+    setTranscript('');
+    setShowType(false);
     await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
     await recorder.prepareToRecordAsync();
     recorder.record();
@@ -109,49 +184,151 @@ export default function SpeakScreen() {
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        {/* top bar */}
         <View style={styles.topBar}>
           <Txt variant="h2">{t.navSpeak}</Txt>
-          <Pressable
-            onPress={changeLanguage}
-            style={[styles.langChip, { backgroundColor: c.surfaceAlt, borderColor: c.border }]}>
-            <Ionicons name="language" size={14} color={c.textDim} />
-            <Txt variant="caption" tone="dim">
-              {langNative}
-            </Txt>
-            <Ionicons name="chevron-down" size={13} color={c.textDim} />
-          </Pressable>
+          <View style={styles.topActions}>
+            <Pressable
+              onPress={() => {
+                stopSpeaking();
+                setAgentMode((v) => !v);
+                setTranscript('');
+                setShowType(false);
+              }}
+              style={[
+                styles.modeChip,
+                {
+                  backgroundColor: agentMode ? c.primary : c.surfaceAlt,
+                  borderColor: agentMode ? c.primary : c.border,
+                },
+              ]}>
+              <Ionicons name="sparkles" size={14} color={agentMode ? c.onPrimary : c.primary} />
+              <Txt variant="caption" style={{ color: agentMode ? c.onPrimary : c.textDim }}>
+                {t.voiceAgent}
+              </Txt>
+            </Pressable>
+            <Pressable
+              onPress={changeLanguage}
+              style={[styles.langChip, { backgroundColor: c.surfaceAlt, borderColor: c.border }]}>
+              <Ionicons name="language" size={14} color={c.textDim} />
+              <Txt variant="caption" tone="dim">
+                {langNative}
+              </Txt>
+              <Ionicons name="chevron-down" size={13} color={c.textDim} />
+            </Pressable>
+          </View>
         </View>
 
         <ScrollView
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
-          {/* mic */}
           <Animated.View entering={FadeIn.duration(500)} style={styles.micWrap}>
             <MicOrb state={micState} onPress={toggleRecord} />
-            <Animated.View entering={FadeInUp.duration(300)} key={status}>
+            <View key={status}>
               <Txt variant="title" center style={{ marginTop: 4 }}>
                 {status}
               </Txt>
-            </Animated.View>
+            </View>
             {micState === 'idle' && (
               <Txt variant="body" tone="dim" center style={{ maxWidth: 280 }}>
-                {t.tapHint}
+                {agentMode ? t.agentHint : t.tapHint}
               </Txt>
             )}
             {recState.isRecording && (
               <View style={[styles.recPill, { backgroundColor: c.dangerSoft }]}>
                 <View style={[styles.recDot, { backgroundColor: c.danger }]} />
                 <Txt variant="caption" style={{ color: c.danger }}>
-                  {Math.round((recState.durationMillis ?? 0) / 1000)}s
+                  {`${Math.round((recState.durationMillis ?? 0) / 1000)}s`}
                 </Txt>
               </View>
             )}
           </Animated.View>
 
-          {/* examples */}
-          {micState === 'idle' && !showType && (
+          {agentMode && agentMessages.length > 0 && (
+            <Animated.View entering={FadeInDown.duration(300)} style={styles.agentThread}>
+              {agentMessages.map((message, index) => (
+                <View
+                  key={`${message.role}-${index}`}
+                  style={[
+                    styles.agentBubble,
+                    {
+                      alignSelf: message.role === 'user' ? 'flex-end' : 'flex-start',
+                      backgroundColor: message.role === 'user' ? c.surfaceAlt : c.primarySoft,
+                      borderColor: message.role === 'user' ? c.border : c.primarySoft,
+                    },
+                  ]}>
+                  <View style={styles.agentBubbleHeader}>
+                    <Ionicons
+                      name={message.role === 'user' ? 'person-circle-outline' : 'sparkles'}
+                      size={15}
+                      color={message.role === 'user' ? c.textDim : c.primary}
+                    />
+                    <Txt variant="overline" tone="faint">
+                      {message.role === 'user' ? t.youSaid : t.agentName}
+                    </Txt>
+                  </View>
+                  <Txt variant="body">{message.text}</Txt>
+                </View>
+              ))}
+              <View style={styles.actionRow}>
+                <Button
+                  label={t.clearAgent}
+                  variant="secondary"
+                  size="md"
+                  icon="trash-outline"
+                  fullWidth={false}
+                  onPress={() => {
+                    stopSpeaking();
+                    setAgentMessages([]);
+                  }}
+                />
+                <Button
+                  label={t.viewResults}
+                  size="md"
+                  icon="school-outline"
+                  fullWidth={false}
+                  onPress={() => router.push('/results')}
+                />
+              </View>
+            </Animated.View>
+          )}
+
+          {transcript && !showType && (
+            <Animated.View
+              entering={FadeInDown.duration(300)}
+              style={[styles.transcriptBox, { backgroundColor: c.surface, borderColor: c.border }, elevation('card')]}>
+              <View style={styles.transcriptHeader}>
+                <Ionicons name="document-text-outline" size={18} color={c.primary} />
+                <Txt variant="overline" tone="faint" style={{ flex: 1 }}>
+                  {t.transcriptTitle}
+                </Txt>
+              </View>
+              <Txt variant="bodyLg">{transcript}</Txt>
+              <View style={styles.actionRow}>
+                <Button
+                  label={t.editTranscript}
+                  variant="secondary"
+                  size="md"
+                  icon="create-outline"
+                  fullWidth={false}
+                  onPress={() => {
+                    setTyped(transcript);
+                    setShowType(true);
+                  }}
+                />
+                <Button
+                  label={t.send}
+                  size="md"
+                  icon="send"
+                  fullWidth={false}
+                  loading={busy}
+                  onPress={() => sendTranscript()}
+                />
+              </View>
+            </Animated.View>
+          )}
+
+          {micState === 'idle' && !showType && !transcript && (
             <Animated.View
               entering={FadeInDown.delay(150).duration(400)}
               style={[styles.examples, { backgroundColor: c.surface, borderColor: c.border }, elevation('card')]}>
@@ -176,7 +353,6 @@ export default function SpeakScreen() {
             </Animated.View>
           )}
 
-          {/* type mode */}
           {showType && (
             <Animated.View entering={FadeInDown.duration(300)} style={styles.typeBox}>
               <TextInput
@@ -194,7 +370,7 @@ export default function SpeakScreen() {
               <Button
                 label={t.send}
                 icon="send"
-                onPress={() => typed.trim() && submit({ transcript: typed.trim() })}
+                onPress={() => sendTranscript(typed)}
                 loading={busy}
                 disabled={!typed.trim()}
               />
@@ -202,14 +378,16 @@ export default function SpeakScreen() {
           )}
         </ScrollView>
 
-        {/* bottom action */}
         <View style={styles.bottom}>
           <Button
-            label={showType ? t.tapToSpeak : t.typeInstead}
+            label={showType ? (agentMode ? t.agentTapToTalk : t.tapToSpeak) : t.typeInstead}
             variant="secondary"
             size="md"
             icon={showType ? 'mic-outline' : 'create-outline'}
-            onPress={() => setShowType((v) => !v)}
+            onPress={() => {
+              if (!showType && transcript) setTyped(transcript);
+              setShowType((v) => !v);
+            }}
           />
         </View>
       </KeyboardAvoidingView>
@@ -223,11 +401,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 10,
     paddingHorizontal: 20,
     paddingTop: 4,
     paddingBottom: 8,
   },
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  topActions: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 },
+  modeChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+  },
   langChip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -250,6 +439,12 @@ const styles = StyleSheet.create({
   },
   recDot: { width: 8, height: 8, borderRadius: 4 },
   examples: { borderRadius: 20, borderWidth: 1, padding: 14, gap: 6 },
+  transcriptBox: { borderRadius: 20, borderWidth: 1, padding: 16, gap: 12 },
+  transcriptHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  actionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 10, flexWrap: 'wrap' },
+  agentThread: { gap: 10 },
+  agentBubble: { maxWidth: '92%', borderRadius: 16, borderWidth: 1, padding: 14, gap: 8 },
+  agentBubbleHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   exampleRow: {
     flexDirection: 'row',
     alignItems: 'center',
