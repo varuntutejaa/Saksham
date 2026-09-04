@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MapPin } from "lucide-react";
 import { getPrograms, type Program } from "@/lib/api";
 
 export function ProgramList() {
@@ -44,8 +45,9 @@ export function ProgramList() {
               .filter(Boolean)
               .join(" · ")}
           </p>
-          <p className="mt-1 text-sm text-neutral-500">
-            📍 {p.district}, {p.state}
+          <p className="mt-1 flex items-center gap-1 text-sm text-neutral-500">
+            <MapPin className="h-3.5 w-3.5 shrink-0" />
+            {p.district}, {p.state}
             {typeof p.seatsAvailable === "number"
               ? ` · ${p.seatsAvailable} seats`
               : ""}

@@ -65,6 +65,7 @@ const profileSchema = z.object({
     .enum(["below_10th", "10th", "12th", "iti_diploma", "undergrad", "postgrad"])
     .optional(),
   onboarded: z.boolean().optional(),
+  avatarUrl: z.string().max(1_500_000).nullable().optional(),
 });
 
 /** PATCH /api/auth/profile — fill in the post-signup gender/age/education questions. */

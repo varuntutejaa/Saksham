@@ -11,12 +11,12 @@ import { setIntent } from '@/lib/session';
 import { speak, stopSpeaking } from '@/lib/speech';
 import { useStore } from '@/lib/store';
 import { useTheme } from '@/theme';
-import { Card, Screen, Txt } from '@/ui';
+import { BrandMark, Card, Screen, Txt } from '@/ui';
 
-const OPTIONS: { intent: Intent; icon: string }[] = [
-  { intent: 'jobs', icon: '💼' },
-  { intent: 'training', icon: '🎓' },
-  { intent: 'certificate', icon: '📜' },
+const OPTIONS: { intent: Intent; icon: keyof typeof Ionicons.glyphMap }[] = [
+  { intent: 'jobs', icon: 'briefcase' },
+  { intent: 'training', icon: 'school' },
+  { intent: 'certificate', icon: 'ribbon' },
 ];
 
 export default function ConfirmScreen() {
@@ -71,7 +71,9 @@ export default function ConfirmScreen() {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* user bubble */}
         <Animated.View entering={FadeInUp.duration(350)} style={styles.bubbleRow}>
-          <Txt style={styles.emoji}>🎙️</Txt>
+          <View style={[styles.avatarBadge, { backgroundColor: c.primarySoft }]}>
+            <Ionicons name="mic" size={18} color={c.primary} />
+          </View>
           <View style={{ flex: 1 }}>
             <Txt variant="overline" tone="faint">
               {t.youSaid}
@@ -86,7 +88,9 @@ export default function ConfirmScreen() {
 
         {/* assistant bubble */}
         <Animated.View entering={FadeInUp.delay(150).duration(350)} style={styles.bubbleRow}>
-          <Txt style={styles.emoji}>🤖</Txt>
+          <View style={[styles.avatarBadge, { backgroundColor: c.surfaceAlt }]}>
+            <BrandMark size={20} />
+          </View>
           <View style={{ flex: 1 }}>
             <Txt variant="overline" tone="faint">
               SAKSHAM
@@ -114,7 +118,9 @@ export default function ConfirmScreen() {
                     { borderRadius: radius.lg, borderColor: pressed ? c.primary : c.border, backgroundColor: c.surface },
                     elevation('card'),
                   ]}>
-                  <Txt style={styles.optionEmoji}>{o.icon}</Txt>
+                  <View style={[styles.optionIconBadge, { backgroundColor: c.primarySoft }]}>
+                    <Ionicons name={o.icon} size={20} color={c.primary} />
+                  </View>
                   <Txt variant="bodyLg" style={{ flex: 1, fontWeight: '500' }}>
                     {optionLabel[o.intent]}
                   </Txt>
@@ -134,7 +140,7 @@ const styles = StyleSheet.create({
   iconBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   scroll: { paddingHorizontal: 20, paddingBottom: 32, gap: 18 },
   bubbleRow: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
-  emoji: { fontSize: 26, lineHeight: 32 },
+  avatarBadge: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
   bubble: { borderRadius: 16, borderWidth: 1, padding: 14, marginTop: 4 },
   userBubble: { borderTopLeftRadius: 4 },
   option: {
@@ -145,5 +151,5 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     paddingHorizontal: 16,
   },
-  optionEmoji: { fontSize: 26 },
+  optionIconBadge: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
 });

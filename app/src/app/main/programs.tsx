@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Linking, StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 import { getPrograms, type Program } from '@/lib/api';
 import { UI_STRINGS } from '@/constants/languages';
@@ -82,9 +83,12 @@ export default function ProgramsScreen() {
                 )}
               </View>
               {(item.district || item.state) && (
-                <Txt variant="caption" tone="faint">
-                  📍 {[item.district, item.state].filter(Boolean).join(', ')}
-                </Txt>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <Ionicons name="location" size={12} color={c.textFaint} />
+                  <Txt variant="caption" tone="faint">
+                    {[item.district, item.state].filter(Boolean).join(', ')}
+                  </Txt>
+                </View>
               )}
               {item.contactPhone && (
                 <Button

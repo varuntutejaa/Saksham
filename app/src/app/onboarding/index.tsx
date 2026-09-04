@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInDown, ZoomIn } from 'react-native-reanimated';
 
 import { UI_STRINGS } from '@/constants/languages';
@@ -24,7 +25,7 @@ export default function OnboardingIntro() {
         <View style={styles.center}>
           <Animated.View entering={ZoomIn.duration(500).springify().damping(12)}>
             <View style={[styles.badge, { backgroundColor: c.primarySoft }]}>
-              <Txt style={{ fontSize: 46 }}>👋</Txt>
+              <Ionicons name="hand-right" size={46} color={c.primary} />
             </View>
           </Animated.View>
           <Animated.View entering={FadeInDown.delay(150).duration(450)}>

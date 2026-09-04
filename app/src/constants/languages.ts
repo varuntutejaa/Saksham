@@ -156,6 +156,12 @@ export interface Strings {
   resetPasswordBtn: string;
   invalidOtp: string;
   passwordMismatch: string;
+  photoSheetTitle: string;
+  takePhoto: string;
+  chooseFromLibrary: string;
+  removePhoto: string;
+  cancel: string;
+  photoPermissionDenied: string;
 }
 
 const hi: Strings = {
@@ -284,6 +290,12 @@ const hi: Strings = {
   resetPasswordBtn: 'पासवर्ड रीसेट करें',
   invalidOtp: 'कृपया सही 6 अंकों का कोड डालें',
   passwordMismatch: 'दोनों पासवर्ड मेल नहीं खाते',
+  photoSheetTitle: 'प्रोफ़ाइल फ़ोटो',
+  takePhoto: 'फ़ोटो खींचें',
+  chooseFromLibrary: 'गैलरी से चुनें',
+  removePhoto: 'फ़ोटो हटाएं',
+  cancel: 'रद्द करें',
+  photoPermissionDenied: 'फ़ोटो एक्सेस की अनुमति नहीं मिली',
 };
 
 const en: Strings = {
@@ -412,6 +424,12 @@ const en: Strings = {
   resetPasswordBtn: 'Reset password',
   invalidOtp: 'Please enter the correct 6-digit code',
   passwordMismatch: 'Passwords do not match',
+  photoSheetTitle: 'Profile photo',
+  takePhoto: 'Take photo',
+  chooseFromLibrary: 'Choose from gallery',
+  removePhoto: 'Remove photo',
+  cancel: 'Cancel',
+  photoPermissionDenied: 'Permission to access photos was not granted',
 };
 
 const bn: Strings = {
@@ -540,6 +558,12 @@ const bn: Strings = {
   resetPasswordBtn: 'পাসওয়ার্ড রিসেট করুন',
   invalidOtp: 'সঠিক ৬ সংখ্যার কোড দিন',
   passwordMismatch: 'দুটি পাসওয়ার্ড মেলেনি',
+  photoSheetTitle: 'প্রোফাইল ছবি',
+  takePhoto: 'ছবি তুলুন',
+  chooseFromLibrary: 'গ্যালারি থেকে বেছে নিন',
+  removePhoto: 'ছবি সরান',
+  cancel: 'বাতিল করুন',
+  photoPermissionDenied: 'ছবি অ্যাক্সেসের অনুমতি পাওয়া যায়নি',
 };
 
 const ta: Strings = {
@@ -668,6 +692,12 @@ const ta: Strings = {
   resetPasswordBtn: 'கடவுச்சொல்லை மீட்டமைக்கவும்',
   invalidOtp: 'சரியான 6 இலக்க குறியீட்டை உள்ளிடவும்',
   passwordMismatch: 'கடவுச்சொற்கள் பொருந்தவில்லை',
+  photoSheetTitle: 'சுயவிவரப் புகைப்படம்',
+  takePhoto: 'புகைப்படம் எடுக்கவும்',
+  chooseFromLibrary: 'கேலரியிலிருந்து தேர்ந்தெடுக்கவும்',
+  removePhoto: 'புகைப்படத்தை அகற்று',
+  cancel: 'ரத்து செய்',
+  photoPermissionDenied: 'புகைப்படங்களை அணுக அனுமதி கிடைக்கவில்லை',
 };
 
 const te: Strings = {
@@ -796,6 +826,12 @@ const te: Strings = {
   resetPasswordBtn: 'పాస్‌వర్డ్ రీసెట్ చేయండి',
   invalidOtp: 'సరైన 6 అంకెల కోడ్ నమోదు చేయండి',
   passwordMismatch: 'పాస్‌వర్డ్‌లు సరిపోలలేదు',
+  photoSheetTitle: 'ప్రొఫైల్ ఫోటో',
+  takePhoto: 'ఫోటో తీయండి',
+  chooseFromLibrary: 'గ్యాలరీ నుండి ఎంచుకోండి',
+  removePhoto: 'ఫోటో తొలగించండి',
+  cancel: 'రద్దు చేయండి',
+  photoPermissionDenied: 'ఫోటోలను యాక్సెస్ చేయడానికి అనుమతి లభించలేదు',
 };
 
 const mr: Strings = {
@@ -924,6 +960,12 @@ const mr: Strings = {
   resetPasswordBtn: 'पासवर्ड रीसेट करा',
   invalidOtp: 'योग्य 6 अंकी कोड टाका',
   passwordMismatch: 'दोन्ही पासवर्ड जुळत नाहीत',
+  photoSheetTitle: 'प्रोफाइल फोटो',
+  takePhoto: 'फोटो काढा',
+  chooseFromLibrary: 'गॅलरीमधून निवडा',
+  removePhoto: 'फोटो काढून टाका',
+  cancel: 'रद्द करा',
+  photoPermissionDenied: 'फोटो अ‍ॅक्सेस करण्याची परवानगी मिळाली नाही',
 };
 
 const kn: Strings = {
@@ -1052,6 +1094,12 @@ const kn: Strings = {
   resetPasswordBtn: 'ಪಾಸ್‌ವರ್ಡ್ ಮರುಹೊಂದಿಸಿ',
   invalidOtp: 'ಸರಿಯಾದ 6 ಅಂಕಿಗಳ ಕೋಡ್ ನಮೂದಿಸಿ',
   passwordMismatch: 'ಎರಡು ಪಾಸ್‌ವರ್ಡ್‌ಗಳು ಹೊಂದುತ್ತಿಲ್ಲ',
+  photoSheetTitle: 'ಪ್ರೊಫೈಲ್ ಫೋಟೋ',
+  takePhoto: 'ಫೋಟೋ ತೆಗೆಯಿರಿ',
+  chooseFromLibrary: 'ಗ್ಯಾಲರಿಯಿಂದ ಆಯ್ಕೆಮಾಡಿ',
+  removePhoto: 'ಫೋಟೋ ತೆಗೆದುಹಾಕಿ',
+  cancel: 'ರದ್ದುಮಾಡಿ',
+  photoPermissionDenied: 'ಫೋಟೋಗಳನ್ನು ಪ್ರವೇಶಿಸಲು ಅನುಮತಿ ಸಿಗಲಿಲ್ಲ',
 };
 
 const gu: Strings = {
@@ -1180,6 +1228,12 @@ const gu: Strings = {
   resetPasswordBtn: 'પાસવર્ડ રીસેટ કરો',
   invalidOtp: 'સાચો 6 અંકનો કોડ દાખલ કરો',
   passwordMismatch: 'બંને પાસવર્ડ મેળ ખાતા નથી',
+  photoSheetTitle: 'પ્રોફાઇલ ફોટો',
+  takePhoto: 'ફોટો લો',
+  chooseFromLibrary: 'ગેલેરીમાંથી પસંદ કરો',
+  removePhoto: 'ફોટો દૂર કરો',
+  cancel: 'રદ કરો',
+  photoPermissionDenied: 'ફોટો ઍક્સેસ કરવાની પરવાનગી મળી નહીં',
 };
 
 const pa: Strings = {
@@ -1308,6 +1362,12 @@ const pa: Strings = {
   resetPasswordBtn: 'ਪਾਸਵਰਡ ਰੀਸੈੱਟ ਕਰੋ',
   invalidOtp: 'ਸਹੀ 6 ਅੰਕਾਂ ਦਾ ਕੋਡ ਦਰਜ ਕਰੋ',
   passwordMismatch: 'ਦੋਵੇਂ ਪਾਸਵਰਡ ਮੇਲ ਨਹੀਂ ਖਾਂਦੇ',
+  photoSheetTitle: 'ਪ੍ਰੋਫਾਈਲ ਫੋਟੋ',
+  takePhoto: 'ਫੋਟੋ ਖਿੱਚੋ',
+  chooseFromLibrary: 'ਗੈਲਰੀ ਤੋਂ ਚੁਣੋ',
+  removePhoto: 'ਫੋਟੋ ਹਟਾਓ',
+  cancel: 'ਰੱਦ ਕਰੋ',
+  photoPermissionDenied: 'ਫੋਟੋਆਂ ਤੱਕ ਪਹੁੰਚ ਦੀ ਇਜਾਜ਼ਤ ਨਹੀਂ ਮਿਲੀ',
 };
 
 const or: Strings = {
@@ -1436,6 +1496,12 @@ const or: Strings = {
   resetPasswordBtn: 'ପାସୱାର୍ଡ ରିସେଟ୍ କରନ୍ତୁ',
   invalidOtp: 'ସଠିକ୍ 6 ଅଙ୍କ କୋଡ୍ ଦିଅନ୍ତୁ',
   passwordMismatch: 'ଦୁଇଟି ପାସୱାର୍ଡ ମେଳ ଖାଉ ନାହିଁ',
+  photoSheetTitle: 'ପ୍ରୋଫାଇଲ୍ ଫଟୋ',
+  takePhoto: 'ଫଟୋ ଉଠାନ୍ତୁ',
+  chooseFromLibrary: 'ଗ୍ୟାଲେରୀରୁ ବାଛନ୍ତୁ',
+  removePhoto: 'ଫଟୋ ହଟାନ୍ତୁ',
+  cancel: 'ବାତିଲ୍ କରନ୍ତୁ',
+  photoPermissionDenied: 'ଫଟୋ ଆକ୍ସେସ୍ ପାଇଁ ଅନୁମତି ମିଳିଲା ନାହିଁ',
 };
 
 export const UI_STRINGS: Record<LanguageCode, Strings> = {

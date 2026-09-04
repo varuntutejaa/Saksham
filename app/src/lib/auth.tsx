@@ -15,7 +15,13 @@ interface AuthValue {
   login: (phone: string, password: string) => Promise<void>;
   register: (input: { phone: string; password: string; name?: string; language: LanguageCode }) => Promise<void>;
   resetPassword: (phone: string, otp: string, newPassword: string) => Promise<void>;
-  updateProfile: (input: { gender?: Gender; age?: number; education?: Education; onboarded?: boolean }) => Promise<void>;
+  updateProfile: (input: {
+    gender?: Gender;
+    age?: number;
+    education?: Education;
+    onboarded?: boolean;
+    avatarUrl?: string | null;
+  }) => Promise<void>;
   logout: () => Promise<void>;
 }
 

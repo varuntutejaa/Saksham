@@ -17,10 +17,10 @@ export default function GenderStep() {
   const t = language ? UI_STRINGS[language] : UI_STRINGS.hi;
   const [selected, setSelected] = useState<Gender | undefined>(getAnswers().gender);
 
-  const options: { value: Gender; label: string; emoji: string }[] = [
-    { value: 'male', label: t.genderMale, emoji: '👨' },
-    { value: 'female', label: t.genderFemale, emoji: '👩' },
-    { value: 'other', label: t.genderOther, emoji: '🧑' },
+  const options: { value: Gender; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
+    { value: 'male', label: t.genderMale, icon: 'male' },
+    { value: 'female', label: t.genderFemale, icon: 'female' },
+    { value: 'other', label: t.genderOther, icon: 'person' },
   ];
 
   function choose(value: Gender) {
@@ -58,7 +58,7 @@ export default function GenderStep() {
             <OptionRow
               key={o.value}
               label={o.label}
-              emoji={o.emoji}
+              icon={o.icon}
               selected={selected === o.value}
               onPress={() => choose(o.value)}
               index={i}

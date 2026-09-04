@@ -20,13 +20,13 @@ export default function EducationStep() {
   const [selected, setSelected] = useState<Education | undefined>(getAnswers().education);
   const [saving, setSaving] = useState(false);
 
-  const options: { value: Education; label: string; emoji: string }[] = [
-    { value: 'below_10th', label: t.eduBelow10th, emoji: '📘' },
-    { value: '10th', label: t.edu10th, emoji: '📗' },
-    { value: '12th', label: t.edu12th, emoji: '📙' },
-    { value: 'iti_diploma', label: t.eduIti, emoji: '🛠️' },
-    { value: 'undergrad', label: t.eduUndergrad, emoji: '🎓' },
-    { value: 'postgrad', label: t.eduPostgrad, emoji: '🏅' },
+  const options: { value: Education; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
+    { value: 'below_10th', label: t.eduBelow10th, icon: 'book-outline' },
+    { value: '10th', label: t.edu10th, icon: 'book' },
+    { value: '12th', label: t.edu12th, icon: 'library' },
+    { value: 'iti_diploma', label: t.eduIti, icon: 'construct' },
+    { value: 'undergrad', label: t.eduUndergrad, icon: 'school' },
+    { value: 'postgrad', label: t.eduPostgrad, icon: 'ribbon' },
   ];
 
   async function choose(value: Education) {
@@ -73,7 +73,7 @@ export default function EducationStep() {
             <OptionRow
               key={o.value}
               label={o.label}
-              emoji={o.emoji}
+              icon={o.icon}
               selected={selected === o.value}
               onPress={() => choose(o.value)}
               index={i}

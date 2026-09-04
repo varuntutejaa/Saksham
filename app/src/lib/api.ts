@@ -335,6 +335,7 @@ export interface AuthUser {
   age?: number | null;
   education?: Education | null;
   onboarded?: boolean;
+  avatarUrl?: string | null;
 }
 
 interface AuthResponse {
@@ -396,7 +397,13 @@ export async function resetPassword(phone: string, otp: string, newPassword: str
 
 export async function updateProfile(
   token: string,
-  input: { gender?: Gender; age?: number; education?: Education; onboarded?: boolean },
+  input: {
+    gender?: Gender;
+    age?: number;
+    education?: Education;
+    onboarded?: boolean;
+    avatarUrl?: string | null;
+  },
 ): Promise<{ user: AuthUser }> {
   const res = await fetch(`${API_BASE}/api/auth/profile`, {
     method: 'PATCH',

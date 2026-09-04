@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import Animated, {
@@ -16,7 +16,7 @@ import { Txt } from './Txt';
 interface Props {
   label: string;
   sublabel?: string;
-  emoji?: string;
+  icon?: keyof typeof Ionicons.glyphMap;
   selected?: boolean;
   onPress: () => void;
   index?: number;
@@ -24,7 +24,7 @@ interface Props {
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-export function OptionRow({ label, sublabel, emoji, selected, onPress, index = 0 }: Props) {
+export function OptionRow({ label, sublabel, icon, selected, onPress, index = 0 }: Props) {
   const { c, radius, elevation } = useTheme();
   const scale = useSharedValue(1);
   const checkScale = useSharedValue(selected ? 1 : 0);
@@ -67,7 +67,11 @@ export function OptionRow({ label, sublabel, emoji, selected, onPress, index = 0
           },
           elevation('card'),
         ]}>
-        {emoji && <Txt style={{ fontSize: 26 }}>{emoji}</Txt>}
+        {icon && (
+          <View style={[styles.iconBadge, { backgroundColor: selected ? c.primary : c.surfaceAlt }]}>
+            <Ionicons name={icon} size={18} color={selected ? '#fff' : c.textDim} />
+          </View>
+        )}
         <View style={{ flex: 1 }}>
           <Txt variant="bodyLg" style={{ fontWeight: '600' }}>
             {label}
@@ -85,3 +89,7 @@ export function OptionRow({ label, sublabel, emoji, selected, onPress, index = 0
     </Animated.View>
   );
 }
+
+const styles = StyleSheet.create({
+  iconBadge: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+});

@@ -47,6 +47,7 @@ model User {
   id            String   @id @default(cuid())
   phone         String?  @unique
   name          String?
+  avatarUrl     String?  @db.Text // base64 data URI or hosted URL; null = no photo set
   passwordHash  String?
   role          Role     @default(BENEFICIARY)
   language      Language @default(hi)
