@@ -7,16 +7,21 @@
     "icon": "./assets/images/icon.png",
     "scheme": "saksham",
     "userInterfaceStyle": "automatic",
+    "backgroundColor": "#F3F6FC",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "supportsTablet": true,
+      "icon": "./assets/images/icon.png",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Saksham needs the microphone so you can speak your skill in your own language."
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#1462C6",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
+      "permissions": ["RECORD_AUDIO"],
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -25,15 +30,16 @@
     },
     "plugins": [
       "expo-router",
+      "expo-audio",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#1462C6",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "imageWidth": 140,
+          "dark": { "backgroundColor": "#0B1120", "image": "./assets/images/splash-icon.png" }
         }
-      ],
-      "expo-audio"
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

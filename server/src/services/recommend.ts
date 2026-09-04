@@ -35,8 +35,8 @@ interface RecommendInput {
  * Score components (0–1, weighted):
  *   0.45  same NSQF qualification as a mapped skill
  *   0.20  same sector as a mapped skill
- *   0.15  programme in the beneficiary's district
- *   0.10  programme in the beneficiary's state
+ *   0.12  programme in the beneficiary's district
+ *   0.08  programme in the beneficiary's state
  *   0.05  seats currently available
  *   0.05  stipend offered (reduces opportunity cost — key barrier for SC beneficiaries)
  */
@@ -70,11 +70,11 @@ export async function recommendPrograms(
       reasons.push("sector");
     }
     if (district && p.district && p.district.toLowerCase() === district.toLowerCase()) {
-      score += 0.15;
+      score += 0.12;
       reasons.push("district");
     }
     if (state && p.state && p.state.toLowerCase() === state.toLowerCase()) {
-      score += 0.1;
+      score += 0.08;
       reasons.push("state");
     }
     if ((p.seatsAvailable ?? 0) > 0) {

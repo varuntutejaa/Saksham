@@ -27,121 +27,175 @@ export function speechTagFor(code: LanguageCode): string {
   return LANGUAGES.find((l) => l.code === code)?.speechTag ?? 'hi-IN';
 }
 
-/** UI micro-copy per language. Kept small and hand-written for accuracy. */
-export const UI_STRINGS: Record<
-  LanguageCode,
-  {
-    pickLanguage: string;
-    tapToSpeak: string;
-    listening: string;
-    thinking: string;
-    yourSkill: string;
-    nsqfMatch: string;
-    recommended: string;
-    speakAgain: string;
-    typeInstead: string;
-    tryAgain: string;
-    noConnection: string;
-    call: string;
-    seats: string;
-    weeks: string;
-    stipendYes: string;
-  }
-> = {
-  hi: {
-    pickLanguage: 'अपनी भाषा चुनें',
-    tapToSpeak: 'दबाकर अपना काम या हुनर बताइए',
-    listening: 'सुन रहे हैं…',
-    thinking: 'समझ रहे हैं…',
-    yourSkill: 'आपने बताया',
-    nsqfMatch: 'NSQF योग्यता',
-    recommended: 'आपके लिए प्रशिक्षण',
-    speakAgain: 'फिर से सुनें',
-    typeInstead: 'लिखकर बताएं',
-    tryAgain: 'दोबारा कोशिश करें',
-    noConnection: 'सर्वर से संपर्क नहीं हो पा रहा',
-    call: 'कॉल करें',
-    seats: 'सीटें',
-    weeks: 'सप्ताह',
-    stipendYes: 'वजीफा मिलेगा',
-  },
-  en: {
-    pickLanguage: 'Choose your language',
-    tapToSpeak: 'Press and tell us your work or skill',
-    listening: 'Listening…',
-    thinking: 'Understanding…',
-    yourSkill: 'You said',
-    nsqfMatch: 'NSQF qualification',
-    recommended: 'Training for you',
-    speakAgain: 'Hear again',
-    typeInstead: 'Type instead',
-    tryAgain: 'Try again',
-    noConnection: 'Cannot reach the server',
-    call: 'Call',
-    seats: 'seats',
-    weeks: 'weeks',
-    stipendYes: 'Stipend provided',
-  },
-  bn: {
-    pickLanguage: 'আপনার ভাষা বেছে নিন',
-    tapToSpeak: 'চেপে ধরে আপনার কাজ বা দক্ষতা বলুন',
-    listening: 'শুনছি…',
-    thinking: 'বুঝছি…',
-    yourSkill: 'আপনি বললেন',
-    nsqfMatch: 'NSQF যোগ্যতা',
-    recommended: 'আপনার জন্য প্রশিক্ষণ',
-    speakAgain: 'আবার শুনুন',
-    typeInstead: 'লিখে বলুন',
-    tryAgain: 'আবার চেষ্টা করুন',
-    noConnection: 'সার্ভারে পৌঁছানো যাচ্ছে না',
-    call: 'কল করুন',
-    seats: 'আসন',
-    weeks: 'সপ্তাহ',
-    stipendYes: 'ভাতা দেওয়া হবে',
-  },
-  ta: {
-    pickLanguage: 'உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்',
-    tapToSpeak: 'அழுத்திப் பிடித்து உங்கள் வேலை அல்லது திறனைச் சொல்லுங்கள்',
-    listening: 'கேட்கிறோம்…',
-    thinking: 'புரிந்துகொள்கிறோம்…',
-    yourSkill: 'நீங்கள் சொன்னது',
-    nsqfMatch: 'NSQF தகுதி',
-    recommended: 'உங்களுக்கான பயிற்சி',
-    speakAgain: 'மீண்டும் கேட்கவும்',
-    typeInstead: 'தட்டச்சு செய்யவும்',
-    tryAgain: 'மீண்டும் முயற்சிக்கவும்',
-    noConnection: 'சேவையகத்தை அணுக முடியவில்லை',
-    call: 'அழைக்கவும்',
-    seats: 'இடங்கள்',
-    weeks: 'வாரங்கள்',
-    stipendYes: 'உதவித்தொகை வழங்கப்படும்',
-  },
-  te: fallbackStrings('te'),
-  mr: fallbackStrings('mr'),
-  kn: fallbackStrings('kn'),
-  gu: fallbackStrings('gu'),
-  pa: fallbackStrings('pa'),
-  or: fallbackStrings('or'),
+export interface Strings {
+  tagline: string;
+  tapToSpeak: string;
+  tapHint: string;
+  listening: string;
+  thinking: string;
+  examplesTitle: string;
+  examples: string[];
+  yourSkill: string;
+  nsqfMatch: string;
+  matchLabel: string;
+  recommended: string;
+  whyThis: string;
+  speakAgain: string;
+  typeInstead: string;
+  typePlaceholder: string;
+  send: string;
+  tryAgain: string;
+  askAgain: string;
+  changeLanguage: string;
+  noConnection: string;
+  noMatch: string;
+  call: string;
+  seats: string;
+  weeks: string;
+  stipendYes: string;
+}
+
+const hi: Strings = {
+  tagline: 'अपनी भाषा में अपना हुनर बताइए',
+  tapToSpeak: 'बोलने के लिए दबाएँ',
+  tapHint: 'अपना काम या हुनर सरल भाषा में बताइए',
+  listening: 'सुन रहे हैं…',
+  thinking: 'समझ रहे हैं…',
+  examplesTitle: 'ऐसे बता सकते हैं',
+  examples: [
+    'मैं मिट्टी के बर्तन और मटका बनाता हूँ',
+    'मैं सिलाई और कढ़ाई का काम करती हूँ',
+    'मैं राज मिस्त्री हूँ, दीवार और प्लास्टर',
+    'मैं गाय-भैंस पालता हूँ, दूध बेचता हूँ',
+  ],
+  yourSkill: 'आपने बताया',
+  nsqfMatch: 'NSQF योग्यता',
+  matchLabel: 'मिलान',
+  recommended: 'आपके लिए प्रशिक्षण',
+  whyThis: 'यह क्यों',
+  speakAgain: 'फिर से सुनें',
+  typeInstead: 'लिखकर बताएं',
+  typePlaceholder: 'अपना हुनर यहाँ लिखें…',
+  send: 'भेजें',
+  tryAgain: 'दोबारा कोशिश करें',
+  askAgain: 'फिर से पूछें',
+  changeLanguage: 'भाषा बदलें',
+  noConnection: 'सर्वर से संपर्क नहीं हो पा रहा',
+  noMatch: 'हुनर पूरी तरह समझ नहीं आया — कृपया दोबारा बताइए',
+  call: 'कॉल करें',
+  seats: 'सीटें',
+  weeks: 'सप्ताह',
+  stipendYes: 'वजीफा',
 };
 
-// Languages we haven't hand-translated yet fall back to Hindi copy so the app
-// still functions; swap in real strings before shipping.
-function fallbackStrings(_c: LanguageCode) {
-  return {
-    pickLanguage: 'अपनी भाषा चुनें',
-    tapToSpeak: 'दबाकर अपना काम या हुनर बताइए',
-    listening: 'सुन रहे हैं…',
-    thinking: 'समझ रहे हैं…',
-    yourSkill: 'आपने बताया',
-    nsqfMatch: 'NSQF योग्यता',
-    recommended: 'आपके लिए प्रशिक्षण',
-    speakAgain: 'फिर से सुनें',
-    typeInstead: 'लिखकर बताएं',
-    tryAgain: 'दोबारा कोशिश करें',
-    noConnection: 'सर्वर से संपर्क नहीं हो पा रहा',
-    call: 'कॉल करें',
-    seats: 'सीटें',
-    weeks: 'सप्ताह',
-    stipendYes: 'वजीफा मिलेगा',
-  };
-}
+const en: Strings = {
+  tagline: 'Tell us your skill, in your own language',
+  tapToSpeak: 'Press to speak',
+  tapHint: 'Describe your work or skill in simple words',
+  listening: 'Listening…',
+  thinking: 'Understanding…',
+  examplesTitle: 'You could say',
+  examples: [
+    'I make clay pots and matka',
+    'I do tailoring and embroidery work',
+    'I am a mason, walls and plaster',
+    'I rear cattle and sell milk',
+  ],
+  yourSkill: 'You said',
+  nsqfMatch: 'NSQF qualification',
+  matchLabel: 'match',
+  recommended: 'Training for you',
+  whyThis: 'Why this',
+  speakAgain: 'Hear again',
+  typeInstead: 'Type instead',
+  typePlaceholder: 'Type your skill here…',
+  send: 'Send',
+  tryAgain: 'Try again',
+  askAgain: 'Ask again',
+  changeLanguage: 'Change language',
+  noConnection: 'Cannot reach the server',
+  noMatch: 'Could not fully understand the skill — please say it again',
+  call: 'Call',
+  seats: 'seats',
+  weeks: 'weeks',
+  stipendYes: 'Stipend',
+};
+
+const bn: Strings = {
+  ...hi,
+  tagline: 'নিজের ভাষায় নিজের দক্ষতা বলুন',
+  tapToSpeak: 'বলতে চাপ দিন',
+  tapHint: 'সহজ ভাষায় আপনার কাজ বা দক্ষতা বলুন',
+  listening: 'শুনছি…',
+  thinking: 'বুঝছি…',
+  examplesTitle: 'এভাবে বলতে পারেন',
+  examples: [
+    'আমি মাটির বাসন ও কলসি বানাই',
+    'আমি সেলাই ও কাঁথার কাজ করি',
+    'আমি রাজমিস্ত্রি, দেওয়াল ও প্লাস্টার',
+    'আমি গরু-মহিষ পালি, দুধ বিক্রি করি',
+  ],
+  yourSkill: 'আপনি বলেছেন',
+  nsqfMatch: 'NSQF যোগ্যতা',
+  matchLabel: 'মিল',
+  recommended: 'আপনার জন্য প্রশিক্ষণ',
+  whyThis: 'কেন এটি',
+  speakAgain: 'আবার শুনুন',
+  typeInstead: 'লিখে বলুন',
+  typePlaceholder: 'আপনার দক্ষতা এখানে লিখুন…',
+  send: 'পাঠান',
+  tryAgain: 'আবার চেষ্টা করুন',
+  askAgain: 'আবার জিজ্ঞাসা করুন',
+  changeLanguage: 'ভাষা পরিবর্তন',
+  noConnection: 'সার্ভারে পৌঁছানো যাচ্ছে না',
+  call: 'কল করুন',
+  seats: 'আসন',
+  weeks: 'সপ্তাহ',
+  stipendYes: 'ভাতা',
+};
+
+const ta: Strings = {
+  ...hi,
+  tagline: 'உங்கள் மொழியில் உங்கள் திறனைச் சொல்லுங்கள்',
+  tapToSpeak: 'பேச அழுத்தவும்',
+  tapHint: 'உங்கள் வேலை அல்லது திறனை எளிய வார்த்தைகளில் சொல்லுங்கள்',
+  listening: 'கேட்கிறோம்…',
+  thinking: 'புரிந்துகொள்கிறோம்…',
+  examplesTitle: 'இப்படிச் சொல்லலாம்',
+  examples: [
+    'நான் மண் பானைகள் செய்கிறேன்',
+    'நான் தையல் மற்றும் எம்பிராய்டரி வேலை செய்கிறேன்',
+    'நான் கொத்தனார், சுவர் மற்றும் பிளாஸ்டர்',
+    'நான் மாடு வளர்த்து பால் விற்கிறேன்',
+  ],
+  yourSkill: 'நீங்கள் சொன்னது',
+  nsqfMatch: 'NSQF தகுதி',
+  matchLabel: 'பொருத்தம்',
+  recommended: 'உங்களுக்கான பயிற்சி',
+  whyThis: 'ஏன் இது',
+  speakAgain: 'மீண்டும் கேட்க',
+  typeInstead: 'தட்டச்சு செய்யவும்',
+  typePlaceholder: 'உங்கள் திறனை இங்கே தட்டச்சு செய்யவும்…',
+  send: 'அனுப்பு',
+  tryAgain: 'மீண்டும் முயற்சி',
+  askAgain: 'மீண்டும் கேள்',
+  changeLanguage: 'மொழியை மாற்று',
+  noConnection: 'சேவையகத்தை அணுக முடியவில்லை',
+  call: 'அழைக்கவும்',
+  seats: 'இடங்கள்',
+  weeks: 'வாரங்கள்',
+  stipendYes: 'உதவித்தொகை',
+};
+
+export const UI_STRINGS: Record<LanguageCode, Strings> = {
+  hi,
+  en,
+  bn,
+  ta,
+  te: hi,
+  mr: hi,
+  kn: hi,
+  gu: hi,
+  pa: hi,
+  or: hi,
+};

@@ -74,12 +74,14 @@ interface ConverseInput {
   state?: string;
   district?: string;
   userId?: string;
+  channel?: 'APP' | 'WEB' | 'IVR';
   bandwidthKbps?: number;
 }
 
 export async function converse(input: ConverseInput): Promise<ConverseResponse> {
   const form = new FormData();
   form.append('language', input.language);
+  form.append('channel', input.channel ?? 'APP');
   if (input.transcript) form.append('transcript', input.transcript);
   if (input.state) form.append('state', input.state);
   if (input.district) form.append('district', input.district);

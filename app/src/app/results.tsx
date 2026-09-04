@@ -1,24 +1,31 @@
 import { Redirect, router } from 'expo-router';
 import { useEffect } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 
-import { setRecommendationStatus, type ProgramRecommendation } from '@/lib/api';
+import { setRecommendationStatus, type NsqfMapping, type ProgramRecommendation } from '@/lib/api';
 import { UI_STRINGS } from '@/constants/languages';
 import { getLastResult } from '@/lib/session';
 import { speak, stopSpeaking } from '@/lib/speech';
 import { useStore } from '@/lib/store';
-import { BigButton, Card, Title, useColors } from '@/components/ui';
+import { useTheme } from '@/theme';
+import { Button, Card, Chip, Meter, Screen, Txt } from '@/ui';
 
 export default function ResultsScreen() {
   const { language } = useStore();
-  const c = useColors();
+  const { c, radius } = useTheme();
   const result = getLastResult();
   const t = language ? UI_STRINGS[language] : UI_STRINGS.hi;
 
   useEffect(() => {
-    if (result?.reply.text && language) speak(result.reply.text, language);
-    return stopSpeaking;
+    if (result?.reply.text && language) {
+      const timer = setTimeout(() => speak(result.reply.text, language), 350);
+      return () => {
+        clearTimeout(timer);
+        stopSpeaking();
+      };
+    }
   }, []);
 
   if (!language) return <Redirect href="/" />;
@@ -27,110 +34,205 @@ export default function ResultsScreen() {
   const known = result.mappings.filter((m) => m.title);
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: c.background }]}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Card>
-          <Text style={[styles.label, { color: c.textSecondary }]}>{t.yourSkill}</Text>
-          <Text style={[styles.transcript, { color: c.text }]}>“{result.transcript}”</Text>
+    <Screen edges={['top']}>
+      {/* header */}
+      <View style={styles.header}>
+        <Pressable
+          onPress={() => router.replace('/home')}
+          hitSlop={12}
+          style={[styles.iconBtn, { backgroundColor: c.surfaceAlt }]}>
+          <Ionicons name="arrow-back" size={20} color={c.text} />
+        </Pressable>
+        <Pressable
+          onPress={() => result.reply.text && speak(result.reply.text, language)}
+          hitSlop={12}
+          style={[styles.iconBtn, { backgroundColor: c.primarySoft }]}>
+          <Ionicons name="volume-high" size={20} color={c.primary} />
+        </Pressable>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        {/* transcript */}
+        <Card index={0}>
+          <Txt variant="overline" tone="faint">
+            {t.yourSkill}
+          </Txt>
+          <View style={styles.quoteRow}>
+            <View style={[styles.quoteBar, { backgroundColor: c.primary }]} />
+            <Txt variant="bodyLg" style={{ flex: 1, fontStyle: 'italic' }}>
+              {result.transcript}
+            </Txt>
+          </View>
         </Card>
 
-        {known.length > 0 && (
-          <Card>
-            <Text style={[styles.label, { color: c.textSecondary }]}>{t.nsqfMatch}</Text>
-            {known.map((m) => (
-              <View key={m.qpCode} style={styles.nsqfRow}>
-                <View style={styles.flex}>
-                  <Text style={[styles.nsqfTitle, { color: c.text }]}>{m.title}</Text>
-                  <Text style={[styles.nsqfMeta, { color: c.textSecondary }]}>
-                    {m.qpCode} · {m.sector} · NSQF {m.nsqfLevel}
-                  </Text>
-                </View>
-                <Text style={styles.confidence}>{Math.round(m.confidence * 100)}%</Text>
-              </View>
-            ))}
+        {/* nsqf */}
+        {known.length > 0 ? (
+          known.map((m, i) => <NsqfCard key={m.qpCode} m={m} label={t.nsqfMatch} matchLabel={t.matchLabel} index={i + 1} />)
+        ) : (
+          <Card index={1} style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <Ionicons name="help-circle-outline" size={26} color={c.warn} />
+            <Txt variant="body" tone="dim" style={{ flex: 1 }}>
+              {t.noMatch}
+            </Txt>
           </Card>
         )}
 
-        <Title>{t.recommended}</Title>
-        {result.recommendations.map((r) => (
-          <ProgramCard key={r.trainingProgramId} r={r} t={t} />
-        ))}
+        {/* recommendations */}
+        {result.recommendations.length > 0 && (
+          <View style={{ gap: 12, marginTop: 4 }}>
+            <View style={styles.sectionHead}>
+              <Ionicons name="school" size={18} color={c.primary} />
+              <Txt variant="h2">{t.recommended}</Txt>
+              <View style={[styles.countPill, { backgroundColor: c.primarySoft }]}>
+                <Txt variant="caption" style={{ color: c.primary }}>
+                  {result.recommendations.length}
+                </Txt>
+              </View>
+            </View>
+            {result.recommendations.map((r, i) => (
+              <ProgramCard key={r.trainingProgramId} r={r} t={t} index={i + 2} />
+            ))}
+          </View>
+        )}
 
-        <BigButton
-          label={t.speakAgain}
-          variant="secondary"
-          onPress={() => result.reply.text && speak(result.reply.text, language)}
-        />
-        <BigButton label={t.tryAgain} onPress={() => router.replace('/home')} />
+        <View style={{ height: 8 }} />
       </ScrollView>
-    </SafeAreaView>
+
+      {/* sticky footer */}
+      <View style={[styles.footer, { backgroundColor: c.bg, borderTopColor: c.border }]}>
+        <View style={{ flex: 1 }}>
+          <Button
+            label={t.speakAgain}
+            variant="secondary"
+            size="md"
+            icon="refresh"
+            onPress={() => result.reply.text && speak(result.reply.text, language)}
+          />
+        </View>
+        <View style={{ flex: 1.2 }}>
+          <Button label={t.askAgain} size="md" icon="mic" onPress={() => router.replace('/home')} />
+        </View>
+      </View>
+    </Screen>
+  );
+}
+
+function NsqfCard({
+  m,
+  label,
+  matchLabel,
+  index,
+}: {
+  m: NsqfMapping;
+  label: string;
+  matchLabel: string;
+  index: number;
+}) {
+  return (
+    <Card index={index}>
+      <Txt variant="overline" tone="faint">
+        {label}
+      </Txt>
+      <View style={styles.nsqfRow}>
+        <View style={{ flex: 1, gap: 8 }}>
+          <Txt variant="h2">{m.title}</Txt>
+          <View style={styles.chipRow}>
+            {m.qpCode && <Chip label={m.qpCode} tone="primary" icon="pricetag" />}
+            {m.sector && <Chip label={m.sector} />}
+            {m.nsqfLevel != null && <Chip label={`NSQF ${m.nsqfLevel}`} tone="accent" icon="layers" />}
+          </View>
+        </View>
+        <Meter value={m.confidence} label={matchLabel} />
+      </View>
+    </Card>
   );
 }
 
 function ProgramCard({
   r,
   t,
+  index,
 }: {
   r: ProgramRecommendation;
   t: (typeof UI_STRINGS)['hi'];
+  index: number;
 }) {
-  const c = useColors();
+  const { c, radius } = useTheme();
   return (
-    <Card style={styles.programCard}>
-      <View style={styles.programHead}>
-        <Text style={[styles.badge, { backgroundColor: '#208AEF22', color: '#208AEF' }]}>
-          {r.scheme}
-          {r.component ? ` · ${r.component}` : ''}
-        </Text>
-        <Text style={[styles.score, { color: c.textSecondary }]}>
-          {Math.round(r.score * 100)}
-        </Text>
+    <Card index={index} style={{ gap: 12 }}>
+      <View style={styles.progHead}>
+        <View style={[styles.schemeBadge, { backgroundColor: c.primary }]}>
+          <Txt variant="caption" style={{ color: '#fff' }}>
+            {r.scheme}
+            {r.component ? ` · ${r.component}` : ''}
+          </Txt>
+        </View>
+        <Meter value={r.score} size={44} />
       </View>
-      <Text style={[styles.programName, { color: c.text }]}>{r.nameHindi ?? r.name}</Text>
-      <Text style={[styles.rationale, { color: c.textSecondary }]}>{r.rationale}</Text>
-      <View style={styles.metaRow}>
-        {r.district && <Meta text={`📍 ${r.district}, ${r.state}`} />}
-        {r.durationWeeks && <Meta text={`⏱ ${r.durationWeeks} ${t.weeks}`} />}
-        {typeof r.seatsAvailable === 'number' && <Meta text={`🎟 ${r.seatsAvailable} ${t.seats}`} />}
-        {r.stipend && <Meta text={`💰 ${t.stipendYes}`} />}
+
+      <Txt variant="h2" style={{ lineHeight: 26 }}>
+        {r.nameHindi ?? r.name}
+      </Txt>
+
+      {!!r.rationale && (
+        <View style={[styles.why, { backgroundColor: c.surfaceAlt, borderRadius: radius.md }]}>
+          <Ionicons name="sparkles" size={14} color={c.accent} />
+          <Txt variant="body" tone="dim" style={{ flex: 1 }}>
+            {r.rationale}
+          </Txt>
+        </View>
+      )}
+
+      <View style={styles.chipRow}>
+        {r.district && <Chip label={`${r.district}, ${r.state}`} icon="location" />}
+        {r.durationWeeks != null && <Chip label={`${r.durationWeeks} ${t.weeks}`} icon="time" />}
+        {r.seatsAvailable != null && (
+          <Chip label={`${r.seatsAvailable} ${t.seats}`} icon="people" tone="success" />
+        )}
+        {r.stipend && <Chip label={t.stipendYes} icon="cash" tone="accent" />}
       </View>
-      {r.contactPhone && (
-        <Pressable
+
+      {!!r.contactPhone && (
+        <Button
+          label={`${t.call} · ${r.contactPhone}`}
+          variant="success"
+          size="md"
+          icon="call"
           onPress={() => {
-            if (r.recommendationId) setRecommendationStatus(r.recommendationId, 'INTERESTED');
-            Linking.openURL(`tel:${r.contactPhone}`);
+            if (r.recommendationId) setRecommendationStatus(r.recommendationId, 'INTERESTED').catch(() => {});
+            Linking.openURL(`tel:${r.contactPhone}`).catch(() => {});
           }}
-          style={styles.callBtn}>
-          <Text style={styles.callText}>📞 {t.call} — {r.contactPhone}</Text>
-        </Pressable>
+        />
       )}
     </Card>
   );
 }
 
-function Meta({ text }: { text: string }) {
-  const c = useColors();
-  return <Text style={[styles.meta, { color: c.textSecondary, backgroundColor: c.backgroundSelected }]}>{text}</Text>;
-}
-
 const styles = StyleSheet.create({
-  safe: { flex: 1 },
-  flex: { flex: 1 },
-  content: { padding: 20, gap: 16, paddingBottom: 48 },
-  label: { fontSize: 14, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 },
-  transcript: { fontSize: 20, fontWeight: '600', lineHeight: 28 },
-  nsqfRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 6 },
-  nsqfTitle: { fontSize: 17, fontWeight: '700' },
-  nsqfMeta: { fontSize: 14, marginTop: 2 },
-  confidence: { fontSize: 16, fontWeight: '700', color: '#2E9B57' },
-  programCard: { gap: 10 },
-  programHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  badge: { fontSize: 12, fontWeight: '700', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, overflow: 'hidden' },
-  score: { fontSize: 14, fontWeight: '700' },
-  programName: { fontSize: 19, fontWeight: '700', lineHeight: 26 },
-  rationale: { fontSize: 15, lineHeight: 22 },
-  metaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  meta: { fontSize: 13, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, overflow: 'hidden' },
-  callBtn: { marginTop: 6, backgroundColor: '#2E9B57', borderRadius: 14, paddingVertical: 14, alignItems: 'center' },
-  callText: { color: '#fff', fontSize: 17, fontWeight: '700' },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 4,
+    paddingBottom: 10,
+  },
+  iconBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  scroll: { paddingHorizontal: 20, paddingBottom: 24, gap: 12 },
+  quoteRow: { flexDirection: 'row', gap: 12, marginTop: 8 },
+  quoteBar: { width: 4, borderRadius: 2 },
+  nsqfRow: { flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 8 },
+  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 },
+  sectionHead: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 },
+  countPill: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999 },
+  progHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  schemeBadge: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 },
+  why: { flexDirection: 'row', gap: 8, padding: 12, alignItems: 'flex-start' },
+  footer: {
+    flexDirection: 'row',
+    gap: 10,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 8,
+    borderTopWidth: 1,
+  },
 });

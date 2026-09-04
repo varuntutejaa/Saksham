@@ -46,8 +46,8 @@ The one flow that matters. Code in
 4. **NSQF + location → PM-AJAY programmes** —
    [`services/recommend.ts`](../server/src/services/recommend.ts).
    `recommendPrograms()` scores every active `TrainingProgram`:
-   `0.45` same qualification · `0.20` same sector · `0.15` same district ·
-   `0.10` same state · `0.05` seats available · `0.05` stipend. Top 5 returned.
+   `0.45` same qualification · `0.20` same sector · `0.12` same district ·
+   `0.08` same state · `0.05` seats available · `0.05` stipend. Top 5 returned.
 5. **Rationale** — [`services/i18n.ts`](../server/src/services/i18n.ts).
    Templated "why this" sentence in the beneficiary's language (not free LLM
    text — predictable for audio + auditable).
