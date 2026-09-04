@@ -42,7 +42,12 @@ export default function WelcomeScreen() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(250).duration(450)} style={styles.bottom}>
-          <Button label="Get Started · शुरू करें" icon="arrow-forward" onPress={() => router.push('/language')} />
+          <Button
+            label="Get Started · शुरू करें"
+            icon="arrow-forward"
+            variant="green"
+            onPress={() => router.push('/language')}
+          />
           <Txt variant="caption" tone="faint" center style={{ marginTop: 18 }}>
             Ministry of Social Justice & Empowerment · PM-AJAY
           </Txt>

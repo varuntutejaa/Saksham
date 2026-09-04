@@ -7,8 +7,11 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-na
 import { useTheme } from '@/theme';
 import { Txt } from './Txt';
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'success';
+type Variant = 'primary' | 'secondary' | 'ghost' | 'success' | 'green';
 type Size = 'md' | 'lg';
+
+// Matches the leaves in the Saksham mark.
+const GREEN_GRADIENT = ['#2FAE60', '#0E7C3D'] as const;
 
 interface Props {
   label: string;
@@ -40,9 +43,9 @@ export function Button({
   const anim = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
   const height = size === 'lg' ? 58 : 46;
-  const isSolid = variant === 'primary' || variant === 'success';
+  const isSolid = variant === 'primary' || variant === 'success' || variant === 'green';
   const fg =
-    variant === 'primary' || variant === 'success'
+    variant === 'primary' || variant === 'success' || variant === 'green'
       ? c.onPrimary
       : variant === 'ghost'
         ? c.primary
@@ -97,7 +100,13 @@ export function Button({
       ]}>
       {isSolid ? (
         <LinearGradient
-          colors={variant === 'success' ? [c.success, c.success] : gradient.primary}
+          colors={
+            variant === 'success'
+              ? [c.success, c.success]
+              : variant === 'green'
+                ? GREEN_GRADIENT
+                : gradient.primary
+          }
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={[styles.fill, { borderRadius: radius.lg, paddingHorizontal: 22 }]}>
