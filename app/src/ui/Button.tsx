@@ -68,7 +68,7 @@ export function Button({
       ) : (
         <>
           {icon && <Ionicons name={icon} size={size === 'lg' ? 22 : 18} color={fg} />}
-          <Txt variant={size === 'lg' ? 'bodyLg' : 'label'} style={{ color: fg, fontWeight: '700' }}>
+          <Txt variant={size === 'lg' ? 'bodyLg' : 'label'} style={{ color: fg, fontWeight: '600' }}>
             {label}
           </Txt>
         </>

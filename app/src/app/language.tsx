@@ -39,10 +39,10 @@ export default function LanguageScreen() {
           <BrandMark size={30} color="#fff" barColor="#2E8BFF" />
         </View>
         <Txt variant="title" tone="onPrimary" center>
-          अपनी भाषा चुनें
+          Choose your language
         </Txt>
         <Txt variant="body" style={{ color: 'rgba(255,255,255,0.9)' }} center>
-          Choose your language
+          अपनी भाषा चुनें
         </Txt>
       </Animated.View>
 
@@ -69,14 +69,14 @@ export default function LanguageScreen() {
                   },
                   elevation('card'),
                 ]}>
+                <Txt variant="caption" tone="faint" numberOfLines={1}>
+                  {l.english}
+                </Txt>
                 <Txt
                   numberOfLines={1}
                   adjustsFontSizeToFit
-                  style={{ fontSize: 25, fontWeight: '800', color: c.text }}>
+                  style={{ fontSize: 24, fontWeight: '600', color: c.text }}>
                   {l.native}
-                </Txt>
-                <Txt variant="caption" tone="faint" numberOfLines={1}>
-                  {l.english}
                 </Txt>
               </Pressable>
             </Animated.View>

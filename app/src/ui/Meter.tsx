@@ -41,7 +41,7 @@ export function Meter({ value, size = 56, label, showPercent }: Props) {
         <Txt
           style={{
             color: tone,
-            fontWeight: '800',
+            fontWeight: '600',
             fontSize: size * (usePercent ? 0.24 : 0.34),
             includeFontPadding: false,
           }}>

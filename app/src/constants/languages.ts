@@ -10,11 +10,8 @@ export interface LanguageOption {
   speechTag: string;
 }
 
-// 9 native Indian languages — English is deliberately excluded here since the
-// point of Saksham is voice access in the beneficiary's own language. `en`
-// still exists as a LanguageCode (server, fallback strings) but isn't offered
-// as a choice on this screen.
 export const LANGUAGES: LanguageOption[] = [
+  { code: 'en', native: 'English', english: 'English', speechTag: 'en-IN' },
   { code: 'hi', native: 'हिन्दी', english: 'Hindi', speechTag: 'hi-IN' },
   { code: 'bn', native: 'বাংলা', english: 'Bengali', speechTag: 'bn-IN' },
   { code: 'ta', native: 'தமிழ்', english: 'Tamil', speechTag: 'ta-IN' },

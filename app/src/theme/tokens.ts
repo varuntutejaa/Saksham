@@ -128,21 +128,20 @@ export const radius = {
   pill: 999,
 } as const;
 
+// Plain system font, normal weights, no letter-spacing tricks. Negative
+// tracking and heavy (700+) synthetic-bold weights look broken on Devanagari
+// and other Indic scripts (browsers fake bold by smearing glyphs, and
+// tightened tracking collides conjuncts/matras) — so this scale stays close to
+// default HTML weights (400/500/600) across every language, not just Latin.
 export const type = {
-  display: { fontSize: 32, lineHeight: 38, fontWeight: '800' as const, letterSpacing: -0.5 },
-  title: { fontSize: 24, lineHeight: 30, fontWeight: '800' as const, letterSpacing: -0.3 },
-  h2: { fontSize: 19, lineHeight: 25, fontWeight: '700' as const, letterSpacing: -0.2 },
-  bodyLg: { fontSize: 17, lineHeight: 26, fontWeight: '500' as const },
-  body: { fontSize: 15, lineHeight: 22, fontWeight: '500' as const },
-  label: { fontSize: 14, lineHeight: 18, fontWeight: '600' as const },
-  caption: { fontSize: 12.5, lineHeight: 16, fontWeight: '600' as const, letterSpacing: 0.2 },
-  overline: {
-    fontSize: 11,
-    lineHeight: 14,
-    fontWeight: '700' as const,
-    letterSpacing: 1,
-    textTransform: 'uppercase' as const,
-  },
+  display: { fontSize: 30, lineHeight: 38, fontWeight: '500' as const },
+  title: { fontSize: 22, lineHeight: 29, fontWeight: '500' as const },
+  h2: { fontSize: 18, lineHeight: 25, fontWeight: '500' as const },
+  bodyLg: { fontSize: 17, lineHeight: 26, fontWeight: '400' as const },
+  body: { fontSize: 15, lineHeight: 22, fontWeight: '400' as const },
+  label: { fontSize: 14, lineHeight: 18, fontWeight: '500' as const },
+  caption: { fontSize: 12.5, lineHeight: 16, fontWeight: '400' as const },
+  overline: { fontSize: 11, lineHeight: 14, fontWeight: '500' as const },
 } as const;
 
 export function elevation(scheme: Scheme, level: 'card' | 'raised' | 'float') {

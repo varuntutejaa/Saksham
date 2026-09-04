@@ -34,21 +34,21 @@ export default function WelcomeScreen() {
             </View>
           </View>
           <Txt variant="display" center style={{ marginTop: 22 }}>
-            सक्षम
+            Saksham
           </Txt>
           <Txt variant="label" tone="primary" center style={{ marginTop: 2 }}>
-            SAKSHAM
+            सक्षम
           </Txt>
           <Txt variant="bodyLg" tone="dim" center style={{ marginTop: 14, maxWidth: 300 }}>
-            अपनी भाषा में अपना हुनर बताइए और सरकारी प्रशिक्षण पाइए
+            Speak your skill, find PM-AJAY training
           </Txt>
           <Txt variant="body" tone="faint" center style={{ marginTop: 4 }}>
-            Speak your skill, find PM-AJAY training
+            अपनी भाषा में अपना हुनर बताइए और सरकारी प्रशिक्षण पाइए
           </Txt>
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(250).duration(450)} style={styles.bottom}>
-          <Button label="शुरू करें · Get Started" icon="arrow-forward" onPress={() => router.push('/language')} />
+          <Button label="Get Started · शुरू करें" icon="arrow-forward" onPress={() => router.push('/language')} />
           <Txt variant="caption" tone="faint" center style={{ marginTop: 18 }}>
             Ministry of Social Justice & Empowerment · PM-AJAY
           </Txt>
