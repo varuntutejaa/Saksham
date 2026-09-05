@@ -26,6 +26,7 @@ import { loadHistory, saveConversation, type ConversationRecord } from '@/lib/co
 import { setLastResult } from '@/lib/session';
 import { revealPortion, speak, stopSpeaking } from '@/lib/speech';
 import { transcribeWithSarvam } from '@/lib/transcription';
+import { useAutoStopRecording } from '@/lib/useAutoStopRecording';
 import { useAuth } from '@/lib/auth';
 import { useStore } from '@/lib/store';
 import { useTheme } from '@/theme';
@@ -89,6 +90,13 @@ export default function SpeakScreen() {
       return () => clearTimeout(timer);
     }
   }, [language]);
+
+  useAutoStopRecording({
+    isRecording: recState.isRecording,
+    level: micLevel,
+    durationMillis: recState.durationMillis ?? 0,
+    onStop: toggleRecord,
+  });
 
   if (!language) return null;
 

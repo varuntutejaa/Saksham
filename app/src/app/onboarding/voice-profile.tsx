@@ -16,6 +16,7 @@ import { UI_STRINGS } from '@/constants/languages';
 import { useAuth } from '@/lib/auth';
 import { revealPortion, speak, stopSpeaking } from '@/lib/speech';
 import { transcribeWithSarvam } from '@/lib/transcription';
+import { useAutoStopRecording } from '@/lib/useAutoStopRecording';
 import { useStore } from '@/lib/store';
 import { useTheme } from '@/theme';
 import { Button, MicOrb, Screen, StepProgress, TypingDots, Txt, type MicState } from '@/ui';
@@ -24,7 +25,7 @@ type ProfileMessage = { id: number; role: 'user' | 'assistant'; text: string };
 
 export default function VoiceProfileStep() {
   const { language, setGuestProfile } = useStore();
-  const { updateProfile, token } = useAuth();
+  const { updateProfile, token, user } = useAuth();
   const { c, radius, elevation } = useTheme();
   const recorder = useAudioRecorder({ ...RecordingPresets.HIGH_QUALITY, isMeteringEnabled: true });
   const recState = useAudioRecorderState(recorder, 100);
@@ -35,11 +36,22 @@ export default function VoiceProfileStep() {
   const t = language ? UI_STRINGS[language] : UI_STRINGS.hi;
   const effectiveLanguage = language ?? 'hi';
 
-  const STEPS: { field: ProfileField; question: string }[] = [
-    { field: 'name', question: t.voiceProfileGreeting },
-    { field: 'age', question: t.ageQuestion },
-    { field: 'education', question: t.eduQuestion },
-  ];
+  // A signed-in beneficiary already gave their name at sign-up — greet them by
+  // it and go straight to the next question instead of asking again.
+  const knownName = user?.name?.trim() || null;
+  const STEPS: { field: ProfileField; question: string }[] = knownName
+    ? [
+        {
+          field: 'age',
+          question: `${t.voiceProfileGreetingNamed.replace('{name}', knownName)} ${t.ageQuestion}`,
+        },
+        { field: 'education', question: t.eduQuestion },
+      ]
+    : [
+        { field: 'name', question: t.voiceProfileGreeting },
+        { field: 'age', question: t.ageQuestion },
+        { field: 'education', question: t.eduQuestion },
+      ];
 
   const eduLabel: Record<string, string> = {
     below_10th: t.eduBelow10th,
@@ -162,6 +174,13 @@ export default function VoiceProfileStep() {
     await recorder.prepareToRecordAsync();
     recorder.record();
   }
+
+  useAutoStopRecording({
+    isRecording: recState.isRecording,
+    level: micLevel,
+    durationMillis: recState.durationMillis ?? 0,
+    onStop: toggleRecord,
+  });
 
   const micState: MicState = busy || transcribing ? 'thinking' : recState.isRecording ? 'listening' : 'idle';
   const status = busy
