@@ -6,5 +6,4 @@ export { Chip } from './Chip';
 export { MicOrb, type MicState } from './MicOrb';
 export { Meter } from './Meter';
 export { BrandMark } from './BrandMark';
-export { OptionRow } from './OptionRow';
 export { StepProgress } from './StepProgress';

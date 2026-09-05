@@ -7,6 +7,7 @@ import { mapTranscriptToNsqf } from "../services/nsqf.js";
 import { recommendPrograms } from "../services/recommend.js";
 import { buildSpokenReply } from "../services/reply.js";
 import { answerFromDocuments } from "../services/rag.js";
+import { extractProfileAnswer } from "../services/profileExtract.js";
 
 export const assistantRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024 } });
@@ -170,6 +171,25 @@ assistantRouter.post("/transcribe", upload.single("audio"), async (req, res) => 
     languageProbability: stt.confidence,
     stt: { provider: stt.provider, confidence: stt.confidence, language: stt.language },
   });
+});
+
+/**
+ * POST /api/assistant/extract-profile-answer
+ * Voice onboarding (app/src/app/onboarding/voice-profile.tsx): turns a free-
+ * text answer (spoken or typed, any language) into the structured
+ * gender/age/education value the profile needs. `value: null` means the
+ * answer couldn't be classified — the app should re-ask, not guess.
+ */
+const extractProfileSchema = z.object({
+  field: z.enum(["gender", "age", "education"]),
+  answer: z.string().min(1),
+  language: z.enum(LANGS).default("hi"),
+});
+assistantRouter.post("/extract-profile-answer", async (req, res) => {
+  const parsed = extractProfileSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  const value = await extractProfileAnswer(parsed.data.field, parsed.data.answer, parsed.data.language);
+  res.json({ value });
 });
 
 /**

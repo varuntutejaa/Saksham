@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInDown, ZoomIn } from 'react-native-reanimated';
 
 import { UI_STRINGS } from '@/constants/languages';
-import { resetAnswers } from '@/lib/onboarding';
 import { useStore } from '@/lib/store';
 import { useTheme } from '@/theme';
 import { Button, Screen, Txt } from '@/ui';
@@ -15,8 +14,7 @@ export default function OnboardingIntro() {
   const t = language ? UI_STRINGS[language] : UI_STRINGS.hi;
 
   function start() {
-    resetAnswers();
-    router.push('/onboarding/gender');
+    router.push('/onboarding/voice-profile');
   }
 
   return (

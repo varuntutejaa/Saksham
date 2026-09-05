@@ -150,6 +150,27 @@ export async function converse(input: ConverseInput): Promise<ConverseResponse> 
   }
 }
 
+export type ProfileField = 'gender' | 'age' | 'education';
+
+/**
+ * Voice onboarding — turns a free-text answer (spoken or typed, any
+ * language) into a structured gender/age/education value via an LLM.
+ * `value: null` means the answer couldn't be classified; re-ask, don't guess.
+ */
+export async function extractProfileAnswer(
+  field: ProfileField,
+  answer: string,
+  language: LanguageCode,
+): Promise<{ value: string | number | null }> {
+  const res = await fetch(`${API_BASE}/api/assistant/extract-profile-answer`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ field, answer, language }),
+  });
+  if (!res.ok) throw new Error(await extractError(res, 'Could not understand that answer'));
+  return res.json();
+}
+
 interface LocalSkill {
   normalizedSkill: string;
   qpCode: string;
