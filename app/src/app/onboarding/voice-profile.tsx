@@ -37,12 +37,10 @@ export default function VoiceProfileStep() {
 
   const STEPS: { field: ProfileField; question: string }[] = [
     { field: 'name', question: t.voiceProfileGreeting },
-    { field: 'gender', question: t.genderQuestion },
     { field: 'age', question: t.ageQuestion },
     { field: 'education', question: t.eduQuestion },
   ];
 
-  const genderLabel: Record<string, string> = { male: t.genderMale, female: t.genderFemale, other: t.genderOther };
   const eduLabel: Record<string, string> = {
     below_10th: t.eduBelow10th,
     '10th': t.edu10th,
@@ -75,7 +73,6 @@ export default function VoiceProfileStep() {
   function labelFor(field: ProfileField, value: string | number): string {
     if (field === 'name') return t.nameConfirmedGreeting.replace('{name}', String(value));
     if (field === 'age') return `${value} ${t.yearsSuffix}`;
-    if (field === 'gender') return genderLabel[value as string] ?? String(value);
     return eduLabel[value as string] ?? String(value);
   }
 

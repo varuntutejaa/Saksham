@@ -28,7 +28,7 @@ export default function AuthScreen() {
   // once signed in, send new/incomplete profiles through onboarding once —
   // handled here (not with an imperative router call in submit()) so it can
   // never race the login/register state update.
-  if (token) return <Redirect href={user?.onboarded ? '/main' : '/onboarding'} />;
+  if (token) return <Redirect href={user?.onboarded ? '/main' : '/onboarding/voice-profile'} />;
 
   async function submit() {
     setError(null);
@@ -60,7 +60,7 @@ export default function AuthScreen() {
             style={[styles.iconBtn, { backgroundColor: c.surfaceAlt }]}>
             <Txt variant="h2">‹</Txt>
           </Pressable>
-          <Pressable onPress={() => router.replace('/onboarding')} hitSlop={8}>
+          <Pressable onPress={() => router.replace('/onboarding/voice-profile')} hitSlop={8}>
             <Txt variant="label" tone="primary">
               {t.continueGuest}
             </Txt>
