@@ -7,3 +7,4 @@ export { MicOrb, type MicState } from './MicOrb';
 export { Meter } from './Meter';
 export { BrandMark } from './BrandMark';
 export { StepProgress } from './StepProgress';
+export { TypingDots } from './TypingDots';

@@ -24,38 +24,17 @@ import { converse, type LanguageCode } from '@/lib/api';
 import { LANGUAGES, UI_STRINGS } from '@/constants/languages';
 import { loadHistory, saveConversation, type ConversationRecord } from '@/lib/conversationHistory';
 import { setLastResult } from '@/lib/session';
-import { speak, stopSpeaking } from '@/lib/speech';
+import { revealPortion, speak, stopSpeaking } from '@/lib/speech';
 import { transcribeWithSarvam } from '@/lib/transcription';
 import { useAuth } from '@/lib/auth';
 import { useStore } from '@/lib/store';
 import { useTheme } from '@/theme';
-import { Button, MicOrb, Screen, Txt, type MicState } from '@/ui';
+import { Button, MicOrb, Screen, TypingDots, Txt, type MicState } from '@/ui';
 
 type AgentMessage = {
   role: 'user' | 'assistant';
   text: string;
 };
-
-/** first `fraction` (0–1) of the reply, rounded to whole words */
-function revealPortion(text: string, fraction: number): string {
-  if (fraction >= 1) return text;
-  const words = text.split(' ');
-  const count = Math.max(1, Math.floor(words.length * Math.min(1, fraction * 1.08)));
-  return words.slice(0, count).join(' ');
-}
-
-function TypingDots({ color }: { color: string }) {
-  const [step, setStep] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setStep((s) => (s + 1) % 3), 350);
-    return () => clearInterval(id);
-  }, []);
-  return (
-    <Txt variant="body" style={{ color, letterSpacing: 3 }}>
-      {['•', '• •', '• • •'][step]}
-    </Txt>
-  );
-}
 
 export default function SpeakScreen() {
   const { language, setLanguage, state, district } = useStore();

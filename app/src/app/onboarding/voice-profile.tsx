@@ -14,13 +14,13 @@ import {
 import { extractProfileAnswer, type ProfileField } from '@/lib/api';
 import { UI_STRINGS } from '@/constants/languages';
 import { useAuth } from '@/lib/auth';
-import { speak, stopSpeaking } from '@/lib/speech';
+import { revealPortion, speak, stopSpeaking } from '@/lib/speech';
 import { transcribeWithSarvam } from '@/lib/transcription';
 import { useStore } from '@/lib/store';
 import { useTheme } from '@/theme';
-import { Button, MicOrb, Screen, StepProgress, Txt, type MicState } from '@/ui';
+import { Button, MicOrb, Screen, StepProgress, TypingDots, Txt, type MicState } from '@/ui';
 
-type ProfileMessage = { role: 'user' | 'assistant'; text: string };
+type ProfileMessage = { id: number; role: 'user' | 'assistant'; text: string };
 
 export default function VoiceProfileStep() {
   const { language, setGuestProfile } = useStore();
@@ -57,15 +57,33 @@ export default function VoiceProfileStep() {
   const [showType, setShowType] = useState(false);
   const [busy, setBusy] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
+  // types the latest agent bubble out word-by-word, paced to the spoken audio
+  const [reveal, setReveal] = useState<{ id: number; fraction: number } | null>(null);
   const askedStepRef = useRef(-1);
+  const idRef = useRef(0);
 
   const currentStep = STEPS[stepIndex];
+
+  function addUser(text: string) {
+    setMessages((m) => m.concat({ id: ++idRef.current, role: 'user', text }));
+  }
+
+  function addAssistant(text: string) {
+    const id = ++idRef.current;
+    setMessages((m) => m.concat({ id, role: 'assistant', text }));
+    setReveal({ id, fraction: 0 });
+    speak(text, effectiveLanguage, {
+      onProgress: (fraction) => setReveal((r) => (r && r.id === id ? { id, fraction } : r)),
+      onDone: () => setReveal((r) => (r && r.id === id ? null : r)),
+    });
+  }
+
+  useEffect(() => () => stopSpeaking(), []);
 
   useEffect(() => {
     if (askedStepRef.current === stepIndex) return;
     askedStepRef.current = stepIndex;
-    setMessages((m) => m.concat({ role: 'assistant', text: currentStep.question }));
-    const timer = setTimeout(() => speak(currentStep.question, effectiveLanguage), 350);
+    const timer = setTimeout(() => addAssistant(currentStep.question), 350);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stepIndex]);
@@ -82,18 +100,16 @@ export default function VoiceProfileStep() {
     setBusy(true);
     setTyped('');
     setShowType(false);
-    setMessages((m) => m.concat({ role: 'user', text: clean }));
+    addUser(clean);
     try {
       const { value } = await extractProfileAnswer(currentStep.field, clean, effectiveLanguage);
       if (value === null) {
-        setMessages((m) => m.concat({ role: 'assistant', text: t.profileAnswerUnclear }));
-        speak(t.profileAnswerUnclear, effectiveLanguage);
+        addAssistant(t.profileAnswerUnclear);
         return;
       }
 
       const label = labelFor(currentStep.field, value);
-      setMessages((m) => m.concat({ role: 'assistant', text: label }));
-      speak(label, effectiveLanguage);
+      addAssistant(label);
 
       const nextCollected = { ...collected, [currentStep.field]: value };
       setCollected(nextCollected);
@@ -141,6 +157,7 @@ export default function VoiceProfileStep() {
       return;
     }
     stopSpeaking();
+    setReveal(null);
     await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
     await recorder.prepareToRecordAsync();
     recorder.record();
@@ -175,21 +192,43 @@ export default function VoiceProfileStep() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
           <View style={styles.thread}>
-            {messages.map((m, i) => (
+            {messages.map((m) => {
+              const revealing = reveal?.id === m.id && m.role === 'assistant';
+              const shownText = revealing ? revealPortion(m.text, reveal.fraction) : m.text;
+              const waiting = revealing && reveal.fraction <= 0;
+              return (
+                <Animated.View
+                  key={m.id}
+                  entering={FadeInDown.duration(250)}
+                  style={[
+                    styles.bubble,
+                    {
+                      alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
+                      backgroundColor: m.role === 'user' ? c.surfaceAlt : c.primarySoft,
+                      borderColor: m.role === 'user' ? c.border : c.primarySoft,
+                    },
+                  ]}>
+                  {waiting ? (
+                    <TypingDots color={c.primary} />
+                  ) : (
+                    <Txt variant="body">
+                      {shownText}
+                      {revealing && shownText.length < m.text.length ? ' ▍' : ''}
+                    </Txt>
+                  )}
+                </Animated.View>
+              );
+            })}
+            {busy && !reveal && (
               <Animated.View
-                key={i}
                 entering={FadeInDown.duration(250)}
                 style={[
                   styles.bubble,
-                  {
-                    alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
-                    backgroundColor: m.role === 'user' ? c.surfaceAlt : c.primarySoft,
-                    borderColor: m.role === 'user' ? c.border : c.primarySoft,
-                  },
+                  { alignSelf: 'flex-start', backgroundColor: c.primarySoft, borderColor: c.primarySoft },
                 ]}>
-                <Txt variant="body">{m.text}</Txt>
+                <TypingDots color={c.primary} />
               </Animated.View>
-            ))}
+            )}
           </View>
 
           <View style={styles.micWrap}>

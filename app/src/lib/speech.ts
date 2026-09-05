@@ -187,3 +187,13 @@ export function stopSpeaking() {
 export function isSpeaking() {
   return speaking;
 }
+
+/** first `fraction` (0–1) of `text`, rounded to whole words and nudged slightly
+ *  ahead of the audio so each word shows just before it is heard. Pair with
+ *  `speak(..., { onProgress })` to type a reply out in time with the voice. */
+export function revealPortion(text: string, fraction: number): string {
+  if (fraction >= 1) return text;
+  const words = text.split(' ');
+  const count = Math.max(1, Math.floor(words.length * Math.min(1, fraction * 1.08)));
+  return words.slice(0, count).join(' ');
+}
