@@ -10,9 +10,25 @@ import { speechTagFor } from '@/constants/languages';
 let speaking = false;
 let player: AudioPlayer | null = null;
 let webAudio: HTMLAudioElement | null = null;
+let fallbackTimer: ReturnType<typeof setTimeout> | null = null;
 // bumped on every speak()/stopSpeaking() so a slow TTS response that resolves
 // after the user has moved on doesn't start playing over the next prompt.
 let generation = 0;
+
+/** Callbacks so a caller can reveal the reply text in step with the audio. */
+export interface SpeakHandlers {
+  /** playback position as a 0–1 fraction, fired repeatedly while speaking */
+  onProgress?: (fraction: number) => void;
+  /** fired once when playback finishes (or is stopped) */
+  onDone?: () => void;
+}
+
+function clearFallbackTimer() {
+  if (fallbackTimer) {
+    clearTimeout(fallbackTimer);
+    fallbackTimer = null;
+  }
+}
 
 function cleanupPlayer() {
   if (player) {
@@ -32,54 +48,85 @@ function cleanupPlayer() {
     }
     webAudio = null;
   }
+  clearFallbackTimer();
 }
 
-function deviceSpeak(text: string, language: LanguageCode) {
+/** On-device TTS. We get no real playback position from expo-speech, so drive
+ *  `onProgress` off a wall-clock estimate (~13 characters per second). */
+function deviceSpeak(text: string, language: LanguageCode, myGeneration: number, handlers?: SpeakHandlers) {
   Speech.stop();
   speaking = true;
+
+  const estimatedMs = Math.max(1200, (text.length / 13) * 1000);
+  const startedAt = Date.now();
+  const tick = () => {
+    if (myGeneration !== generation) return;
+    const fraction = Math.min(1, (Date.now() - startedAt) / estimatedMs);
+    handlers?.onProgress?.(fraction);
+    if (fraction < 1) fallbackTimer = setTimeout(tick, 90);
+  };
+  tick();
+
   Speech.speak(text, {
     language: speechTagFor(language),
     rate: 0.92,
     pitch: 1.0,
     onDone: () => {
       speaking = false;
+      clearFallbackTimer();
+      if (myGeneration === generation) {
+        handlers?.onProgress?.(1);
+        handlers?.onDone?.();
+      }
     },
     onStopped: () => {
       speaking = false;
+      clearFallbackTimer();
     },
     onError: () => {
       speaking = false;
+      clearFallbackTimer();
+      if (myGeneration === generation) handlers?.onDone?.();
     },
   });
 }
 
 /** Speak text aloud in the given language via Sarvam TTS (proxied through the
  *  backend), falling back to the on-device engine on any failure. Any
- *  in-progress utterance is stopped first. */
-export async function speak(text: string, language: LanguageCode) {
+ *  in-progress utterance is stopped first. Pass `handlers` to sync UI (e.g. a
+ *  typing reveal) to the spoken audio. */
+export async function speak(text: string, language: LanguageCode, handlers?: SpeakHandlers) {
   if (!text) return;
   stopSpeaking();
   const myGeneration = generation;
   speaking = true;
 
   try {
-    console.log('[speech] requesting Sarvam TTS', language, text.slice(0, 40));
-    const { audioUrl, format, provider } = await synthesizeSpeech(text, language);
-    console.log('[speech] TTS response', provider, format);
+    const { audioUrl, format } = await synthesizeSpeech(text, language);
     if (myGeneration !== generation) return;
     if (format === 'text' || !audioUrl.startsWith('data:audio')) {
-      deviceSpeak(text, language);
+      deviceSpeak(text, language, myGeneration, handlers);
       return;
     }
 
     if (Platform.OS === 'web') {
       const audio = new Audio(audioUrl);
       webAudio = audio;
+      audio.ontimeupdate = () => {
+        if (myGeneration === generation && audio.duration > 0) {
+          handlers?.onProgress?.(Math.min(1, audio.currentTime / audio.duration));
+        }
+      };
       audio.onended = () => {
         speaking = false;
+        if (myGeneration === generation) {
+          handlers?.onProgress?.(1);
+          handlers?.onDone?.();
+        }
       };
       audio.onerror = () => {
         speaking = false;
+        if (myGeneration === generation) handlers?.onDone?.();
       };
       await audio.play();
       return;
@@ -104,10 +151,16 @@ export async function speak(text: string, language: LanguageCode) {
       return;
     }
 
-    player = createAudioPlayer(file.uri);
+    player = createAudioPlayer(file.uri, { updateInterval: 100 });
     const sub = player.addListener('playbackStatusUpdate', (status) => {
+      if (myGeneration !== generation) return;
+      if (status.duration > 0) {
+        handlers?.onProgress?.(Math.min(1, status.currentTime / status.duration));
+      }
       if (status.didJustFinish) {
         speaking = false;
+        handlers?.onProgress?.(1);
+        handlers?.onDone?.();
         sub.remove();
         cleanupPlayer();
         try {
@@ -120,7 +173,7 @@ export async function speak(text: string, language: LanguageCode) {
     player.play();
   } catch (e) {
     console.warn('[speech] Sarvam TTS failed, using on-device voice:', e);
-    if (myGeneration === generation) deviceSpeak(text, language);
+    if (myGeneration === generation) deviceSpeak(text, language, myGeneration, handlers);
   }
 }
 

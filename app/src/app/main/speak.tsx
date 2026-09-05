@@ -36,6 +36,27 @@ type AgentMessage = {
   text: string;
 };
 
+/** first `fraction` (0–1) of the reply, rounded to whole words */
+function revealPortion(text: string, fraction: number): string {
+  if (fraction >= 1) return text;
+  const words = text.split(' ');
+  const count = Math.max(1, Math.floor(words.length * Math.min(1, fraction * 1.08)));
+  return words.slice(0, count).join(' ');
+}
+
+function TypingDots({ color }: { color: string }) {
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setStep((s) => (s + 1) % 3), 350);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <Txt variant="body" style={{ color, letterSpacing: 3 }}>
+      {['•', '• •', '• • •'][step]}
+    </Txt>
+  );
+}
+
 export default function SpeakScreen() {
   const { language, setLanguage, state, district } = useStore();
   const { user } = useAuth();
@@ -56,12 +77,16 @@ export default function SpeakScreen() {
   const [showType, setShowType] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [history, setHistory] = useState<ConversationRecord[]>([]);
+  // reveals the latest agent bubble word-by-word, paced to the spoken audio
+  const [reveal, setReveal] = useState<{ index: number; fraction: number } | null>(null);
   const spoke = useRef(false);
   const sessionIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     loadHistory().then(setHistory);
   }, []);
+
+  useEffect(() => () => stopSpeaking(), []);
 
   function ensureSessionId(): string {
     if (!sessionIdRef.current) sessionIdRef.current = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -70,6 +95,7 @@ export default function SpeakScreen() {
 
   function openHistoryItem(record: ConversationRecord) {
     stopSpeaking();
+    setReveal(null);
     setAgentMode(true);
     setAgentMessages(record.messages);
     sessionIdRef.current = record.id;
@@ -175,7 +201,13 @@ export default function SpeakScreen() {
       const replyText = result.reply.text || t.agentFallbackReply;
       const withReply = withUser.concat({ role: 'assistant' as const, text: replyText });
       setAgentMessages(withReply);
-      speak(replyText, replyLanguage);
+      const replyIndex = withReply.length - 1;
+      setReveal({ index: replyIndex, fraction: 0 });
+      speak(replyText, replyLanguage, {
+        onProgress: (fraction) =>
+          setReveal((r) => (r && r.index === replyIndex ? { index: replyIndex, fraction } : r)),
+        onDone: () => setReveal((r) => (r && r.index === replyIndex ? null : r)),
+      });
       const updated = await saveConversation(ensureSessionId(), withReply);
       setHistory(updated);
     } catch (e) {
@@ -217,6 +249,7 @@ export default function SpeakScreen() {
       return;
     }
     stopSpeaking();
+    setReveal(null);
     setTranscript('');
     setShowType(false);
     await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
@@ -252,6 +285,7 @@ export default function SpeakScreen() {
             <Pressable
               onPress={() => {
                 stopSpeaking();
+                setReveal(null);
                 setAgentMode((v) => !v);
                 setTranscript('');
                 setShowType(false);
@@ -336,30 +370,57 @@ export default function SpeakScreen() {
 
           {agentMode && agentMessages.length > 0 && (
             <Animated.View entering={FadeInDown.duration(300)} style={styles.agentThread}>
-              {agentMessages.map((message, index) => (
+              {agentMessages.map((message, index) => {
+                const revealing = reveal?.index === index && message.role === 'assistant';
+                const waitingToSpeak = revealing && reveal.fraction <= 0;
+                const shownText = revealing ? revealPortion(message.text, reveal.fraction) : message.text;
+                return (
+                  <View
+                    key={`${message.role}-${index}`}
+                    style={[
+                      styles.agentBubble,
+                      {
+                        alignSelf: message.role === 'user' ? 'flex-end' : 'flex-start',
+                        backgroundColor: message.role === 'user' ? c.surfaceAlt : c.primarySoft,
+                        borderColor: message.role === 'user' ? c.border : c.primarySoft,
+                      },
+                    ]}>
+                    <View style={styles.agentBubbleHeader}>
+                      <Ionicons
+                        name={message.role === 'user' ? 'person-circle-outline' : 'sparkles'}
+                        size={15}
+                        color={message.role === 'user' ? c.textDim : c.primary}
+                      />
+                      <Txt variant="overline" tone="faint">
+                        {message.role === 'user' ? t.youSaid : t.agentName}
+                      </Txt>
+                    </View>
+                    {waitingToSpeak ? (
+                      <TypingDots color={c.primary} />
+                    ) : (
+                      <Txt variant="body">
+                        {shownText}
+                        {revealing && shownText.length < message.text.length ? ' ▍' : ''}
+                      </Txt>
+                    )}
+                  </View>
+                );
+              })}
+              {busy && !reveal && (
                 <View
-                  key={`${message.role}-${index}`}
                   style={[
                     styles.agentBubble,
-                    {
-                      alignSelf: message.role === 'user' ? 'flex-end' : 'flex-start',
-                      backgroundColor: message.role === 'user' ? c.surfaceAlt : c.primarySoft,
-                      borderColor: message.role === 'user' ? c.border : c.primarySoft,
-                    },
+                    { alignSelf: 'flex-start', backgroundColor: c.primarySoft, borderColor: c.primarySoft },
                   ]}>
                   <View style={styles.agentBubbleHeader}>
-                    <Ionicons
-                      name={message.role === 'user' ? 'person-circle-outline' : 'sparkles'}
-                      size={15}
-                      color={message.role === 'user' ? c.textDim : c.primary}
-                    />
+                    <Ionicons name="sparkles" size={15} color={c.primary} />
                     <Txt variant="overline" tone="faint">
-                      {message.role === 'user' ? t.youSaid : t.agentName}
+                      {t.agentName}
                     </Txt>
                   </View>
-                  <Txt variant="body">{message.text}</Txt>
+                  <TypingDots color={c.primary} />
                 </View>
-              ))}
+              )}
               <View style={styles.actionRow}>
                 <Button
                   label={t.clearAgent}
@@ -369,6 +430,7 @@ export default function SpeakScreen() {
                   fullWidth={false}
                   onPress={() => {
                     stopSpeaking();
+                    setReveal(null);
                     setAgentMessages([]);
                     sessionIdRef.current = null;
                   }}
