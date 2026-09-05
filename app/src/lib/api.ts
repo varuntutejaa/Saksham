@@ -42,22 +42,20 @@ export interface NsqfMapping {
   pmajayCourse: { subCourseCode: string; subCourseName: string; sector: string } | null;
 }
 
-export interface ProgramRecommendation {
+/** A real PM-AJAY course (one of the 2,366 in the government catalogue),
+ *  scored against the NSQF qualification the spoken skill mapped to. */
+export interface CourseRecommendation {
   recommendationId?: string;
-  trainingProgramId: string;
-  name: string;
-  nameHindi: string | null;
-  scheme: string;
-  component: string | null;
-  sector: string | null;
+  pmajayCourseId: string;
+  subCourseCode: string;
+  subCourseName: string;
+  courseName: string;
+  sector: string;
+  subSector: string;
+  courseLevel: string;
+  nsqfQpCode: string | null;
+  nsqfTitle: string | null;
   nsqfLevel: number | null;
-  mode: string;
-  durationWeeks: number | null;
-  stipend: boolean;
-  district: string | null;
-  state: string | null;
-  contactPhone: string | null;
-  seatsAvailable: number | null;
   score: number;
   rationale: string;
 }
@@ -159,7 +157,7 @@ export interface ConverseResponse {
   language?: LanguageCode;
   stt?: { provider: string; confidence: number; language?: LanguageCode };
   mappings: NsqfMapping[];
-  recommendations: ProgramRecommendation[];
+  recommendations: CourseRecommendation[];
   reply: { text: string; audioUrl: string; format: string };
 }
 
@@ -404,20 +402,16 @@ function localConverse(
           },
         ],
     recommendations: selected.slice(0, 3).map((skill, index) => ({
-      trainingProgramId: `local-${skill.normalizedSkill}`,
-      name: `${skill.title} Training`,
-      nameHindi: null,
-      scheme: 'PM-AJAY',
-      component: 'Skill Development',
+      pmajayCourseId: `local-${skill.normalizedSkill}`,
+      subCourseCode: skill.qpCode,
+      subCourseName: skill.title,
+      courseName: skill.sector,
       sector: skill.sector,
+      subSector: skill.sector,
+      courseLevel: 'National',
+      nsqfQpCode: skill.qpCode,
+      nsqfTitle: skill.title,
       nsqfLevel: skill.nsqfLevel,
-      mode: 'OFFLINE',
-      durationWeeks: 8 + index * 2,
-      stipend: true,
-      district: district ?? null,
-      state: state ?? null,
-      contactPhone: null,
-      seatsAvailable: null,
       score: 0.72 - index * 0.04,
       rationale: copy.rationale,
     })),

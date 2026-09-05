@@ -3,21 +3,18 @@ import type { Language } from "@prisma/client";
 import { rationalePhrase } from "./i18n.js";
 import type { MappingResult } from "./nsqf.js";
 
-export interface RecommendationResult {
-  trainingProgramId: string;
-  name: string;
-  nameHindi: string | null;
-  scheme: string;
-  component: string | null;
-  sector: string | null;
+export interface CourseRecommendation {
+  pmajayCourseId: string;
+  subCourseCode: string;
+  subCourseName: string;
+  courseName: string;
+  sector: string;
+  subSector: string;
+  courseLevel: string;
+  /** the NSQF qualification the beneficiary's skill mapped to, when there was one */
+  nsqfQpCode: string | null;
+  nsqfTitle: string | null;
   nsqfLevel: number | null;
-  mode: string;
-  durationWeeks: number | null;
-  stipend: boolean;
-  district: string | null;
-  state: string | null;
-  contactPhone: string | null;
-  seatsAvailable: number | null;
   score: number;
   rationale: string;
 }
@@ -25,87 +22,134 @@ export interface RecommendationResult {
 interface RecommendInput {
   mappings: MappingResult[];
   state?: string | null;
-  district?: string | null;
   language?: Language;
 }
 
+/** The two real datasets spell sectors differently — NSQF says
+ *  "Handicrafts & Carpet", the PM-AJAY catalogue says "Handicrafts and Carpet".
+ *  Compare them on a normalized form so the sector signal actually fires. */
+function normalizeSector(sector: string): string {
+  return sector.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "");
+}
+
+const TITLE_STOPWORDS = new Set([
+  "including", "traditional", "tradtional", "product", "maker", "worker", "assistant",
+  "operator", "general", "other", "service", "services", "based",
+]);
+
+/** Content words from the matched NSQF qualification title, used to prefer the
+ *  course that names the same trade as the qualification the skill mapped to. */
+function titleWords(title: string | null): string[] {
+  if (!title) return [];
+  return [
+    ...new Set(
+      title
+        .toLowerCase()
+        .split(/[^a-z]+/)
+        .filter((w) => w.length > 4 && !TITLE_STOPWORDS.has(w)),
+    ),
+  ];
+}
+
+/** "State [ODISHA]" -> "odisha", so a course scoped to a state can be matched
+ *  against the beneficiary's own state. */
+function courseStateName(courseLevel: string): string | null {
+  const match = courseLevel.match(/\[([^\]]+)\]/);
+  return match ? match[1].trim().toLowerCase() : null;
+}
+
 /**
- * Score PM-AJAY / partner training programmes for a beneficiary.
+ * Recommend real PM-AJAY courses for a beneficiary.
+ *
+ * Scores the actual 2,366-row PM-AJAY course catalogue
+ * (prisma/data/README-pmajay-courses.md) against the NSQF qualifications the
+ * beneficiary's spoken skill mapped to — so both halves of a recommendation
+ * are real government data, not sample rows.
  *
  * Score components (0–1, weighted):
- *   0.45  same NSQF qualification as a mapped skill
- *   0.20  same sector as a mapped skill
- *   0.12  programme in the beneficiary's district
- *   0.08  programme in the beneficiary's state
- *   0.05  seats currently available
- *   0.05  stipend offered (reduces opportunity cost — key barrier for SC beneficiaries)
+ *   0.50  course keywords contain the normalized skill the beneficiary said
+ *   0.20  course sector matches the mapped NSQF qualification's sector
+ *   0.15  course title names the skill, or the same trade as the matched NSQF QP
+ *   0.10  scoped to the beneficiary's own state, or nationally available
+ *   0.05  the skill mapped to an NSQF qualification at all (auditable match)
  */
-export async function recommendPrograms(
-  input: RecommendInput,
-): Promise<RecommendationResult[]> {
-  const { mappings, state, district, language = "hi" } = input;
+export async function recommendCourses(input: RecommendInput): Promise<CourseRecommendation[]> {
+  const { mappings, state, language = "hi" } = input;
 
-  const qualIds = mappings
-    .map((m) => m.nsqfQualificationId)
-    .filter((id): id is string => Boolean(id));
-  const sectors = mappings
-    .map((m) => m.sector)
-    .filter((s): s is string => Boolean(s));
+  const matched = mappings.filter((m) => m.normalizedSkill !== "unknown");
+  const tokens = [...new Set(matched.map((m) => m.normalizedSkill.toLowerCase()))];
+  const sectors = [...new Set(matched.map((m) => m.sector).filter((s): s is string => Boolean(s)))];
+  if (tokens.length === 0 && sectors.length === 0) return [];
 
-  const programs = await prisma.trainingProgram.findMany({
-    where: { active: true },
-    include: { nsqfQualification: true },
+  const wantedSectors = new Set(sectors.map(normalizeSector));
+  // "&"/"and" spellings differ between the two datasets, so widen the SQL filter
+  // and settle the real comparison on the normalized form below.
+  const sectorVariants = [...new Set(sectors.flatMap((s) => [s, s.replace(/ & /g, " and "), s.replace(/ and /g, " & ")]))];
+
+  const candidates = await prisma.pmajayCourse.findMany({
+    where: {
+      OR: [
+        ...(tokens.length ? [{ keywords: { hasSome: tokens } }] : []),
+        ...(sectorVariants.length ? [{ sector: { in: sectorVariants } }] : []),
+      ],
+    },
+    take: 300,
   });
 
-  const scored = programs.map((p) => {
+  const beneficiaryState = state?.trim().toLowerCase() ?? null;
+
+  const scored = candidates.map((course) => {
+    const courseKeywords = course.keywords.map((k) => k.toLowerCase());
+    const hitToken = tokens.find((token) => courseKeywords.includes(token));
+    // the mapping that produced the hit — carries the NSQF qualification we
+    // can show alongside the course, so the match stays auditable
+    const source = matched.find((m) => m.normalizedSkill.toLowerCase() === hitToken) ?? matched[0];
+
     let score = 0;
     const reasons: string[] = [];
 
-    if (p.nsqfQualificationId && qualIds.includes(p.nsqfQualificationId)) {
-      score += 0.45;
+    if (hitToken) {
+      score += 0.5;
       reasons.push("nsqf");
     }
-    if (p.sector && sectors.includes(p.sector)) {
+    if (wantedSectors.has(normalizeSector(course.sector))) {
       score += 0.2;
       reasons.push("sector");
     }
-    if (district && p.district && p.district.toLowerCase() === district.toLowerCase()) {
-      score += 0.12;
-      reasons.push("district");
-    }
-    if (state && p.state && p.state.toLowerCase() === state.toLowerCase()) {
-      score += 0.08;
-      reasons.push("state");
-    }
-    if ((p.seatsAvailable ?? 0) > 0) {
-      score += 0.05;
-      reasons.push("seats");
-    }
-    if (p.stipend) {
-      score += 0.05;
-      reasons.push("stipend");
+    const courseTitle = course.subCourseName.toLowerCase();
+    if (hitToken && courseTitle.includes(hitToken)) {
+      score += 0.15;
+    } else {
+      // otherwise prefer courses naming the same trade as the matched NSQF QP
+      const overlap = titleWords(source?.title ?? null).filter((w) => courseTitle.includes(w)).length;
+      score += Math.min(0.15, overlap * 0.05);
     }
 
+    const scopedState = courseStateName(course.courseLevel);
+    if (scopedState && beneficiaryState && beneficiaryState.includes(scopedState)) {
+      score += 0.1;
+      reasons.push("state");
+    } else if (!scopedState) {
+      score += 0.1; // nationally available
+    } else {
+      score -= 0.15; // scoped to a state this beneficiary isn't in
+    }
+
+    if (source?.nsqfQualificationId) score += 0.05;
+
     return {
-      trainingProgramId: p.id,
-      name: p.name,
-      nameHindi: p.nameHindi,
-      scheme: p.scheme,
-      component: p.component,
-      sector: p.sector,
-      nsqfLevel: p.nsqfLevel ?? p.nsqfQualification?.nsqfLevel ?? null,
-      mode: p.mode,
-      durationWeeks: p.durationWeeks,
-      stipend: p.stipend,
-      district: p.district,
-      state: p.state,
-      contactPhone: p.contactPhone,
-      seatsAvailable: p.seatsAvailable,
-      score: Number(score.toFixed(3)),
-      rationale: rationalePhrase(language, reasons, {
-        sector: p.sector ?? undefined,
-        district: p.district ?? undefined,
-      }),
+      pmajayCourseId: course.id,
+      subCourseCode: course.subCourseCode,
+      subCourseName: course.subCourseName,
+      courseName: course.courseName,
+      sector: course.sector,
+      subSector: course.subSector,
+      courseLevel: course.courseLevel,
+      nsqfQpCode: source?.qpCode ?? null,
+      nsqfTitle: source?.title ?? null,
+      nsqfLevel: source?.nsqfLevel ?? null,
+      score: Number(Math.max(0, Math.min(1, score)).toFixed(3)),
+      rationale: rationalePhrase(language, reasons, { sector: course.sector }),
     };
   });
 

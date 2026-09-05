@@ -4,7 +4,7 @@ import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { transcribeAudio, synthesizeSpeech } from "../services/speech.js";
 import { mapTranscriptToNsqf } from "../services/nsqf.js";
-import { recommendPrograms } from "../services/recommend.js";
+import { recommendCourses } from "../services/recommend.js";
 import { buildSpokenReply } from "../services/reply.js";
 import { answerFromDocuments } from "../services/rag.js";
 import { extractProfileAnswer } from "../services/profileExtract.js";
@@ -88,8 +88,8 @@ assistantRouter.post("/converse", upload.single("audio"), async (req, res) => {
   const mappingTranscript = [recentUserContext, transcript].filter(Boolean).join(" ");
   const mappings = await mapTranscriptToNsqf(mappingTranscript);
 
-  // 3. NSQF + location -> PM-AJAY programmes
-  const recommendations = await recommendPrograms({ mappings, state, district, language: effectiveLanguage });
+  // 3. NSQF match -> real PM-AJAY courses
+  const recommendations = await recommendCourses({ mappings, state, language: effectiveLanguage });
 
   // 4. Persist the session for the admin dashboard
   const session = await prisma.voiceSession.create({
@@ -117,7 +117,7 @@ assistantRouter.post("/converse", upload.single("audio"), async (req, res) => {
       recommendations: {
         create: recommendations.map((r) => ({
           userId: userId || null,
-          trainingProgramId: r.trainingProgramId,
+          pmajayCourseId: r.pmajayCourseId,
           score: r.score,
           rationale: r.rationale,
         })),
@@ -127,7 +127,11 @@ assistantRouter.post("/converse", upload.single("audio"), async (req, res) => {
   });
 
   // 5. Build the spoken reply
-  const spokenText = buildSpokenReply(effectiveLanguage, mappings, recommendations);
+  const spokenText = buildSpokenReply(
+    effectiveLanguage,
+    mappings,
+    recommendations.map((r) => ({ name: r.subCourseName, rationale: r.rationale })),
+  );
   const audio = await synthesizeSpeech(spokenText, effectiveLanguage);
 
   res.json({

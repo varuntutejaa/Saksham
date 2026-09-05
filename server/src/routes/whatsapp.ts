@@ -4,7 +4,7 @@ import { prisma } from "../lib/prisma.js";
 import { env, hasTwilio } from "../lib/env.js";
 import { transcribeAudio } from "../services/speech.js";
 import { mapTranscriptToNsqf } from "../services/nsqf.js";
-import { recommendPrograms } from "../services/recommend.js";
+import { recommendCourses } from "../services/recommend.js";
 import { buildSpokenReply } from "../services/reply.js";
 
 export const whatsappRouter = Router();
@@ -65,7 +65,7 @@ whatsappRouter.post("/webhook", async (req, res) => {
     }
 
     const mappings = await mapTranscriptToNsqf(transcript);
-    const recommendations = await recommendPrograms({ mappings, language });
+    const recommendations = await recommendCourses({ mappings, language });
 
     await prisma.voiceSession.create({
       data: {
@@ -87,7 +87,7 @@ whatsappRouter.post("/webhook", async (req, res) => {
         },
         recommendations: {
           create: recommendations.map((r) => ({
-            trainingProgramId: r.trainingProgramId,
+            pmajayCourseId: r.pmajayCourseId,
             score: r.score,
             rationale: r.rationale,
           })),
@@ -95,7 +95,7 @@ whatsappRouter.post("/webhook", async (req, res) => {
       },
     });
 
-    res.type("text/xml").send(twiml(buildSpokenReply(language, mappings, recommendations)));
+    res.type("text/xml").send(twiml(buildSpokenReply(language, mappings, recommendations.map((r) => ({ name: r.subCourseName, rationale: r.rationale })))));
   } catch (err) {
     console.error("[whatsapp] webhook failed:", err);
     res.type("text/xml").send(twiml("Something went wrong on our end — please try again in a moment."));

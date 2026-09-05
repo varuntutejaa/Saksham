@@ -54,7 +54,7 @@ adminRouter.get("/sessions", async (req, res) => {
       include: {
         user: { select: { id: true, name: true, phone: true, district: true } },
         mappings: { include: { nsqfQualification: true } },
-        recommendations: { include: { trainingProgram: true } },
+        recommendations: { include: { pmajayCourse: true, trainingProgram: true } },
       },
       orderBy: { createdAt: "desc" },
       take,

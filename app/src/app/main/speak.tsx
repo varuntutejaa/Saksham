@@ -49,8 +49,6 @@ export default function SpeakScreen() {
     : 0;
   const [busy, setBusy] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
-  const [transcript, setTranscript] = useState('');
-  const [agentMode, setAgentMode] = useState(false);
   const [agentMessages, setAgentMessages] = useState<AgentMessage[]>([]);
   const [typed, setTyped] = useState('');
   const [showType, setShowType] = useState(false);
@@ -75,11 +73,9 @@ export default function SpeakScreen() {
   function openHistoryItem(record: ConversationRecord) {
     stopSpeaking();
     setReveal(null);
-    setAgentMode(true);
     setAgentMessages(record.messages);
     sessionIdRef.current = record.id;
     setHistoryOpen(false);
-    setTranscript('');
     setShowType(false);
   }
 
@@ -98,14 +94,12 @@ export default function SpeakScreen() {
 
   const micState: MicState = busy || transcribing ? 'thinking' : recState.isRecording ? 'listening' : 'idle';
   const status = busy
-    ? agentMode ? t.agentThinking : t.thinking
+    ? t.agentThinking
     : transcribing
       ? t.transcribing
       : recState.isRecording
         ? t.listening
-        : agentMode
-          ? t.agentTapToTalk
-          : t.tapToSpeak;
+        : t.agentTapToTalk;
 
   async function submit(payload: { transcript?: string; audioUri?: string }, turnLanguage: LanguageCode = language!) {
     setBusy(true);
@@ -140,17 +134,13 @@ export default function SpeakScreen() {
     }
   }
 
-  async function sendTranscript(text = transcript) {
+  async function sendTranscript(text: string) {
     const clean = text.trim();
     if (!clean) {
       Alert.alert(t.noSpeechDetected);
       return;
     }
-    if (agentMode) {
-      await runAgentTurn(clean);
-      return;
-    }
-    await submit({ transcript: clean });
+    await runAgentTurn(clean);
   }
 
   async function runAgentTurn(text: string, turnLanguage: LanguageCode = language!) {
@@ -158,7 +148,6 @@ export default function SpeakScreen() {
     if (!clean) return;
 
     setBusy(true);
-    setTranscript('');
     setShowType(false);
     setTyped('');
     const withUser = agentMessages.concat({ role: 'user' as const, text: clean });
@@ -210,11 +199,7 @@ export default function SpeakScreen() {
         const result = await transcribeWithSarvam(audioUri, language!);
         const detectedLanguage = result.languageCode ?? language!;
         if (result.languageCode && result.languageCode !== language) await setLanguage(result.languageCode);
-        if (agentMode) await runAgentTurn(result.transcript, detectedLanguage);
-        else {
-          setTranscript(result.transcript);
-          setShowType(false);
-        }
+        await runAgentTurn(result.transcript, detectedLanguage);
       } catch (e) {
         Alert.alert(t.transcriptionError, e instanceof Error ? e.message : String(e));
       } finally {
@@ -229,7 +214,6 @@ export default function SpeakScreen() {
     }
     stopSpeaking();
     setReveal(null);
-    setTranscript('');
     setShowType(false);
     await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
     await recorder.prepareToRecordAsync();
@@ -260,26 +244,6 @@ export default function SpeakScreen() {
                 },
               ]}>
               <Ionicons name="time-outline" size={16} color={historyOpen ? c.onPrimary : c.textDim} />
-            </Pressable>
-            <Pressable
-              onPress={() => {
-                stopSpeaking();
-                setReveal(null);
-                setAgentMode((v) => !v);
-                setTranscript('');
-                setShowType(false);
-              }}
-              style={[
-                styles.modeChip,
-                {
-                  backgroundColor: agentMode ? c.primary : c.surfaceAlt,
-                  borderColor: agentMode ? c.primary : c.border,
-                },
-              ]}>
-              <Ionicons name="sparkles" size={14} color={agentMode ? c.onPrimary : c.primary} />
-              <Txt variant="caption" style={{ color: agentMode ? c.onPrimary : c.textDim }}>
-                {t.voiceAgent}
-              </Txt>
             </Pressable>
             <Pressable
               onPress={changeLanguage}
@@ -334,7 +298,7 @@ export default function SpeakScreen() {
             </View>
             {micState === 'idle' && (
               <Txt variant="body" tone="dim" center style={{ maxWidth: 280 }}>
-                {agentMode ? t.agentHint : t.tapHint}
+                {t.agentHint}
               </Txt>
             )}
             {recState.isRecording && (
@@ -347,7 +311,7 @@ export default function SpeakScreen() {
             )}
           </Animated.View>
 
-          {agentMode && agentMessages.length > 0 && (
+          {agentMessages.length > 0 && (
             <Animated.View entering={FadeInDown.duration(300)} style={styles.agentThread}>
               {agentMessages.map((message, index) => {
                 const revealing = reveal?.index === index && message.role === 'assistant';
@@ -425,42 +389,7 @@ export default function SpeakScreen() {
             </Animated.View>
           )}
 
-          {transcript.length > 0 && !showType && (
-            <Animated.View
-              entering={FadeInDown.duration(300)}
-              style={[styles.transcriptBox, { backgroundColor: c.surface, borderColor: c.border }, elevation('card')]}>
-              <View style={styles.transcriptHeader}>
-                <Ionicons name="document-text-outline" size={18} color={c.primary} />
-                <Txt variant="overline" tone="faint" style={{ flex: 1 }}>
-                  {t.transcriptTitle}
-                </Txt>
-              </View>
-              <Txt variant="bodyLg">{transcript}</Txt>
-              <View style={styles.actionRow}>
-                <Button
-                  label={t.editTranscript}
-                  variant="secondary"
-                  size="md"
-                  icon="create-outline"
-                  fullWidth={false}
-                  onPress={() => {
-                    setTyped(transcript);
-                    setShowType(true);
-                  }}
-                />
-                <Button
-                  label={t.send}
-                  size="md"
-                  icon="send"
-                  fullWidth={false}
-                  loading={busy}
-                  onPress={() => sendTranscript()}
-                />
-              </View>
-            </Animated.View>
-          )}
-
-          {micState === 'idle' && !showType && !transcript && (
+          {micState === 'idle' && !showType && (
             <Animated.View
               entering={FadeInDown.delay(150).duration(400)}
               style={[styles.examples, { backgroundColor: c.surface, borderColor: c.border }, elevation('card')]}>
@@ -512,14 +441,11 @@ export default function SpeakScreen() {
 
         <View style={styles.bottom}>
           <Button
-            label={showType ? (agentMode ? t.agentTapToTalk : t.tapToSpeak) : t.typeInstead}
+            label={showType ? t.agentTapToTalk : t.typeInstead}
             variant="secondary"
             size="md"
             icon={showType ? 'mic-outline' : 'create-outline'}
-            onPress={() => {
-              if (!showType && transcript) setTyped(transcript);
-              setShowType((v) => !v);
-            }}
+            onPress={() => setShowType((v) => !v)}
           />
         </View>
       </KeyboardAvoidingView>
@@ -540,15 +466,6 @@ const styles = StyleSheet.create({
   },
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   topActions: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 },
-  modeChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 999,
-    borderWidth: 1,
-  },
   langChip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -587,8 +504,6 @@ const styles = StyleSheet.create({
   },
   recDot: { width: 8, height: 8, borderRadius: 4 },
   examples: { borderRadius: 20, borderWidth: 1, padding: 14, gap: 6 },
-  transcriptBox: { borderRadius: 20, borderWidth: 1, padding: 16, gap: 12 },
-  transcriptHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   actionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 10, flexWrap: 'wrap' },
   agentThread: { gap: 10 },
   agentBubble: { maxWidth: '92%', borderRadius: 16, borderWidth: 1, padding: 14, gap: 8 },

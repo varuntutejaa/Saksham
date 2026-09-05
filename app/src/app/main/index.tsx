@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
 import { UI_STRINGS } from '@/constants/languages';
-import { getPrograms } from '@/lib/api';
+import { getPmajayCourses } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { resolveDeviceLocation } from '@/lib/location';
 import { getLastResult } from '@/lib/session';
@@ -13,17 +13,16 @@ import { useStore } from '@/lib/store';
 import { useTheme } from '@/theme';
 import { BrandMark, Button, Card, Chip, Screen, Txt } from '@/ui';
 
-/** A programme card on the home screen — either scored against what the
- *  beneficiary just said, or the nearest available programme if they haven't
+/** A real PM-AJAY course card on the home screen — either scored against what
+ *  the beneficiary just said, or a nationally available course if they haven't
  *  spoken yet. */
 interface RecommendedItem {
   id: string;
-  name: string;
-  nameHindi: string | null;
-  sector: string | null;
+  title: string;
+  code: string;
+  sector: string;
+  courseLevel: string;
   nsqfLevel: number | null;
-  district: string | null;
-  stipend: boolean;
   rationale?: string;
 }
 
@@ -50,23 +49,31 @@ export default function DashboardScreen() {
       if (scored?.length) {
         setRecommended(
           scored.slice(0, 3).map((r) => ({
-            id: r.trainingProgramId,
-            name: r.name,
-            nameHindi: r.nameHindi,
+            id: r.pmajayCourseId,
+            title: r.subCourseName,
+            code: r.subCourseCode,
             sector: r.sector,
+            courseLevel: r.courseLevel,
             nsqfLevel: r.nsqfLevel,
-            district: r.district,
-            stipend: r.stipend,
             rationale: r.rationale,
           })),
         );
         return;
       }
       let cancelled = false;
-      getPrograms({ state, district, pageSize: 3 })
-        .then((page) => (page.items.length ? page : getPrograms({ pageSize: 3 })))
+      getPmajayCourses({ courseLevel: 'National', pageSize: 3 })
         .then((page) => {
-          if (!cancelled) setRecommended(page.items);
+          if (cancelled) return;
+          setRecommended(
+            page.items.map((course) => ({
+              id: course.id,
+              title: course.subCourseName,
+              code: course.subCourseCode,
+              sector: course.sector,
+              courseLevel: course.courseLevel,
+              nsqfLevel: null,
+            })),
+          );
         })
         .catch(() => {
           if (!cancelled) setRecommended([]);
@@ -74,7 +81,7 @@ export default function DashboardScreen() {
       return () => {
         cancelled = true;
       };
-    }, [state, district]),
+    }, []),
   );
 
   // keep the greeting correct if the app is left open across a time boundary
@@ -190,16 +197,14 @@ export default function DashboardScreen() {
             </View>
             {recommended.map((item, i) => (
               <Card key={item.id} index={i} style={{ gap: 8 }}>
-                <View style={styles.row}>
-                  <Txt variant="label" style={{ flex: 1 }}>
-                    {language === 'hi' ? item.nameHindi ?? item.name : item.name}
-                  </Txt>
-                  {item.stipend && <Chip label={t.stipendYes} icon="cash" tone="accent" />}
-                </View>
+                <Txt variant="overline" tone="faint">
+                  {item.code}
+                </Txt>
+                <Txt variant="label">{item.title}</Txt>
                 <View style={styles.chipRow}>
-                  {item.sector && <Chip label={item.sector} />}
+                  <Chip label={item.sector} />
                   {item.nsqfLevel != null && <Chip label={`NSQF ${item.nsqfLevel}`} icon="layers" tone="primary" />}
-                  {item.district && <Chip label={item.district} icon="location" />}
+                  <Chip label={item.courseLevel} icon="ribbon" />
                 </View>
                 {item.rationale && (
                   <Txt variant="caption" tone="dim">

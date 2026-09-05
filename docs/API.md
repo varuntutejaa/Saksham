@@ -56,8 +56,8 @@ at once (what the app actually does, on the last screen).
 ## Assistant (the core pipeline)
 
 ### `POST /api/assistant/converse`
-The whole voice flow in one call: speech/text → NSQF mapping → PM-AJAY
-recommendations → spoken reply. Accepts **either** JSON with a `transcript`
+The whole voice flow in one call: speech/text → NSQF mapping → real PM-AJAY
+course recommendations → spoken reply. Accepts **either** JSON with a `transcript`
 **or** `multipart/form-data` with an `audio` file (same field names).
 
 ```jsonc
@@ -87,20 +87,26 @@ recommendations → spoken reply. Accepts **either** JSON with a `transcript`
       "pmajayCourse": { "subCourseCode": "CON/Q1105", "subCourseName": "Masonry & Concrete Work", "sector": "Construction" } }
   ],
   "recommendations": [
-    { "recommendationId": "cmt...", "trainingProgramId": "pm-ajay-gia-...",
-      "name": "PM-AJAY GIA — Assistant Mason & Carpenter, Jaipur",
-      "nameHindi": "पीएम-अजय — ...", "scheme": "PM-AJAY", "component": "GIA",
-      "sector": "Construction", "nsqfLevel": 3, "mode": "OFFLINE",
-      "durationWeeks": 6, "stipend": true, "district": "Jaipur",
-      "state": "Rajasthan", "contactPhone": "0141-000000",
-      "seatsAvailable": 30, "score": 1, "rationale": "यह सुझाया गया क्योंकि ..." }
+    { "recommendationId": "cmt...", "pmajayCourseId": "cmt...",
+      "subCourseCode": "CON/Q0103", "subCourseName": "Mason General",
+      "courseName": "Construction", "sector": "Construction",
+      "subSector": "Masonry", "courseLevel": "National",
+      "nsqfQpCode": "CON/Q0101", "nsqfTitle": "Assistant Mason", "nsqfLevel": 3,
+      "score": 0.95, "rationale": "यह सुझाया गया क्योंकि ..." }
   ],
   "reply": { "text": "आपका हुनर Assistant Mason ...", "audioUrl": "data:text/plain;...", "format": "text" }
 }
 ```
 Notes:
+- **Recommendations are real PM-AJAY courses**, scored out of the 2,366-row
+  government catalogue (`PmajayCourse`) against the NSQF qualification the
+  spoken skill mapped to — both halves of a recommendation are real, traceable
+  data. `nsqfQpCode`/`nsqfTitle`/`nsqfLevel` carry that qualification so the
+  match stays auditable. Scoring: keyword hit 0.50, sector match 0.20, title
+  names the trade 0.15, nationally available or in the beneficiary's state
+  0.10, mapped to a QP at all 0.05.
 - If nothing maps, `mappings` has one entry with `normalizedSkill: "unknown"` and
-  `recommendations` may be empty.
+  `recommendations` is empty.
 - `reply.format` is `"text"` from the mock engine — clients speak it with
   on-device TTS. With Bhashini keys set it becomes a real audio URL.
 - `pmajayVerified`/`pmajayCourse` are independent of the NSQF match — they say

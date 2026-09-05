@@ -1,10 +1,10 @@
 import { Redirect, router } from 'expo-router';
 import { useEffect } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 
-import { setRecommendationStatus, type NsqfMapping, type ProgramRecommendation } from '@/lib/api';
+import { setRecommendationStatus, type NsqfMapping, type CourseRecommendation } from '@/lib/api';
 import { UI_STRINGS } from '@/constants/languages';
 import { getIntent, getLastResult } from '@/lib/session';
 import { speak, stopSpeaking } from '@/lib/speech';
@@ -19,6 +19,14 @@ export default function ResultsScreen() {
   const intent = getIntent();
   const t = language ? UI_STRINGS[language] : UI_STRINGS.hi;
   const sectionTitle = intent === 'jobs' ? t.jobsTitle : intent === 'certificate' ? t.certTitle : t.recommended;
+
+  // the admin funnel is SUGGESTED -> VIEWED -> ... ; reaching this screen is
+  // what "viewed" means, now that courses carry no call-to-action of their own
+  useEffect(() => {
+    for (const r of result?.recommendations ?? []) {
+      if (r.recommendationId) setRecommendationStatus(r.recommendationId, 'VIEWED').catch(() => {});
+    }
+  }, []);
 
   useEffect(() => {
     if (result?.reply.text && language) {
@@ -97,7 +105,7 @@ export default function ResultsScreen() {
               </View>
             </View>
             {result.recommendations.map((r, i) => (
-              <ProgramCard key={r.trainingProgramId} r={r} t={t} index={i + 2} />
+              <CourseCard key={r.pmajayCourseId} r={r} t={t} index={i + 2} />
             ))}
           </View>
         )}
@@ -155,12 +163,12 @@ function NsqfCard({
   );
 }
 
-function ProgramCard({
+function CourseCard({
   r,
   t,
   index,
 }: {
-  r: ProgramRecommendation;
+  r: CourseRecommendation;
   t: (typeof UI_STRINGS)['hi'];
   index: number;
 }) {
@@ -170,15 +178,14 @@ function ProgramCard({
       <View style={styles.progHead}>
         <View style={[styles.schemeBadge, { backgroundColor: c.primary }]}>
           <Txt variant="caption" style={{ color: '#fff' }}>
-            {r.scheme}
-            {r.component ? ` · ${r.component}` : ''}
+            PM-AJAY · {r.subCourseCode}
           </Txt>
         </View>
         <Meter value={r.score} size={44} />
       </View>
 
       <Txt variant="h2" style={{ lineHeight: 26 }}>
-        {r.nameHindi ?? r.name}
+        {r.subCourseName}
       </Txt>
 
       {!!r.rationale && (
@@ -191,25 +198,15 @@ function ProgramCard({
       )}
 
       <View style={styles.chipRow}>
-        {r.district && <Chip label={`${r.district}, ${r.state}`} icon="location" />}
-        {r.durationWeeks != null && <Chip label={`${r.durationWeeks} ${t.weeks}`} icon="time" />}
-        {r.seatsAvailable != null && (
-          <Chip label={`${r.seatsAvailable} ${t.seats}`} icon="people" tone="success" />
-        )}
-        {r.stipend && <Chip label={t.stipendYes} icon="cash" tone="accent" />}
+        <Chip label={r.sector} />
+        {r.nsqfLevel != null && <Chip label={`NSQF ${r.nsqfLevel}`} icon="layers" tone="primary" />}
+        <Chip label={r.courseLevel} icon="ribbon" />
       </View>
 
-      {!!r.contactPhone && (
-        <Button
-          label={`${t.call} · ${r.contactPhone}`}
-          variant="success"
-          size="md"
-          icon="call"
-          onPress={() => {
-            if (r.recommendationId) setRecommendationStatus(r.recommendationId, 'INTERESTED').catch(() => {});
-            Linking.openURL(`tel:${r.contactPhone}`).catch(() => {});
-          }}
-        />
+      {!!r.nsqfTitle && (
+        <Txt variant="caption" tone="faint">
+          {r.nsqfQpCode} · {r.nsqfTitle}
+        </Txt>
       )}
     </Card>
   );

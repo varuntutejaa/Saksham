@@ -119,6 +119,8 @@ model PmajayCourse {
   subCourseCode String // the QP-style code shown on the source page — NOT guaranteed unique (~170 codes repeat across rows)
   subCourseName String
   keywords      String[] // informal-skill keywords that map to this course, same convention as NsqfQualification.keywords
+
+  recommendations Recommendation[]
 }
 
 /// One retrievable passage of a real government policy document, for the
@@ -200,8 +202,13 @@ model Recommendation {
   session           VoiceSession         @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   userId            String?
   user              User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
-  trainingProgramId String
-  trainingProgram   TrainingProgram      @relation(fields: [trainingProgramId], references: [id], onDelete: Cascade)
+  /// What was recommended. The voice pipeline recommends real PM-AJAY courses
+  /// (`pmajayCourseId`); `trainingProgramId` is kept for the illustrative
+  /// TrainingProgram rows the admin dashboard still manages. Exactly one is set.
+  pmajayCourseId    String?
+  pmajayCourse      PmajayCourse?        @relation(fields: [pmajayCourseId], references: [id], onDelete: SetNull)
+  trainingProgramId String?
+  trainingProgram   TrainingProgram?     @relation(fields: [trainingProgramId], references: [id], onDelete: SetNull)
   score             Float                @default(0)
   rationale         String? // human-readable "why this" in the user's language
   status            RecommendationStatus @default(SUGGESTED)
