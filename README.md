@@ -54,7 +54,8 @@ grounded in real government data, not fabricated placeholders.
 |---|---|
 | **Backend API** | [`saksham-api-82mn.onrender.com`](https://saksham-api-82mn.onrender.com/health) — Render, Ohio region (co-located with the Neon DB) |
 | **Android APK** | Built locally via `expo prebuild` + Gradle — see [Building the Android app](#building-the-android-app) |
-| **Website / App** | Run locally (`npm run dev`) — see [Run](#run) |
+| **Frontend / Admin dashboard** | [`saksham-website-five.vercel.app`](https://saksham-website-five.vercel.app/) — Vercel deployment |
+| **Website / App (local)** | Run locally (`npm run dev`) — see [Run](#run) |
 
 ---
 
