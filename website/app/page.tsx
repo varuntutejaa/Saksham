@@ -3,7 +3,7 @@ import { MessageCircle } from "lucide-react";
 import { SkillTryout } from "./skill-tryout";
 import { ProgramList } from "./program-list";
 
-const APP_URL = "https://saksham-website-five.vercel.app/";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "saksham://";
 
 export default function Home() {
   return (
@@ -14,12 +14,12 @@ export default function Home() {
           <p className="text-xs text-neutral-500">Ministry of Social Justice &amp; Empowerment</p>
         </div>
         <div className="flex items-center gap-2">
-          <Link
+          <a
             href={APP_URL}
             className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
           >
             Try the app
-          </Link>
+          </a>
           <Link
             href="/admin"
             className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-semibold hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-900"
@@ -57,12 +57,12 @@ export default function Home() {
           ))}
         </div>
         <div className="mt-8">
-          <Link
+          <a
             href={APP_URL}
             className="inline-flex rounded-lg bg-brand px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
           >
             Try the app
-          </Link>
+          </a>
         </div>
       </section>
 

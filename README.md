@@ -305,6 +305,9 @@ npm run dev:app         # the Expo app (separate terminal)
 - Website: <http://localhost:3000> — admin at <http://localhost:3000/admin>
 - API health: <http://localhost:4000/health>
 - App: press `i` / `a` in the Expo terminal, or scan the QR with Expo Go.
+- Website "Try the app" CTA: opens the installed Saksham app via `saksham://`
+  by default. Set `NEXT_PUBLIC_APP_URL` on Vercel if you want that CTA to point
+  at a deployed Expo web app instead.
 
 ### Pointing the app at a backend
 
