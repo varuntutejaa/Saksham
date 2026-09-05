@@ -1,0 +1,18 @@
+name: Keep backend warm
+
+# Pings the live Render backend's health endpoint every 10 minutes so the
+# free-plan web service never sits idle long enough to spin down (15 min).
+# Free — well within GitHub Actions' included minutes (this job finishes in
+# a couple of seconds). Note: GitHub auto-disables scheduled workflows after
+# 60 days of repo inactivity; a push to main re-enables it.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping /health
+        run: curl -sf --max-time 30 https://saksham-api-82mn.onrender.com/health || echo "Ping failed (service may be cold-starting) — not treated as a failure."
