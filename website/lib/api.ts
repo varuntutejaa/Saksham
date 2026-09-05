@@ -98,10 +98,19 @@ export interface Program {
   contactPhone: string | null;
 }
 
+export interface Paginated<T> {
+  items: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 export async function getPrograms(): Promise<Program[]> {
-  const res = await fetch(`${API_BASE}/api/programs`, { cache: "no-store" });
+  const res = await fetch(`${API_BASE}/api/programs?pageSize=50`, { cache: "no-store" });
   if (!res.ok) throw new Error(`programs ${res.status}`);
-  return res.json();
+  const body = (await res.json()) as Paginated<Program>;
+  return body.items;
 }
 
 export async function mapSkill(text: string) {

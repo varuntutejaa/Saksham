@@ -22,7 +22,6 @@ function resolveBaseUrl(): string {
 }
 
 export const API_BASE = resolveBaseUrl();
-console.log('[api] API_BASE =', API_BASE);
 
 export type LanguageCode =
   | 'hi' | 'en' | 'bn' | 'ta' | 'te' | 'mr' | 'kn' | 'gu' | 'pa' | 'or';
@@ -81,12 +80,76 @@ export interface Program {
   eligibilityNote: string | null;
 }
 
-export async function getPrograms(params: { state?: string; district?: string } = {}): Promise<Program[]> {
-  const qs = new URLSearchParams(
-    Object.entries(params).filter((e): e is [string, string] => Boolean(e[1])),
-  );
-  const res = await fetch(`${API_BASE}/api/programs${qs.toString() ? `?${qs}` : ''}`);
-  if (!res.ok) throw new Error(`programs ${res.status}`);
+export interface NsqfQualification {
+  id: string;
+  qpCode: string;
+  title: string;
+  titleHindi: string | null;
+  sector: string;
+  nsqfLevel: number;
+  ssc: string | null;
+  notionalHours: number | null;
+}
+
+export interface PmajayCourse {
+  id: string;
+  courseLevel: string;
+  sector: string;
+  subSector: string;
+  courseName: string;
+  subCourseCode: string;
+  subCourseName: string;
+}
+
+export interface Paginated<T> {
+  items: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+/** The catalogues are large (1,283 NSQF QPs, 2,366 PM-AJAY courses) — every
+ *  list endpoint is paginated; the browse screen requests 5 rows at a time. */
+export const CATALOG_PAGE_SIZE = 5;
+
+function catalogQuery(params: Record<string, string | number | undefined>): string {
+  const qs = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== '') qs.set(key, String(value));
+  }
+  return qs.toString() ? `?${qs}` : '';
+}
+
+async function getPage<T>(path: string, params: Record<string, string | number | undefined>): Promise<Paginated<T>> {
+  const res = await fetch(`${API_BASE}${path}${catalogQuery(params)}`);
+  if (!res.ok) throw new Error(`${path} ${res.status}`);
+  return res.json();
+}
+
+export function getPrograms(
+  params: { state?: string; district?: string; sector?: string; q?: string; page?: number; pageSize?: number } = {},
+): Promise<Paginated<Program>> {
+  return getPage<Program>('/api/programs', { pageSize: CATALOG_PAGE_SIZE, ...params });
+}
+
+export function getNsqfQualifications(
+  params: { sector?: string; level?: number; q?: string; page?: number; pageSize?: number } = {},
+): Promise<Paginated<NsqfQualification>> {
+  return getPage<NsqfQualification>('/api/nsqf', { pageSize: CATALOG_PAGE_SIZE, ...params });
+}
+
+export function getPmajayCourses(
+  params: { sector?: string; courseLevel?: string; q?: string; page?: number; pageSize?: number } = {},
+): Promise<Paginated<PmajayCourse>> {
+  return getPage<PmajayCourse>('/api/pmajay-courses', { pageSize: CATALOG_PAGE_SIZE, ...params });
+}
+
+export async function getCatalogFilters(
+  kind: 'programs' | 'nsqf' | 'pmajay-courses',
+): Promise<{ sectors: string[]; levels?: number[]; courseLevels?: string[] }> {
+  const res = await fetch(`${API_BASE}/api/${kind}/filters`);
+  if (!res.ok) throw new Error(`${kind} filters ${res.status}`);
   return res.json();
 }
 

@@ -187,26 +187,61 @@ the website's landing-page "try the skill mapper" widget.
     "pmajayCourse": { "subCourseCode": "RSETI/217", "subCourseName": "Sewing Machine Servicing & Repair", "sector": "RSETI" } } ]
 ```
 
-### `GET /api/nsqf`
-List NSQF qualifications. Query: `?sector=Construction&level=3`.
+**Every list endpoint below is paginated the same way** — the catalogues are too
+large to send whole (1,283 NSQF QPs, 2,366 PM-AJAY courses). Query `?page=1&pageSize=5`
+(`pageSize` max 50, default 5); the response is always:
 ```jsonc
-[ { "id", "qpCode": "CON/Q0101", "title": "Assistant Mason", "titleHindi",
+{ "items": [ ... ], "total": 1283, "page": 1, "pageSize": 5, "totalPages": 257 }
+```
+
+### `GET /api/nsqf`
+NSQF qualifications. Query: `?sector=Construction&level=3&q=mason&page=&pageSize=`.
+```jsonc
+{ "items": [ { "id", "qpCode": "CON/Q0101", "title": "Assistant Mason", "titleHindi",
     "sector": "Construction", "nsqfLevel": 3, "ssc", "description",
-    "keywords": ["masonry"] } ]
+    "notionalHours", "keywords": ["masonry"] } ], "total": 1283, ... }
+```
+
+### `GET /api/nsqf/filters`
+The filter values that actually exist, for the app's filter chips.
+```jsonc
+{ "sectors": ["Agriculture", "Apparel", ...], "levels": [1,2,3,4,5,6,7] }
+```
+
+### `GET /api/pmajay-courses`
+The real PM-AJAY course catalogue (`server/prisma/data/README-pmajay-courses.md`).
+Query: `?sector=&courseLevel=&q=&page=&pageSize=`.
+```jsonc
+{ "items": [ { "id", "srNo", "courseLevel": "National", "sector": "Apparel",
+    "subSector", "courseName", "subCourseCode": "AMH/Q1947",
+    "subCourseName": "Self Employed Tailor", "keywords": ["tailoring"] } ],
+  "total": 2366, ... }
+```
+
+### `GET /api/pmajay-courses/filters`
+```jsonc
+{ "sectors": ["Aerospace and Aviation", ...],
+  "courseLevels": ["National", "State [ODISHA]", "State [PUNJAB]"] }
 ```
 
 ### `GET /api/programs`
-List active PM-AJAY training programmes. Query: `?state=&district=&sector=`.
+Active PM-AJAY training programmes. Query: `?state=&district=&sector=&q=&page=&pageSize=`.
 ```jsonc
-[ { "id", "name", "nameHindi", "scheme": "PM-AJAY", "component": "GIA",
+{ "items": [ { "id", "name", "nameHindi", "scheme": "PM-AJAY", "component": "GIA",
     "providerName", "sector", "nsqfLevel", "mode": "OFFLINE",
     "durationWeeks", "stipend": true, "certification", "state", "district",
     "address", "contactPhone", "seatsTotal", "seatsAvailable",
-    "eligibilityNote", "active": true, "nsqfQualification": { ... } } ]
+    "eligibilityNote", "active": true, "nsqfQualification": { ... } } ],
+  "total": 12, ... }
+```
+
+### `GET /api/programs/filters`
+```jsonc
+{ "sectors": ["Agriculture", "Construction", ...] }
 ```
 
 ### `GET /api/programs/:id`
-Single programme. `404` if unknown.
+Single programme (not paginated — one object). `404` if unknown.
 
 ---
 

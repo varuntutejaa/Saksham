@@ -1,15 +1,31 @@
-import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
 import { UI_STRINGS } from '@/constants/languages';
+import { getPrograms } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { resolveDeviceLocation } from '@/lib/location';
+import { getLastResult } from '@/lib/session';
 import { useStore } from '@/lib/store';
 import { useTheme } from '@/theme';
 import { BrandMark, Button, Card, Chip, Screen, Txt } from '@/ui';
+
+/** A programme card on the home screen — either scored against what the
+ *  beneficiary just said, or the nearest available programme if they haven't
+ *  spoken yet. */
+interface RecommendedItem {
+  id: string;
+  name: string;
+  nameHindi: string | null;
+  sector: string | null;
+  nsqfLevel: number | null;
+  district: string | null;
+  stipend: boolean;
+  rationale?: string;
+}
 
 function greetingKey(hour: number): 'goodMorning' | 'goodAfternoon' | 'goodEvening' {
   if (hour < 12) return 'goodMorning';
@@ -24,6 +40,42 @@ export default function DashboardScreen() {
   const [hour, setHour] = useState(new Date().getHours());
   const [locating, setLocating] = useState(false);
   const [locationDenied, setLocationDenied] = useState(false);
+  const [recommended, setRecommended] = useState<RecommendedItem[] | null>(null);
+
+  // Refetched on focus so a programme scored against the conversation the
+  // beneficiary just had replaces the generic nearby list.
+  useFocusEffect(
+    useCallback(() => {
+      const scored = getLastResult()?.recommendations;
+      if (scored?.length) {
+        setRecommended(
+          scored.slice(0, 3).map((r) => ({
+            id: r.trainingProgramId,
+            name: r.name,
+            nameHindi: r.nameHindi,
+            sector: r.sector,
+            nsqfLevel: r.nsqfLevel,
+            district: r.district,
+            stipend: r.stipend,
+            rationale: r.rationale,
+          })),
+        );
+        return;
+      }
+      let cancelled = false;
+      getPrograms({ state, district, pageSize: 3 })
+        .then((page) => (page.items.length ? page : getPrograms({ pageSize: 3 })))
+        .then((page) => {
+          if (!cancelled) setRecommended(page.items);
+        })
+        .catch(() => {
+          if (!cancelled) setRecommended([]);
+        });
+      return () => {
+        cancelled = true;
+      };
+    }, [state, district]),
+  );
 
   // keep the greeting correct if the app is left open across a time boundary
   useEffect(() => {
@@ -123,6 +175,42 @@ export default function DashboardScreen() {
           )}
         </Animated.View>
 
+        {recommended !== null && recommended.length > 0 && (
+          <Animated.View entering={FadeInDown.delay(170).duration(400)} style={{ gap: 10 }}>
+            <View style={styles.sectionHead}>
+              <Ionicons name="sparkles" size={17} color={c.primary} />
+              <Txt variant="h2" style={{ flex: 1 }}>
+                {t.recommended}
+              </Txt>
+              <Pressable onPress={() => router.push('/main/programs')} hitSlop={8}>
+                <Txt variant="label" tone="primary">
+                  {t.seeAll}
+                </Txt>
+              </Pressable>
+            </View>
+            {recommended.map((item, i) => (
+              <Card key={item.id} index={i} style={{ gap: 8 }}>
+                <View style={styles.row}>
+                  <Txt variant="label" style={{ flex: 1 }}>
+                    {language === 'hi' ? item.nameHindi ?? item.name : item.name}
+                  </Txt>
+                  {item.stipend && <Chip label={t.stipendYes} icon="cash" tone="accent" />}
+                </View>
+                <View style={styles.chipRow}>
+                  {item.sector && <Chip label={item.sector} />}
+                  {item.nsqfLevel != null && <Chip label={`NSQF ${item.nsqfLevel}`} icon="layers" tone="primary" />}
+                  {item.district && <Chip label={item.district} icon="location" />}
+                </View>
+                {item.rationale && (
+                  <Txt variant="caption" tone="dim">
+                    {item.rationale}
+                  </Txt>
+                )}
+              </Card>
+            ))}
+          </Animated.View>
+        )}
+
         <Animated.View entering={FadeInDown.delay(180).duration(400)}>
           <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12, borderColor: '#B7E4C7', backgroundColor: '#EAFBF1' }}>
             <Ionicons name="logo-whatsapp" size={26} color="#149B63" />
@@ -179,8 +267,9 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   speakBtn: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
-  chipRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  chipRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  sectionHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   locCardInner: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, flex: 1 },
   locBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   comingSoonPill: {
