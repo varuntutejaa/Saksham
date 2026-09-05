@@ -22,6 +22,7 @@ function resolveBaseUrl(): string {
 }
 
 export const API_BASE = resolveBaseUrl();
+console.log('[api] API_BASE =', API_BASE);
 
 export type LanguageCode =
   | 'hi' | 'en' | 'bn' | 'ta' | 'te' | 'mr' | 'kn' | 'gu' | 'pa' | 'or';

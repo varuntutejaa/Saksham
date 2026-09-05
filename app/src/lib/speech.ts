@@ -58,7 +58,9 @@ export async function speak(text: string, language: LanguageCode) {
   }
 
   try {
-    const { audioUrl, format } = await synthesizeSpeech(text, language);
+    console.log('[speech] requesting Sarvam TTS', language, text.slice(0, 40));
+    const { audioUrl, format, provider } = await synthesizeSpeech(text, language);
+    console.log('[speech] TTS response', provider, format);
     if (myGeneration !== generation) return;
     if (format === 'text' || !audioUrl.startsWith('data:audio')) {
       deviceSpeak(text, language);
