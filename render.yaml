@@ -8,7 +8,14 @@ services:
     rootDir: server
     branch: main
     buildCommand: npm install --include=dev && npm run prisma:generate && npm run build
-    startCommand: npm run start:render
+    # Runs once per actual deploy — NOT on every cold-start wake from the free
+    # plan's spin-down. Pushing schema + reseeding here (rather than in
+    # startCommand) is what keeps a cold-start wake fast: it used to re-run
+    # the full ~1,300-row NSQF + 2,300-row PM-AJAY-course + RAG-chunk seed
+    # every time the service woke from idle, turning a 30s Render cold start
+    # into several minutes.
+    preDeployCommand: npm run prisma:push && npm run seed
+    startCommand: npm start
     healthCheckPath: /health
     autoDeploy: true
     envVars:
