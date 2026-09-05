@@ -9,6 +9,7 @@ import { assistantRouter } from "./routes/assistant.js";
 import { catalogRouter } from "./routes/catalog.js";
 import { adminRouter } from "./routes/admin.js";
 import { whatsappRouter } from "./routes/whatsapp.js";
+import { stitchRouter } from "./routes/stitch.js";
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use("/api/assistant", assistantRouter);
 app.use("/api", catalogRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/whatsapp", whatsappRouter);
+app.use("/api/stitch", stitchRouter);
 
 app.use((_req, res) => res.status(404).json({ error: "Route not found" }));
 

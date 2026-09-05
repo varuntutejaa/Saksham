@@ -176,6 +176,73 @@ Advance the funnel when a beneficiary acts on a recommendation.
 
 ---
 
+## Google Stitch (admin bearer, server-side key)
+
+Google Stitch generates UI designs from natural-language prompts. The server
+keeps Stitch credentials out of app/website bundles and returns Stitch screen
+asset URLs. `GET /api/stitch/status` is public; the project and screen routes
+require an ADMIN bearer token so a public client cannot spend Stitch quota.
+Use `STITCH_ACCESS_TOKEN` + `GOOGLE_CLOUD_PROJECT` for OAuth generation; keep
+`STITCH_API_KEY` only if your Stitch account supports key auth for the operation.
+Without usable Stitch credentials, project and screen routes return `503`.
+
+### `GET /api/stitch/status`
+```jsonc
+// 200
+{
+  "configured": true,
+  "authMode": "oauth",
+  "googleCloudProject": "my-gcp-project",
+  "defaultProjectId": "4044680601076201931"
+}
+```
+
+### `POST /api/stitch/projects`
+Creates a Stitch project.
+```jsonc
+// request
+{ "title": "Saksham App Redesign" }
+// 201
+{ "projectId": "4044680601076201931", "id": "4044680601076201931", "title": "Saksham App Redesign" }
+```
+
+### `GET /api/stitch/projects`
+Lists projects accessible to the configured Stitch key. Requires admin bearer.
+```jsonc
+[
+  { "projectId": "4044680601076201931", "id": "4044680601076201931", "title": "Saksham App Redesign" }
+]
+```
+
+### `POST /api/stitch/screens`
+Generates one screen. Requires admin bearer. If `projectId` is omitted, the server uses
+`STITCH_PROJECT_ID`; if that is also unset, it creates a new project using
+`projectTitle` or `Saksham Stitch Designs`.
+```jsonc
+// request
+{
+  "prompt": "A mobile onboarding screen for Saksham in Hindi with a language picker",
+  "projectId": "4044680601076201931",
+  "deviceType": "MOBILE",      // MOBILE|DESKTOP|TABLET|AGNOSTIC
+  "modelId": "GEMINI_3_FLASH", // optional
+  "includeAssets": true        // default true
+}
+// 201
+{
+  "projectId": "4044680601076201931",
+  "screenId": "5828011220123456789",
+  "htmlUrl": "https://...",
+  "imageUrl": "https://..."
+}
+```
+
+### `GET /api/stitch/projects/:projectId/screens`
+Lists screens in a project. Add `?includeAssets=true` to resolve HTML and
+screenshot URLs for each screen.
+
+### `GET /api/stitch/projects/:projectId/screens/:screenId`
+Gets one screen. `includeAssets` defaults to `true`.
+
 ## Catalog (public, no auth)
 
 ### `POST /api/nsqf/map`

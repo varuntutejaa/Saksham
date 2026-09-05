@@ -13,6 +13,11 @@ export const env = {
   twilioAccountSid: process.env.TWILIO_ACCOUNT_SID ?? "",
   twilioAuthToken: process.env.TWILIO_AUTH_TOKEN ?? "",
   twilioWhatsappNumber: process.env.TWILIO_WHATSAPP_NUMBER ?? "",
+  stitchApiKey: process.env.STITCH_API_KEY ?? "",
+  stitchAccessToken: process.env.STITCH_ACCESS_TOKEN ?? "",
+  stitchProjectId: process.env.STITCH_PROJECT_ID ?? "",
+  googleCloudProject: process.env.GOOGLE_CLOUD_PROJECT ?? "",
+  stitchHost: process.env.STITCH_HOST ?? "",
 };
 
 export const hasLLM = Boolean(env.anthropicApiKey);
@@ -21,3 +26,4 @@ export const hasGroq = Boolean(env.groqApiKey);
 export const hasBhashini = Boolean(env.bhashiniApiKey && env.bhashiniUserId);
 export const hasSms = Boolean(env.smsApiKey);
 export const hasTwilio = Boolean(env.twilioAccountSid && env.twilioAuthToken);
+export const hasStitch = Boolean(env.stitchApiKey || (env.stitchAccessToken && env.googleCloudProject));

@@ -266,6 +266,10 @@ BHASHINI_USER_ID=
 TWILIO_ACCOUNT_SID=  # WhatsApp webhook — see server/src/routes/whatsapp.ts
 TWILIO_AUTH_TOKEN=
 TWILIO_WHATSAPP_NUMBER=
+STITCH_API_KEY=      # Google Stitch key, if your account supports key auth
+STITCH_ACCESS_TOKEN= # OAuth token from gcloud auth print-access-token
+GOOGLE_CLOUD_PROJECT=# required when using STITCH_ACCESS_TOKEN
+STITCH_PROJECT_ID=   # optional default Stitch project for generated screens
 ```
 
 ### 4. Create tables + load real data
@@ -366,6 +370,9 @@ notification asset are the real uploaded Saksham logo — see
 | `POST` | `/api/assistant/ask` | **RAG** — free-text policy/FAQ question → grounded answer + sources |
 | `PATCH`| `/api/assistant/recommendations/:id` | Update funnel status |
 | `POST` | `/api/whatsapp/webhook` | Twilio inbound WhatsApp message → same real pipeline |
+| `GET`  | `/api/stitch/status` | Check whether Google Stitch is configured |
+| `POST` | `/api/stitch/screens` | Generate a Google Stitch UI screen from a prompt |
+| `GET`  | `/api/stitch/projects/:projectId/screens` | List screens in a Stitch project |
 | `POST` | `/api/nsqf/map` | Map free text to NSQF (no persistence) — the website try-out |
 | `GET`  | `/api/nsqf` · `/api/nsqf/filters` | Browse the NSQF qualifications (paginated, filterable; expired ones hidden unless `?includeExpired=true`) |
 | `GET`  | `/api/pmajay-courses` · `/filters` | Browse the 2,366 real PM-AJAY courses (paginated, filterable) |
