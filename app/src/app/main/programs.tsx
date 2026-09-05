@@ -276,6 +276,15 @@ function CatalogCard({ row, index }: { row: Row; index: number }) {
 
   if (row.kind === 'nsqf') {
     const q = row.item;
+    const eduLabel: Record<string, string> = {
+      none: t.eduBelow10th,
+      below_10th: t.eduBelow10th,
+      '10th': t.edu10th,
+      '12th': t.edu12th,
+      iti_diploma: t.eduIti,
+      undergrad: t.eduUndergrad,
+      postgrad: t.eduPostgrad,
+    };
     return (
       <Card index={index} style={{ gap: 8 }}>
         <Txt variant="overline" tone="faint">
@@ -286,7 +295,13 @@ function CatalogCard({ row, index }: { row: Row; index: number }) {
           <Chip label={q.sector} />
           <Chip label={`NSQF ${q.nsqfLevel}`} icon="layers" tone="primary" />
           {q.notionalHours != null && <Chip label={`${q.notionalHours} h`} icon="time" />}
+          {q.minEducation && <Chip label={eduLabel[q.minEducation] ?? q.minEducation} icon="school" tone="success" />}
         </View>
+        {q.proposedOccupations?.length > 0 && (
+          <Txt variant="caption" tone="dim">
+            {q.proposedOccupations.slice(0, 3).join(' · ')}
+          </Txt>
+        )}
         {q.ssc && (
           <Txt variant="caption" tone="faint">
             {q.ssc}

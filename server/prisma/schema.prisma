@@ -99,6 +99,35 @@ model NsqfQualification {
   notionalHours Int? // training duration per NQR, when known
   nqrId        Int? @unique // nqr.gov.in qualification id, for traceability back to the source page
 
+  /// Everything below is scraped verbatim from this qualification's own NQR
+  /// detail page — nqr.gov.in/qualifications/<nqrId>, the same URL `qpCode`
+  /// came from. See scripts/scrape-nsqf-details.ts; re-runnable any time.
+  eligibility         Json? // [{ criteria1, criteria2, experience, trainingQualification }] — entry requirements
+  minEducation        String? // lowest entry bar across the eligibility rows, denormalized so it can be filtered on
+  progressionPathway  String[] // vertical / horizontal / academic next steps
+  nos                 Json? // [{ title, code, mandatory, hours, credits, level }] — the syllabus
+  nsqcNumber          String?
+  approvedOn          DateTime?
+  validTill           DateTime?
+  /// true when validTill has passed. NQR qualifications genuinely expire, so
+  /// the voice pipeline and catalogue both exclude these by default.
+  expired             Boolean @default(false)
+  notionalHoursMin    Int?
+  notionalHoursMax    Int?
+  theoryHours         Int?
+  practicalHours      Int?
+  employabilityHours  Int?
+  ojtHours            String?
+  awardingBodies      String[]
+  organisationType    String?
+  certifyingBodies    String[]
+  /// job titles this qualification leads to, e.g. "Field Worker" — a much
+  /// richer source of informal role names than the qualification title alone
+  proposedOccupations String[]
+  qualificationType   String?
+  applicability       String? // STT | RPL | ...
+  detailsScrapedAt    DateTime?
+
   mappings         SkillMapping[]
   trainingPrograms TrainingProgram[]
 }

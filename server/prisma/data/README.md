@@ -25,6 +25,54 @@ fabricated**. `titleHindi` is `null` throughout — NQR is English-only and no
 translation was invented. `nqrId` lets you trace any row back to its source:
 `https://www.nqr.gov.in/qualifications/<nqrId>`.
 
+## Full detail pages (`nsqf-details.json`)
+
+`nsqf-details.json` — **all 1,283 qualifications' complete NQR detail pages**,
+keyed by `nqrId`, produced by
+[`scripts/scrape-nsqf-details.ts`](../../scripts/scrape-nsqf-details.ts)
+(re-runnable and resumable; `npm run scrape:nsqf-details`, then
+`npm run apply:nsqf-details` to load it onto the rows).
+
+The original pass fetched these same URLs but kept only `qpCode` and `ssc`.
+This captures the rest of the page — every field verbatim, nothing inferred:
+
+| Field | Coverage |
+|---|---|
+| `jobDescription` (the NQR "Job Description" prose) | 1,283 / 1,283 |
+| `eligibility` — entry education, field, experience, prior training | 1,283 |
+| `proposedOccupations` — job titles the qualification leads to | 1,283 |
+| `progressionPathway` — vertical / horizontal / academic next steps | 1,283 |
+| `validTill` + `approvedOn` + `nsqcNumber` | 1,283 |
+| `nos` — the syllabus: code, mandatory/optional, hours, credits, level | 1,268 |
+| `theoryHours` / `practicalHours` / `employabilityHours` / `ojtHours` | 1,281 |
+| `notionalHoursMin` / `notionalHoursMax` | 1,283 |
+| `awardingBodies`, `certifyingBodies`, `organisationType` | 1,283 |
+| `qualificationType`, `applicability` (STT/RPL) | 1,283 |
+
+### Expiry — 464 of 1,283 are no longer valid
+
+NQR qualifications carry a `Valid Till` date and **they genuinely expire**. As
+of this scrape **464 of the 1,283 rows (36%) are past their validity date** and
+only **819 are live**. Recommending an expired qualification would be wrong, so
+`NsqfQualification.expired` is set at seed time and:
+
+- `services/nsqf.ts` never maps a spoken skill onto an expired qualification;
+- `GET /api/nsqf` hides them unless you pass `?includeExpired=true`.
+
+Re-run the scrape to refresh — expiry is a moving target, not a fixed fact.
+
+### `minEducation`
+
+`eligibility` is a list of alternative entry routes ("10th, in any field, 2
+years' experience" / "12th, completed, no experience"), and meeting **any one**
+of them qualifies a candidate. `apply-nsqf-details.ts` therefore denormalizes
+the *lowest* bar across the rows into `minEducation`, mapped onto the same
+ladder the app collects during voice onboarding
+(`below_10th | 10th | 12th | iti_diploma | undergrad | postgrad`), so
+"can this beneficiary actually enrol?" is answerable. Rows whose only entry
+route is "Previous NSQF qualification" get `null` — that is a prior-learning
+route, not a school level.
+
 ## Known gaps
 
 - **This is a partial scrape, not the whole registry.** NQR has 59 sectors

@@ -9,11 +9,14 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
+    "typecheck": "tsc -p tsconfig.check.json",
     "start": "node dist/index.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:push": "prisma db push",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "scrape:nsqf-details": "tsx scripts/scrape-nsqf-details.ts",
+    "apply:nsqf-details": "tsx scripts/apply-nsqf-details.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

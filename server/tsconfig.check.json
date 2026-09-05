@@ -1,0 +1,8 @@
+{
+  // scripts/ and prisma/seed.ts are executed by tsx as ESM, not compiled by
+  // `npm run build` (which only emits src/). This config type-checks them
+  // anyway, under the module system they actually run in.
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "noEmit": true, "rootDir": ".", "module": "esnext", "moduleResolution": "bundler" },
+  "include": ["src/**/*", "scripts/**/*", "prisma/**/*.ts"]
+}

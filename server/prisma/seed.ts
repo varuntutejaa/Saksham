@@ -1,8 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import nsqfData from "./data/nsqf-qualifications.json" with { type: "json" };
+import nsqfDetails from "./data/nsqf-details.json" with { type: "json" };
 import pmajayCourseData from "./data/pmajay-courses.json" with { type: "json" };
 import knowledgeChunkData from "./data/knowledge-chunks.json" with { type: "json" };
+import { minEducationOf } from "../src/lib/education.js";
+import type { NsqfDetail } from "../scripts/scrape-nsqf-details.js";
 
 const prisma = new PrismaClient();
 
@@ -49,6 +52,16 @@ const KNOWLEDGE_CHUNKS = knowledgeChunkData as {
   text: string;
 }[];
 
+const DETAILS = nsqfDetails as unknown as Record<string, NsqfDetail>;
+
+/** DD/MM/YYYY -> Date */
+function isoToDate(value: string | null): Date | null {
+  const m = value?.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+  if (!m) return null;
+  const d = new Date(`${m[3]}-${m[2]}-${m[1]}T00:00:00.000Z`);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
 async function main() {
   console.log("Clearing old NSQF qualifications (replaced by the real nqr.gov.in scrape)…");
   // qpCode formats differ from any earlier hand-authored batch, so upsert alone
@@ -56,16 +69,60 @@ async function main() {
   // SkillMapping and TrainingProgram set their FK to null on delete.
   await prisma.nsqfQualification.deleteMany({});
 
-  console.log("Seeding NSQF qualifications…");
+  console.log("Seeding NSQF qualifications (with their full NQR detail pages)…");
   const qualByKeyword = new Map<string, string>();
-  for (const q of NSQF) {
+  const today = new Date().toISOString().slice(0, 10);
+  let expiredCount = 0;
+  // 1,283 sequential upserts against a remote Postgres took long enough to put
+  // Render's pre-deploy step at risk; batch them instead.
+  const NSQF_BATCH = 25;
+  async function upsertQualification(q: (typeof NSQF)[number]) {
+    // scripts/scrape-nsqf-details.ts captured the rest of each qualification's
+    // NQR page; merge it in so a re-seed never drops back to the thin rows
+    const detail = q.nqrId != null ? DETAILS[String(q.nqrId)] : undefined;
+    const expired = detail?.validTillIso ? detail.validTillIso < today : false;
+    if (expired) expiredCount++;
+    const data = {
+      ...q,
+      ...(detail
+        ? {
+            description: detail.jobDescription,
+            eligibility: detail.eligibility.length ? (detail.eligibility as object[]) : undefined,
+            minEducation: minEducationOf(detail.eligibility),
+            progressionPathway: detail.progressionPathway,
+            nos: detail.nos.length ? (detail.nos as object[]) : undefined,
+            nsqcNumber: detail.nsqcNumber,
+            approvedOn: isoToDate(detail.approvedOn),
+            validTill: isoToDate(detail.validTill),
+            expired,
+            notionalHoursMin: detail.notionalHoursMin,
+            notionalHoursMax: detail.notionalHoursMax,
+            theoryHours: detail.theoryHours,
+            practicalHours: detail.practicalHours,
+            employabilityHours: detail.employabilityHours,
+            ojtHours: detail.ojtHours,
+            awardingBodies: detail.awardingBodies,
+            organisationType: detail.organisationType,
+            certifyingBodies: detail.certifyingBodies,
+            proposedOccupations: detail.proposedOccupations,
+            qualificationType: detail.qualificationType,
+            applicability: detail.applicability,
+            detailsScrapedAt: new Date(detail.scrapedAt),
+          }
+        : {}),
+    };
     const rec = await prisma.nsqfQualification.upsert({
       where: { qpCode: q.qpCode },
-      update: q,
-      create: q,
+      update: data,
+      create: data,
     });
     for (const k of q.keywords) qualByKeyword.set(k, rec.id);
   }
+
+  for (let i = 0; i < NSQF.length; i += NSQF_BATCH) {
+    await Promise.all(NSQF.slice(i, i + NSQF_BATCH).map(upsertQualification));
+  }
+  console.log(`  ${NSQF.length - expiredCount} live · ${expiredCount} expired (excluded from the voice pipeline)`);
 
   console.log("Clearing old PM-AJAY courses…");
   await prisma.pmajayCourse.deleteMany({});

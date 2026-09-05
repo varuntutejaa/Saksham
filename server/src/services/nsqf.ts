@@ -49,7 +49,9 @@ export async function mapTranscriptToNsqf(transcript: string): Promise<MappingRe
   }
 
   const [quals, pmajayCourses] = await Promise.all([
-    prisma.nsqfQualification.findMany(),
+    // NQR qualifications genuinely expire — never map a beneficiary's skill
+    // onto one that is no longer valid (scripts/scrape-nsqf-details.ts).
+    prisma.nsqfQualification.findMany({ where: { expired: false } }),
     prisma.pmajayCourse.findMany({ where: { keywords: { isEmpty: false } } }),
   ]);
   const results: MappingResult[] = [];

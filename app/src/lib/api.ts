@@ -78,6 +78,13 @@ export interface Program {
   eligibilityNote: string | null;
 }
 
+export interface EligibilityRow {
+  criteria1: string;
+  criteria2: string;
+  experience: string;
+  trainingQualification: string;
+}
+
 export interface NsqfQualification {
   id: string;
   qpCode: string;
@@ -87,6 +94,23 @@ export interface NsqfQualification {
   nsqfLevel: number;
   ssc: string | null;
   notionalHours: number | null;
+  /** the NQR "Job Description" prose */
+  description: string | null;
+  /** lowest entry bar across the eligibility rows, on the same ladder as
+   *  the education we collect during onboarding */
+  minEducation: Education | 'none' | null;
+  eligibility: EligibilityRow[] | null;
+  /** job titles this qualification leads to */
+  proposedOccupations: string[];
+  progressionPathway: string[];
+  awardingBodies: string[];
+  certifyingBodies: string[];
+  organisationType: string | null;
+  validTill: string | null;
+  expired: boolean;
+  theoryHours: number | null;
+  practicalHours: number | null;
+  applicability: string | null;
 }
 
 export interface PmajayCourse {

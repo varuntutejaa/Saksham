@@ -202,11 +202,31 @@ large to send whole (1,283 NSQF QPs, 2,366 PM-AJAY courses). Query `?page=1&page
 
 ### `GET /api/nsqf`
 NSQF qualifications. Query: `?sector=Construction&level=3&q=mason&page=&pageSize=`.
+
+**Expired qualifications are excluded by default.** NQR qualifications carry a
+`Valid Till` date and 464 of the 1,283 have passed it — pass
+`?includeExpired=true` to see them anyway.
 ```jsonc
 { "items": [ { "id", "qpCode": "CON/Q0101", "title": "Assistant Mason", "titleHindi",
-    "sector": "Construction", "nsqfLevel": 3, "ssc", "description",
-    "notionalHours", "keywords": ["masonry"] } ], "total": 1283, ... }
+    "sector": "Construction", "nsqfLevel": 3, "ssc",
+    "description": "The individual lays bricks…",       // NQR "Job Description"
+    "notionalHours": 300, "notionalHoursMin": 300, "notionalHoursMax": 300,
+    "theoryHours": 60, "practicalHours": 120, "employabilityHours": 0, "ojtHours": "120",
+    "eligibility": [ { "criteria1": "10th", "criteria2": "In any field",
+                      "experience": "2 years", "trainingQualification": "None" } ],
+    "minEducation": "10th",                              // lowest bar across those rows
+    "proposedOccupations": ["Mason", "Field Worker"],    // job titles it leads to
+    "progressionPathway": ["Vertical - Mason Trainer", "Academic: Diploma in Civil"],
+    "nos": [ { "title", "code", "mandatory", "hours", "credits", "level" } ],
+    "nsqcNumber": "26", "approvedOn": "2022-05-26T00:00:00.000Z",
+    "validTill": "2025-05-26T00:00:00.000Z", "expired": false,
+    "awardingBodies": ["…"], "certifyingBodies": ["…"], "organisationType": "Sector Skill Council",
+    "qualificationType": "General Qualification", "applicability": "STT",
+    "keywords": ["masonry"] } ], "total": 819, ... }
 ```
+Everything from `description` down is scraped verbatim from that qualification's
+own NQR page (`nqr.gov.in/qualifications/<nqrId>`) — see
+`server/prisma/data/README.md`.
 
 ### `GET /api/nsqf/filters`
 The filter values that actually exist, for the app's filter chips.

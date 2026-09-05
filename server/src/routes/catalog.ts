@@ -22,10 +22,12 @@ catalogRouter.get("/nsqf", async (req, res) => {
   const parsed = pageQuery.safeParse(req.query);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
   const { page, pageSize } = parsed.data;
-  const { sector, q } = req.query as Record<string, string | undefined>;
+  const { sector, q, includeExpired } = req.query as Record<string, string | undefined>;
   const level = req.query.level ? Number(req.query.level) : undefined;
 
   const where = {
+    // NQR qualifications expire; the catalogue hides those unless asked
+    ...(includeExpired === "true" ? {} : { expired: false }),
     ...(sector ? { sector } : {}),
     ...(level ? { nsqfLevel: level } : {}),
     ...(q ? { title: { contains: q, mode: "insensitive" as const } } : {}),
@@ -45,11 +47,13 @@ catalogRouter.get("/nsqf", async (req, res) => {
 /** GET /api/nsqf/filters — the sector + level values that actually exist */
 catalogRouter.get("/nsqf/filters", async (_req, res) => {
   const rows = await prisma.nsqfQualification.findMany({
+    where: { expired: false },
     select: { sector: true, nsqfLevel: true },
     distinct: ["sector"],
     orderBy: { sector: "asc" },
   });
   const levels = await prisma.nsqfQualification.findMany({
+    where: { expired: false },
     select: { nsqfLevel: true },
     distinct: ["nsqfLevel"],
     orderBy: { nsqfLevel: "asc" },

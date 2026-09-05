@@ -87,6 +87,14 @@ grounded in real government data, not fabricated placeholders.
   scored against all 2,366 real PM-AJAY courses, and each card carries the QP
   code it came from, so any recommendation can be traced back to its
   government source.
+- **Only qualifications that are still valid** — every one of the 1,283 NSQF
+  detail pages was scraped, and **464 of them (36%) turned out to be past their
+  `Valid Till` date**. Expired qualifications are excluded from skill mapping
+  and hidden from the catalogue, so nobody is routed to a dead qualification.
+- **Real entry requirements** — each qualification's eligibility table (minimum
+  education, field, required experience, prior training) is captured, along
+  with the job titles it leads to, its progression pathway, the full NOS
+  syllabus, and the theory/practical hour split.
 - **Browse both catalogues** — search and filter all 1,283 NSQF qualifications
   and 2,366 PM-AJAY courses by sector, level and free text, five rows a page.
 - **RAG for policy questions** — "will I get a certificate?", "how do I
@@ -113,7 +121,7 @@ in the same places the data lives:
 
 | Real, scraped, traceable | Illustrative sample data |
 |---|---|
-| 1,283 NSQF qualifications ([nqr.gov.in](https://www.nqr.gov.in)) | The 12 `TrainingProgram` rows — their seats, contact numbers and batch dates are invented, because no government source publishes scheduled-batch data centrally (that lives with state/district implementing agencies) |
+| 1,283 NSQF qualifications with their **complete detail pages** — job description, eligibility, occupations, progression pathway, NOS syllabus, validity dates ([nqr.gov.in](https://www.nqr.gov.in)) | The 12 `TrainingProgram` rows — their seats, contact numbers and batch dates are invented, because no government source publishes scheduled-batch data centrally (that lives with state/district implementing agencies) |
 | 2,366 PM-AJAY-eligible courses ([pmajay.dosje.gov.in](https://pmajay.dosje.gov.in)) | |
 | 177 RAG passages from 2 real government PDFs (PM-AJAY guidelines, NSQF gazette notification) | |
 
@@ -210,10 +218,11 @@ Next.js 15 (App Router) · React 19 · Tailwind v4 · `lucide-react`
 </td></tr>
 <tr><td><b>Data</b></td><td>
 
-1,283 real NSQF qualifications (nqr.gov.in) · 2,366 real PM-AJAY courses
-(pmajay.dosje.gov.in) · 177 real RAG passages from 2 government PDFs —
-all scraped/fetched directly, fully documented provenance, zero invented
-rows
+1,283 real NSQF qualifications with full detail pages — eligibility,
+occupations, syllabus, validity (nqr.gov.in; 819 currently valid, 464
+expired and excluded) · 2,366 real PM-AJAY courses (pmajay.dosje.gov.in) ·
+177 real RAG passages from 2 government PDFs — all scraped/fetched
+directly, fully documented provenance, zero invented rows
 
 </td></tr>
 <tr><td><b>Deployment</b></td><td>
@@ -263,7 +272,7 @@ TWILIO_WHATSAPP_NUMBER=
 
 ```bash
 npm run db:setup       # prisma db push + seed:
-                        #  1,283 real NSQF qualifications
+                        #  1,283 real NSQF qualifications + full detail pages
                         #  2,366 real PM-AJAY courses
                         #  177 real RAG knowledge-base passages
                         #  12 illustrative PM-AJAY programmes + demo users
@@ -358,7 +367,7 @@ notification asset are the real uploaded Saksham logo — see
 | `PATCH`| `/api/assistant/recommendations/:id` | Update funnel status |
 | `POST` | `/api/whatsapp/webhook` | Twilio inbound WhatsApp message → same real pipeline |
 | `POST` | `/api/nsqf/map` | Map free text to NSQF (no persistence) — the website try-out |
-| `GET`  | `/api/nsqf` · `/api/nsqf/filters` | Browse the 1,283 NSQF qualifications (paginated, filterable) |
+| `GET`  | `/api/nsqf` · `/api/nsqf/filters` | Browse the NSQF qualifications (paginated, filterable; expired ones hidden unless `?includeExpired=true`) |
 | `GET`  | `/api/pmajay-courses` · `/filters` | Browse the 2,366 real PM-AJAY courses (paginated, filterable) |
 | `GET`  | `/api/programs` · `/filters` · `/:id` | Training programmes (paginated) |
 | `POST` | `/api/auth/login` · `/register` · `GET /me` | JWT auth |
