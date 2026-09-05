@@ -59,6 +59,7 @@ authRouter.get("/me", authenticate, async (req, res) => {
 });
 
 const profileSchema = z.object({
+  name: z.string().min(1).max(80).optional(),
   gender: z.enum(["male", "female", "other"]).optional(),
   age: z.number().int().min(10).max(100).optional(),
   education: z

@@ -16,6 +16,7 @@ interface AuthValue {
   register: (input: { phone: string; password: string; name?: string; language: LanguageCode }) => Promise<void>;
   resetPassword: (phone: string, otp: string, newPassword: string) => Promise<void>;
   updateProfile: (input: {
+    name?: string;
     gender?: Gender;
     age?: number;
     education?: Education;

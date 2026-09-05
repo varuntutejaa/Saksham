@@ -23,8 +23,8 @@ import { Button, MicOrb, Screen, StepProgress, Txt, type MicState } from '@/ui';
 type ProfileMessage = { role: 'user' | 'assistant'; text: string };
 
 export default function VoiceProfileStep() {
-  const { language } = useStore();
-  const { updateProfile } = useAuth();
+  const { language, setGuestProfile } = useStore();
+  const { updateProfile, token } = useAuth();
   const { c, radius, elevation } = useTheme();
   const recorder = useAudioRecorder({ ...RecordingPresets.HIGH_QUALITY, isMeteringEnabled: true });
   const recState = useAudioRecorderState(recorder, 100);
@@ -36,6 +36,7 @@ export default function VoiceProfileStep() {
   const effectiveLanguage = language ?? 'hi';
 
   const STEPS: { field: ProfileField; question: string }[] = [
+    { field: 'name', question: t.voiceProfileGreeting },
     { field: 'gender', question: t.genderQuestion },
     { field: 'age', question: t.ageQuestion },
     { field: 'education', question: t.eduQuestion },
@@ -72,6 +73,7 @@ export default function VoiceProfileStep() {
   }, [stepIndex]);
 
   function labelFor(field: ProfileField, value: string | number): string {
+    if (field === 'name') return t.nameConfirmedGreeting.replace('{name}', String(value));
     if (field === 'age') return `${value} ${t.yearsSuffix}`;
     if (field === 'gender') return genderLabel[value as string] ?? String(value);
     return eduLabel[value as string] ?? String(value);
@@ -102,7 +104,11 @@ export default function VoiceProfileStep() {
       if (stepIndex < STEPS.length - 1) {
         setTimeout(() => setStepIndex((i) => i + 1), 700);
       } else {
-        await updateProfile({ ...nextCollected, onboarded: true } as Parameters<typeof updateProfile>[0]);
+        if (token) {
+          await updateProfile({ ...nextCollected, onboarded: true } as Parameters<typeof updateProfile>[0]);
+        } else {
+          setGuestProfile(nextCollected as Parameters<typeof setGuestProfile>[0]);
+        }
         setTimeout(() => router.replace('/onboarding/done'), 700);
       }
     } catch (e) {

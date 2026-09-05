@@ -20,7 +20,7 @@ async function toAvatarDataUri(uri: string): Promise<string> {
 }
 
 export default function ProfileScreen() {
-  const { language } = useStore();
+  const { language, guestProfile } = useStore();
   const { user, token, logout, updateProfile } = useAuth();
   const { c } = useTheme();
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -28,6 +28,7 @@ export default function ProfileScreen() {
 
   if (!language) return null;
   const t = UI_STRINGS[language];
+  const prof = user ?? guestProfile;
   const langNative = LANGUAGES.find((l) => l.code === language)?.native ?? '';
 
   async function pickFrom(source: 'camera' | 'library') {
@@ -115,7 +116,7 @@ export default function ProfileScreen() {
             )}
           </Pressable>
           <Txt variant="h2" style={{ marginTop: 10 }}>
-            {user?.name?.trim() || t.guestLabel}
+            {user?.name?.trim() || guestProfile?.name?.trim() || t.guestLabel}
           </Txt>
           {user?.phone && (
             <Txt variant="body" tone="dim">
@@ -152,10 +153,10 @@ export default function ProfileScreen() {
         <Card style={{ gap: 2 }} padded={false}>
           <Row icon="language" label={t.languageLabel} value={langNative} onPress={() => router.push('/language')} />
           {user?.phone && <Row icon="call" label={t.phoneLabel} value={user.phone} />}
-          {user?.gender && <Row icon="male-female" label={t.genderQuestion} value={genderLabel[user.gender] ?? user.gender} />}
-          {user?.age != null && <Row icon="calendar" label={t.ageQuestion} value={`${user.age} ${t.yearsSuffix}`} />}
-          {user?.education && (
-            <Row icon="school" label={t.eduQuestion} value={eduLabel[user.education] ?? user.education} />
+          {prof?.gender && <Row icon="male-female" label={t.genderQuestion} value={genderLabel[prof.gender] ?? prof.gender} />}
+          {prof?.age != null && <Row icon="calendar" label={t.ageQuestion} value={`${prof.age} ${t.yearsSuffix}`} />}
+          {prof?.education && (
+            <Row icon="school" label={t.eduQuestion} value={eduLabel[prof.education] ?? prof.education} />
           )}
         </Card>
 

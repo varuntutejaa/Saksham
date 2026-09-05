@@ -150,7 +150,7 @@ export async function converse(input: ConverseInput): Promise<ConverseResponse> 
   }
 }
 
-export type ProfileField = 'gender' | 'age' | 'education';
+export type ProfileField = 'name' | 'gender' | 'age' | 'education';
 
 /**
  * Voice onboarding — turns a free-text answer (spoken or typed, any
@@ -427,6 +427,7 @@ export async function resetPassword(phone: string, otp: string, newPassword: str
 export async function updateProfile(
   token: string,
   input: {
+    name?: string;
     gender?: Gender;
     age?: number;
     education?: Education;

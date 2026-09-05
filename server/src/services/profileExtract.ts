@@ -3,7 +3,7 @@ import { env, hasGroq } from "../lib/env.js";
 const GROQ_CHAT_URL = "https://api.groq.com/openai/v1/chat/completions";
 const GROQ_CHAT_MODEL = "openai/gpt-oss-120b";
 
-export type ProfileField = "gender" | "age" | "education";
+export type ProfileField = "name" | "gender" | "age" | "education";
 
 const ENUM_OPTIONS: Record<"gender" | "education", string[]> = {
   gender: ["male", "female", "other"],
@@ -40,7 +40,9 @@ export async function extractProfileAnswer(
   const instruction =
     field === "age"
       ? "Extract the person's age as a single integer between 10 and 100. The number may be spoken as a word in any language (e.g. Hindi \"paccis\" = 25, \"tees\" = 30, \"chalis\" = 40, \"pachaas\" = 50) rather than digits — convert it carefully and precisely, do not guess a rounder nearby number. Reply with ONLY the final integer, nothing else. If no clear age is stated, reply exactly: unclear"
-      : `Classify the answer into exactly one of these options: ${ENUM_OPTIONS[field].join(", ")}. Reply with ONLY one of those exact words, nothing else. If it doesn't clearly fit any option, reply exactly: unclear`;
+      : field === "name"
+        ? "Extract just the person's own name from their answer, dropping filler words like \"my name is\" / \"mera naam ... hai\". Reply with ONLY their name, properly capitalized, transliterated to plain Latin letters if it was spoken in another script or language. If no name is clearly stated, reply exactly: unclear"
+        : `Classify the answer into exactly one of these options: ${ENUM_OPTIONS[field].join(", ")}. Reply with ONLY one of those exact words, nothing else. If it doesn't clearly fit any option, reply exactly: unclear`;
 
   const res = await fetch(GROQ_CHAT_URL, {
     method: "POST",
@@ -71,9 +73,16 @@ export async function extractProfileAnswer(
   }
 
   const body = (await res.json()) as GroqChatResponse;
-  const raw = body.choices?.[0]?.message?.content?.trim().toLowerCase();
-  if (!raw || raw.includes("unclear")) return null;
+  const rawContent = body.choices?.[0]?.message?.content?.trim();
+  if (!rawContent || rawContent.toLowerCase().includes("unclear")) return null;
 
+  if (field === "name") {
+    // keep original casing/script — this is a proper noun, not an enum
+    const cleaned = rawContent.replace(/["'.]/g, "").trim();
+    return cleaned.length > 0 && cleaned.length <= 80 ? cleaned : null;
+  }
+
+  const raw = rawContent.toLowerCase();
   if (field === "age") {
     const n = Number(raw.replace(/[^\d]/g, ""));
     return Number.isFinite(n) && n >= 10 && n <= 100 ? n : null;

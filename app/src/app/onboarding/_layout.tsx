@@ -1,10 +1,11 @@
-import { Redirect, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import { useAuth } from '@/lib/auth';
 
 export default function OnboardingLayout() {
-  const { ready, token } = useAuth();
+  // Guests (no token) go through voice profiling too — their answers are kept
+  // locally for the session (see useStore().guestProfile).
+  const { ready } = useAuth();
   if (!ready) return null;
-  if (!token) return <Redirect href="/auth" />;
 
   return (
     <Stack

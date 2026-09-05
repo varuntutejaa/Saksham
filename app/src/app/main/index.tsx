@@ -18,7 +18,7 @@ function greetingKey(hour: number): 'goodMorning' | 'goodAfternoon' | 'goodEveni
 }
 
 export default function DashboardScreen() {
-  const { language, state, district, setLocation } = useStore();
+  const { language, state, district, setLocation, guestProfile } = useStore();
   const { user } = useAuth();
   const { c } = useTheme();
   const [hour, setHour] = useState(new Date().getHours());
@@ -34,7 +34,7 @@ export default function DashboardScreen() {
   if (!language) return null;
   const t = UI_STRINGS[language];
   const greeting = t[greetingKey(hour)];
-  const name = user?.name?.trim() || t.guestLabel;
+  const name = user?.name?.trim() || guestProfile?.name?.trim() || t.guestLabel;
 
   async function enableLocation() {
     setLocating(true);

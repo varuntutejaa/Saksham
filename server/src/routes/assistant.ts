@@ -181,7 +181,7 @@ assistantRouter.post("/transcribe", upload.single("audio"), async (req, res) => 
  * answer couldn't be classified — the app should re-ask, not guess.
  */
 const extractProfileSchema = z.object({
-  field: z.enum(["gender", "age", "education"]),
+  field: z.enum(["name", "gender", "age", "education"]),
   answer: z.string().min(1),
   language: z.enum(LANGS).default("hi"),
 });

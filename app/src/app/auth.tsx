@@ -60,7 +60,7 @@ export default function AuthScreen() {
             style={[styles.iconBtn, { backgroundColor: c.surfaceAlt }]}>
             <Txt variant="h2">‹</Txt>
           </Pressable>
-          <Pressable onPress={() => router.replace('/main')} hitSlop={8}>
+          <Pressable onPress={() => router.replace('/onboarding')} hitSlop={8}>
             <Txt variant="label" tone="primary">
               {t.continueGuest}
             </Txt>

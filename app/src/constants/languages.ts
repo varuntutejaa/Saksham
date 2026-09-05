@@ -167,6 +167,8 @@ export interface Strings {
   noHistoryYet: string;
   profileAnswerUnclear: string;
   voiceProfileIntro: string;
+  voiceProfileGreeting: string;
+  nameConfirmedGreeting: string;
   whatsappBody: string;
   comingSoon: string;
 }
@@ -308,6 +310,8 @@ const hi: Strings = {
   noHistoryYet: 'अभी तक कोई बातचीत नहीं',
   profileAnswerUnclear: 'मुझे समझ नहीं आया, कृपया फिर से बताएं',
   voiceProfileIntro: 'बोलकर जवाब दें, या टाइप करें',
+  voiceProfileGreeting: 'नमस्ते! मैं साक्षम हूं। कृपया अपना नाम बताइए।',
+  nameConfirmedGreeting: 'नमस्ते, {name}!',
   whatsappBody: 'व्हाट्सएप पर चैट करें या वॉइस नोट भेजें — ऐप की ज़रूरत नहीं',
   comingSoon: 'जल्द आ रहा है',
 };
@@ -449,6 +453,8 @@ const en: Strings = {
   noHistoryYet: 'No conversations yet',
   profileAnswerUnclear: "I didn't catch that, please say it again",
   voiceProfileIntro: 'Answer by speaking, or type it instead',
+  voiceProfileGreeting: "Hello! I'm Saksham. Please tell me your name.",
+  nameConfirmedGreeting: 'Hello, {name}!',
   whatsappBody: 'Chat or send a voice note — no app needed',
   comingSoon: 'Coming soon',
 };
@@ -590,6 +596,8 @@ const bn: Strings = {
   noHistoryYet: 'এখনও কোনো কথোপকথন নেই',
   profileAnswerUnclear: 'আমি বুঝতে পারিনি, আবার বলুন',
   voiceProfileIntro: 'বলে উত্তর দিন, অথবা টাইপ করুন',
+  voiceProfileGreeting: 'নমস্কার! আমি সক্ষম। অনুগ্রহ করে আপনার নাম বলুন।',
+  nameConfirmedGreeting: 'নমস্কার, {name}!',
   whatsappBody: 'চ্যাট করুন বা ভয়েস নোট পাঠান — অ্যাপের প্রয়োজন নেই',
   comingSoon: 'শীঘ্রই আসছে',
 };
@@ -731,6 +739,8 @@ const ta: Strings = {
   noHistoryYet: 'இதுவரை உரையாடல்கள் இல்லை',
   profileAnswerUnclear: 'எனக்கு புரியவில்லை, மீண்டும் சொல்லுங்கள்',
   voiceProfileIntro: 'பேசி பதிலளிக்கவும், அல்லது தட்டச்சு செய்யவும்',
+  voiceProfileGreeting: 'வணக்கம்! நான் சாக்ஷம். தயவுசெய்து உங்கள் பெயரைச் சொல்லுங்கள்.',
+  nameConfirmedGreeting: 'வணக்கம், {name}!',
   whatsappBody: 'அரட்டையடிக்கவும் அல்லது குரல் குறிப்பு அனுப்பவும் — ஆப் தேவையில்லை',
   comingSoon: 'விரைவில் வருகிறது',
 };
@@ -872,6 +882,8 @@ const te: Strings = {
   noHistoryYet: 'ఇంకా సంభాషణలు లేవు',
   profileAnswerUnclear: 'నాకు అర్థం కాలేదు, దయచేసి మళ్లీ చెప్పండి',
   voiceProfileIntro: 'మాట్లాడి సమాధానం ఇవ్వండి, లేదా టైప్ చేయండి',
+  voiceProfileGreeting: 'నమస్కారం! నేను సాక్షమ్. దయచేసి మీ పేరు చెప్పండి.',
+  nameConfirmedGreeting: 'నమస్కారం, {name}!',
   whatsappBody: 'చాట్ చేయండి లేదా వాయిస్ నోట్ పంపండి — యాప్ అవసరం లేదు',
   comingSoon: 'త్వరలో వస్తుంది',
 };
@@ -1013,6 +1025,8 @@ const mr: Strings = {
   noHistoryYet: 'अजून कोणतेही संभाषण नाही',
   profileAnswerUnclear: 'मला समजले नाही, कृपया पुन्हा सांगा',
   voiceProfileIntro: 'बोलून उत्तर द्या, किंवा टाइप करा',
+  voiceProfileGreeting: 'नमस्कार! मी साक्षम आहे. कृपया तुमचे नाव सांगा.',
+  nameConfirmedGreeting: 'नमस्कार, {name}!',
   whatsappBody: 'चॅट करा किंवा व्हॉइस नोट पाठवा — अ‍ॅपची गरज नाही',
   comingSoon: 'लवकरच येत आहे',
 };
@@ -1154,6 +1168,8 @@ const kn: Strings = {
   noHistoryYet: 'ಇನ್ನೂ ಯಾವುದೇ ಸಂಭಾಷಣೆ ಇಲ್ಲ',
   profileAnswerUnclear: 'ನನಗೆ ಅರ್ಥವಾಗಲಿಲ್ಲ, ದಯವಿಟ್ಟು ಮತ್ತೆ ಹೇಳಿ',
   voiceProfileIntro: 'ಮಾತನಾಡಿ ಉತ್ತರಿಸಿ, ಅಥವಾ ಟೈಪ್ ಮಾಡಿ',
+  voiceProfileGreeting: 'ನಮಸ್ಕಾರ! ನಾನು ಸಕ್ಷಮ್. ದಯವಿಟ್ಟು ನಿಮ್ಮ ಹೆಸರನ್ನು ಹೇಳಿ.',
+  nameConfirmedGreeting: 'ನಮಸ್ಕಾರ, {name}!',
   whatsappBody: 'ಚಾಟ್ ಮಾಡಿ ಅಥವಾ ಧ್ವನಿ ಸಂದೇಶ ಕಳುಹಿಸಿ — ಆಪ್ ಅಗತ್ಯವಿಲ್ಲ',
   comingSoon: 'ಶೀಘ್ರದಲ್ಲೇ ಬರುತ್ತಿದೆ',
 };
@@ -1295,6 +1311,8 @@ const gu: Strings = {
   noHistoryYet: 'હજુ સુધી કોઈ વાતચીત નથી',
   profileAnswerUnclear: 'મને સમજાયું નહીં, કૃપા કરી ફરી કહો',
   voiceProfileIntro: 'બોલીને જવાબ આપો, અથવા ટાઇપ કરો',
+  voiceProfileGreeting: 'નમસ્તે! હું સક્ષમ છું. કૃપા કરી તમારું નામ કહો.',
+  nameConfirmedGreeting: 'નમસ્તે, {name}!',
   whatsappBody: 'ચેટ કરો અથવા વોઇસ નોટ મોકલો — ઍપની જરૂર નથી',
   comingSoon: 'જલ્દી આવી રહ્યું છે',
 };
@@ -1436,6 +1454,8 @@ const pa: Strings = {
   noHistoryYet: 'ਹਾਲੇ ਤੱਕ ਕੋਈ ਗੱਲਬਾਤ ਨਹੀਂ',
   profileAnswerUnclear: 'ਮੈਨੂੰ ਸਮਝ ਨਹੀਂ ਆਇਆ, ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਦੱਸੋ',
   voiceProfileIntro: 'ਬੋਲ ਕੇ ਜਵਾਬ ਦਿਓ, ਜਾਂ ਟਾਈਪ ਕਰੋ',
+  voiceProfileGreeting: 'ਸਤ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ ਸਕਸ਼ਮ ਹਾਂ। ਕਿਰਪਾ ਕਰਕੇ ਆਪਣਾ ਨਾਮ ਦੱਸੋ।',
+  nameConfirmedGreeting: 'ਸਤ ਸ੍ਰੀ ਅਕਾਲ, {name}!',
   whatsappBody: 'ਚੈਟ ਕਰੋ ਜਾਂ ਵੌਇਸ ਨੋਟ ਭੇਜੋ — ਐਪ ਦੀ ਲੋੜ ਨਹੀਂ',
   comingSoon: 'ਜਲਦੀ ਆ ਰਿਹਾ ਹੈ',
 };
@@ -1577,6 +1597,8 @@ const or: Strings = {
   noHistoryYet: 'ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ବାର୍ତ୍ତାଳାପ ନାହିଁ',
   profileAnswerUnclear: 'ମୁଁ ବୁଝିପାରିଲି ନାହିଁ, ଦୟାକରି ପୁଣି କୁହନ୍ତୁ',
   voiceProfileIntro: 'କହି ଉତ୍ତର ଦିଅନ୍ତୁ, କିମ୍ବା ଟାଇପ୍ କରନ୍ତୁ',
+  voiceProfileGreeting: 'ନମସ୍କାର! ମୁଁ ସକ୍ଷମ। ଦୟାକରି ଆପଣଙ୍କ ନାମ କୁହନ୍ତୁ।',
+  nameConfirmedGreeting: 'ନମସ୍କାର, {name}!',
   whatsappBody: 'ଚାଟ୍ କରନ୍ତୁ କିମ୍ବା ଭଏସ୍ ନୋଟ୍ ପଠାନ୍ତୁ — ଆପ୍ ଆବଶ୍ୟକ ନାହିଁ',
   comingSoon: 'ଶୀଘ୍ର ଆସୁଛି',
 };
