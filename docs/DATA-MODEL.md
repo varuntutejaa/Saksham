@@ -12,6 +12,9 @@ page is so you understand what the API payloads mean.
 User ──< VoiceSession ──< SkillMapping >── NsqfQualification ──< TrainingProgram
   │           │                                                        │
   └───────────┴──────────────< Recommendation >───────────────────────┘
+
+PmajayCourse  (not FK-linked — matched to the same normalizedSkill token at
+               query time, surfaced as SkillMapping.pmajayVerified)
 ```
 
 ## Enums
@@ -20,7 +23,7 @@ User ──< VoiceSession ──< SkillMapping >── NsqfQualification ──<
 |------|--------|
 | `Role` | `BENEFICIARY`, `ADMIN` |
 | `Language` | `hi en bn ta te mr kn gu pa or` |
-| `SessionChannel` | `APP`, `WEB`, `IVR` |
+| `SessionChannel` | `APP`, `WEB`, `IVR`, `WHATSAPP` |
 | `RecommendationStatus` | `SUGGESTED → VIEWED → INTERESTED → APPLIED → ENROLLED` (or `REJECTED`) — the admin funnel |
 
 ## Tables
@@ -75,11 +78,34 @@ here — a token with no match simply falls through to "no confident match",
 same as any other unmapped skill; it doesn't mean the real qualification
 doesn't exist, only that this scrape didn't reach it.
 
+### `PmajayCourse`
+A course/QP code actually eligible for PM-AJAY skilling funding — a separate
+real dataset from `NsqfQualification`, not a duplicate of it. Seeded from
+[`server/prisma/data/pmajay-courses.json`](../server/prisma/data/pmajay-courses.json)
+— **2,366 real rows**, scraped verbatim from the official course catalogue at
+[pmajay.dosje.gov.in/CourseList](https://pmajay.dosje.gov.in/CourseList). See
+[`server/prisma/data/README-pmajay-courses.md`](../server/prisma/data/README-pmajay-courses.md)
+for provenance and, importantly, what this data *isn't*: a list of scheduled
+training batches. No central government source publishes seat/contact/date
+data for specific batches — that's handled at the state/district level — so
+this only makes the *course* half of the picture real; see `TrainingProgram`
+below for what's still illustrative.
+
+`keywords: string[]` (871 of 2,366 rows) links courses to the same
+normalized-skill tokens `NsqfQualification` uses, populated by
+[`server/scripts/link-pmajay-keywords.ts`](../server/scripts/link-pmajay-keywords.ts)
+via whole-word title matching (not substring — see that file's comment on a
+real false-positive it fixes). This feeds `pmajayVerified` below.
+
 ### `SkillMapping`
 The recorded result of mapping one skill phrase in a session:
 `rawSkillText` → `normalizedSkill` → `nsqfQualificationId` (nullable — a
 low-confidence match is stored with a null qualification and flagged for
 counsellor review). `confidence` 0–1, `method` = `keyword|embedding|llm|manual`.
+`pmajayVerified` is a separate, independent signal: true if the same
+`normalizedSkill` also has a real PM-AJAY-fundable course in `PmajayCourse` —
+it doesn't affect confidence or scoring, it's additional transparency about
+whether the skill is backed by two real government sources or one.
 
 ### `TrainingProgram`
 A PM-AJAY / partner skilling programme. Linked to an `NsqfQualification`.
@@ -87,6 +113,13 @@ Location (`state`/`district`), `mode` (`OFFLINE|ONLINE|HYBRID`), `durationWeeks`
 `stipend`, `seatsTotal`/`seatsAvailable`, `contactPhone`, `eligibilityNote`,
 `component` (`Adarsh Gram | GIA | Hostel | Skill Development`). `active` gates
 visibility. Seeded with 12 rows; admins can add more via the API.
+
+**Data-realness note**: these 12 seed rows are illustrative sample data, not
+scraped — confirmed by directly checking the PM-AJAY portal that no central
+source publishes district-level batch data (seats, contact, dates) at all.
+This is unlike `NsqfQualification` and `PmajayCourse`, which are both real and
+traceable. See the same disclaimer in `schema.prisma`'s `TrainingProgram`
+comment and the website landing page footer.
 
 ### `Recommendation`
 A programme proposed to a beneficiary in a session. `score` 0–1 (see the weighting

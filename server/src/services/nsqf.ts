@@ -11,6 +11,11 @@ export interface MappingResult {
   nsqfLevel: number | null;
   confidence: number;
   method: "keyword" | "embedding" | "llm" | "manual";
+  /** true if this normalizedSkill also has a real, currently PM-AJAY-funded
+   *  course (prisma/data/README-pmajay-courses.md) — independent of, and not
+   *  required for, the NSQF match above. */
+  pmajayVerified: boolean;
+  pmajayCourse: { subCourseCode: string; subCourseName: string; sector: string } | null;
 }
 
 /**
@@ -20,6 +25,8 @@ export interface MappingResult {
  *  1. Pull normalized skill tokens from the lexicon.
  *  2. For each token, find the NsqfQualification whose `keywords` array contains it.
  *  3. Confidence = keyword overlap ratio, capped at 0.95 so nothing looks certain.
+ *  4. Separately, check the real PM-AJAY course catalogue for the same token —
+ *     this is an independent real-data signal, not a scoring input.
  */
 export async function mapTranscriptToNsqf(transcript: string): Promise<MappingResult[]> {
   const tokens = extractSkills(transcript);
@@ -35,17 +42,36 @@ export async function mapTranscriptToNsqf(transcript: string): Promise<MappingRe
         nsqfLevel: null,
         confidence: 0,
         method: "keyword",
+        pmajayVerified: false,
+        pmajayCourse: null,
       },
     ];
   }
 
-  const quals = await prisma.nsqfQualification.findMany();
+  const [quals, pmajayCourses] = await Promise.all([
+    prisma.nsqfQualification.findMany(),
+    prisma.pmajayCourse.findMany({ where: { keywords: { isEmpty: false } } }),
+  ]);
   const results: MappingResult[] = [];
 
   for (const token of tokens) {
     const match = quals.find((q) =>
       q.keywords.map((k) => k.toLowerCase()).includes(token.toLowerCase()),
     );
+    // Several courses can share a broad concept (e.g. "masonry" also matches
+    // generic "construction" job titles) — among all real matches, prefer
+    // whichever course title most directly names the concept itself, so the
+    // example surfaced is the most representative one, not just the first
+    // row Postgres happened to return.
+    const pmajayCandidates = pmajayCourses.filter((c) =>
+      c.keywords.map((k) => k.toLowerCase()).includes(token.toLowerCase()),
+    );
+    const pmajayMatch =
+      pmajayCandidates.find((c) => c.subCourseName.toLowerCase().includes(token.toLowerCase())) ??
+      pmajayCandidates[0];
+    const pmajayCourse = pmajayMatch
+      ? { subCourseCode: pmajayMatch.subCourseCode, subCourseName: pmajayMatch.subCourseName, sector: pmajayMatch.sector }
+      : null;
 
     if (!match) {
       results.push({
@@ -58,6 +84,8 @@ export async function mapTranscriptToNsqf(transcript: string): Promise<MappingRe
         nsqfLevel: null,
         confidence: 0.2,
         method: "keyword",
+        pmajayVerified: Boolean(pmajayMatch),
+        pmajayCourse,
       });
       continue;
     }
@@ -77,6 +105,8 @@ export async function mapTranscriptToNsqf(transcript: string): Promise<MappingRe
       nsqfLevel: match.nsqfLevel,
       confidence,
       method: "keyword",
+      pmajayVerified: Boolean(pmajayMatch),
+      pmajayCourse,
     });
   }
 

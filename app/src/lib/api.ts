@@ -36,6 +36,10 @@ export interface NsqfMapping {
   nsqfLevel: number | null;
   confidence: number;
   method: string;
+  /** true if this skill also has a real, currently PM-AJAY-fundable course
+   *  (independent of the NSQF match above — see server/prisma/data/README-pmajay-courses.md) */
+  pmajayVerified: boolean;
+  pmajayCourse: { subCourseCode: string; subCourseName: string; sector: string } | null;
 }
 
 export interface ProgramRecommendation {
@@ -278,6 +282,8 @@ function localConverse(
           nsqfLevel: skill.nsqfLevel,
           confidence: 0.75,
           method: 'local',
+          pmajayVerified: false,
+          pmajayCourse: null,
         }))
       : [
           {
@@ -290,6 +296,8 @@ function localConverse(
             nsqfLevel: null,
             confidence: 0,
             method: 'local',
+            pmajayVerified: false,
+            pmajayCourse: null,
           },
         ],
     recommendations: selected.slice(0, 3).map((skill, index) => ({

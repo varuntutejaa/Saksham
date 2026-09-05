@@ -25,6 +25,8 @@ src/
     nsqf.ts          normalized skill -> NsqfQualification (keyword match + confidence)
     recommend.ts     NSQF + location -> scored TrainingProgram list
     i18n.ts          templated multilingual "why this" rationale
+  scripts/
+    link-pmajay-keywords.ts   regenerates PmajayCourse keywords (see below)
 prisma/
   schema.prisma    source of truth for the DB
   data/
@@ -33,8 +35,17 @@ prisma/
                                ~64 rows have a non-empty `keywords` (linked
                                into skillLexicon.ts); most exist for
                                breadth/browsing, not voice-mapping yet
-  seed.ts          wipes + reloads NsqfQualification from the above, then
-                   12 PM-AJAY programmes + demo users (idempotent)
+    pmajay-courses.json       2,366 REAL courses scraped from PM-AJAY's own
+                               course catalogue (data/README-pmajay-courses.md)
+                               — 871 rows have keywords, feeding
+                               MappingResult.pmajayVerified as an independent
+                               real-data signal alongside the NSQF match.
+                               TrainingProgram's batch/seat/contact data is
+                               still illustrative — no government source
+                               publishes that at this granularity (disclosed
+                               in schema.prisma's TrainingProgram comment)
+  seed.ts          wipes + reloads NsqfQualification + PmajayCourse from the
+                   above, then 12 PM-AJAY programmes + demo users (idempotent)
 ```
 
 ## Rules

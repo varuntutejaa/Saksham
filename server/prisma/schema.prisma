@@ -103,6 +103,24 @@ model NsqfQualification {
   trainingPrograms TrainingProgram[]
 }
 
+/// A course/QP code actually eligible for PM-AJAY skilling funding, scraped
+/// verbatim from the official course catalogue at pmajay.dosje.gov.in/CourseList
+/// (see prisma/data/README-pmajay-courses.md for provenance). This is a
+/// separate, real list from NsqfQualification — the two overlap conceptually
+/// (same trades) but rarely share the same QP code, since PM-AJAY's list uses
+/// newer course-code versions.
+model PmajayCourse {
+  id            String   @id @default(cuid())
+  srNo          Int // row number on the source page, not a stable id
+  courseLevel   String // "National" | "State [ODISHA]" | "State [PUNJAB]"
+  sector        String
+  subSector     String
+  courseName    String
+  subCourseCode String // the QP-style code shown on the source page — NOT guaranteed unique (~170 codes repeat across rows)
+  subCourseName String
+  keywords      String[] // informal-skill keywords that map to this course, same convention as NsqfQualification.keywords
+}
+
 /// Result of mapping an informal skill phrase to an NSQF qualification.
 model SkillMapping {
   id                 String            @id @default(cuid())
@@ -114,10 +132,20 @@ model SkillMapping {
   nsqfQualification  NsqfQualification? @relation(fields: [nsqfQualificationId], references: [id], onDelete: SetNull)
   confidence         Float             @default(0) // 0–1
   method             String            @default("keyword") // keyword | embedding | llm | manual
+  pmajayVerified     Boolean           @default(false) // true if this normalizedSkill also has a real PM-AJAY-eligible course (PmajayCourse)
   createdAt          DateTime          @default(now())
 }
 
 /// A PM-AJAY / partner skilling programme a beneficiary can be routed to.
+///
+/// NOTE ON DATA REALNESS: the current seed rows here are illustrative sample
+/// data, not scraped from a government source — no central PM-AJAY source
+/// publishes scheduled-batch data (seats, contact number, exact dates) at
+/// this granularity; that's handled at the state/district implementing-
+/// agency level. This is unlike NsqfQualification and PmajayCourse, which are
+/// both real, scraped, traceable data (see prisma/data/README*.md). If real
+/// programme data ever becomes available, replace these rows — the shape of
+/// this model is already correct.
 model TrainingProgram {
   id                  String             @id @default(cuid())
   name                String

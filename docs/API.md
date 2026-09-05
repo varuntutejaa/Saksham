@@ -68,7 +68,7 @@ recommendations → spoken reply. Accepts **either** JSON with a `transcript`
   "state": "Rajasthan",          // optional, improves ranking
   "district": "Jaipur",          // optional, improves ranking
   "userId": "clx...",            // optional, links session to a user
-  "channel": "WEB",              // APP|WEB|IVR (default APP)
+  "channel": "WEB",              // APP|WEB|IVR|WHATSAPP (default APP)
   "bandwidthKbps": 128           // optional, for low-bandwidth analytics
 }
 ```
@@ -82,7 +82,9 @@ recommendations → spoken reply. Accepts **either** JSON with a `transcript`
     { "rawSkillText": "...", "normalizedSkill": "masonry",
       "nsqfQualificationId": "cmt...", "qpCode": "CON/Q0101",
       "title": "Assistant Mason", "sector": "Construction",
-      "nsqfLevel": 3, "confidence": 0.55, "method": "keyword" }
+      "nsqfLevel": 3, "confidence": 0.55, "method": "keyword",
+      "pmajayVerified": true,
+      "pmajayCourse": { "subCourseCode": "CON/Q1105", "subCourseName": "Masonry & Concrete Work", "sector": "Construction" } }
   ],
   "recommendations": [
     { "recommendationId": "cmt...", "trainingProgramId": "pm-ajay-gia-...",
@@ -101,6 +103,10 @@ Notes:
   `recommendations` may be empty.
 - `reply.format` is `"text"` from the mock engine — clients speak it with
   on-device TTS. With Bhashini keys set it becomes a real audio URL.
+- `pmajayVerified`/`pmajayCourse` are independent of the NSQF match — they say
+  whether this `normalizedSkill` also has a real, currently PM-AJAY-fundable
+  course (`PmajayCourse`, scraped from pmajay.dosje.gov.in/CourseList — see
+  `server/prisma/data/README-pmajay-courses.md`). They don't affect scoring.
 
 ### `PATCH /api/assistant/recommendations/:id`
 Advance the funnel when a beneficiary acts on a recommendation.
@@ -123,7 +129,9 @@ the website's landing-page "try the skill mapper" widget.
 [ { "normalizedSkill": "tailoring", "qpCode": "AMH/Q1947",
     "title": "Self Employed Tailor", "sector": "Apparel, Made-ups & Home Furnishing",
     "nsqfLevel": 4, "confidence": 0.55, "method": "keyword",
-    "rawSkillText": "silai aur kadhai ka kaam", "nsqfQualificationId": "cmt..." } ]
+    "rawSkillText": "silai aur kadhai ka kaam", "nsqfQualificationId": "cmt...",
+    "pmajayVerified": true,
+    "pmajayCourse": { "subCourseCode": "RSETI/217", "subCourseName": "Sewing Machine Servicing & Repair", "sector": "RSETI" } } ]
 ```
 
 ### `GET /api/nsqf`

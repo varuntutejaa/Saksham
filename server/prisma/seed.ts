@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import nsqfData from "./data/nsqf-qualifications.json" with { type: "json" };
+import pmajayCourseData from "./data/pmajay-courses.json" with { type: "json" };
 
 const prisma = new PrismaClient();
 
@@ -20,6 +21,21 @@ const NSQF = nsqfData as {
   nqrId: number;
 }[];
 
+/**
+ * 2,366 real PM-AJAY-eligible courses scraped from pmajay.dosje.gov.in/CourseList
+ * — see prisma/data/README-pmajay-courses.md for provenance.
+ */
+const PMAJAY_COURSES = pmajayCourseData as {
+  srNo: number;
+  courseLevel: string;
+  sector: string;
+  subSector: string;
+  courseName: string;
+  subCourseCode: string;
+  subCourseName: string;
+  keywords: string[];
+}[];
+
 async function main() {
   console.log("Clearing old NSQF qualifications (replaced by the real nqr.gov.in scrape)…");
   // qpCode formats differ from any earlier hand-authored batch, so upsert alone
@@ -37,6 +53,11 @@ async function main() {
     });
     for (const k of q.keywords) qualByKeyword.set(k, rec.id);
   }
+
+  console.log("Clearing old PM-AJAY courses…");
+  await prisma.pmajayCourse.deleteMany({});
+  console.log("Seeding PM-AJAY courses…");
+  await prisma.pmajayCourse.createMany({ data: PMAJAY_COURSES });
 
   console.log("Seeding PM-AJAY training programmes…");
   const programs = [

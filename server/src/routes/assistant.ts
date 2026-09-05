@@ -109,6 +109,7 @@ assistantRouter.post("/converse", upload.single("audio"), async (req, res) => {
             nsqfQualificationId: m.nsqfQualificationId,
             confidence: m.confidence,
             method: m.method,
+            pmajayVerified: m.pmajayVerified,
           })),
       },
       recommendations: {
