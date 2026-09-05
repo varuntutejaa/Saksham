@@ -9,7 +9,7 @@ import { useTheme } from '@/theme';
 export default function MainLayout() {
   const { ready: storeReady, language } = useStore();
   const { ready: authReady } = useAuth();
-  const { c } = useTheme();
+  const { c, elevation } = useTheme();
 
   if (!storeReady || !authReady) return null;
   if (!language) return <Redirect href="/" />;
@@ -22,8 +22,19 @@ export default function MainLayout() {
         headerShown: false,
         tabBarActiveTintColor: c.primary,
         tabBarInactiveTintColor: c.textFaint,
-        tabBarStyle: { backgroundColor: c.surface, borderTopColor: c.border, height: 60, paddingBottom: 8, paddingTop: 6 },
-        tabBarLabelStyle: { fontSize: 11.5, fontWeight: '500' },
+        tabBarStyle: [
+          {
+            backgroundColor: c.surface,
+            borderTopWidth: 0,
+            borderTopLeftRadius: 26,
+            borderTopRightRadius: 26,
+            height: 68,
+            paddingBottom: 12,
+            paddingTop: 10,
+          },
+          elevation('float'),
+        ],
+        tabBarLabelStyle: { fontSize: 11.5, fontWeight: '600' },
       }}>
       <Tabs.Screen
         name="index"

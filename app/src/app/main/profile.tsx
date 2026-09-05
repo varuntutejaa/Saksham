@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
@@ -22,7 +23,7 @@ async function toAvatarDataUri(uri: string): Promise<string> {
 export default function ProfileScreen() {
   const { language, guestProfile } = useStore();
   const { user, token, logout, updateProfile } = useAuth();
-  const { c } = useTheme();
+  const { c, gradient } = useTheme();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -88,20 +89,24 @@ export default function ProfileScreen() {
 
   return (
     <Screen edges={['top']}>
-      <View style={styles.header}>
-        <Txt variant="title">{t.profileTitle}</Txt>
-      </View>
+      <LinearGradient colors={gradient.hero} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.banner}>
+        <View pointerEvents="none" style={[styles.bannerBlob, styles.bannerBlobA]} />
+        <View pointerEvents="none" style={[styles.bannerBlob, styles.bannerBlobB]} />
+        <Txt variant="title" tone="onPrimary">
+          {t.profileTitle}
+        </Txt>
+      </LinearGradient>
 
       <View style={styles.body}>
-        <View style={styles.identity}>
+        <View style={[styles.identity, { marginTop: -54 }]}>
           <Pressable
             onPress={() => token && setSheetOpen(true)}
             disabled={!token || busy}
-            style={[styles.avatar, { backgroundColor: c.primarySoft }]}>
+            style={[styles.avatar, { backgroundColor: c.primarySoft, borderColor: c.bg }]}>
             {user?.avatarUrl ? (
               <Image source={{ uri: user.avatarUrl }} style={styles.avatarImg} contentFit="cover" />
             ) : (
-              <BrandMark size={34} />
+              <BrandMark size={40} />
             )}
             {busy ? (
               <View style={[styles.avatarOverlay, { backgroundColor: 'rgba(0,0,0,0.35)' }]}>
@@ -109,13 +114,13 @@ export default function ProfileScreen() {
               </View>
             ) : (
               token && (
-                <View style={[styles.editBadge, { backgroundColor: c.primary, borderColor: c.surface }]}>
+                <View style={[styles.editBadge, { backgroundColor: c.primary, borderColor: c.bg }]}>
                   <Ionicons name="camera" size={14} color="#fff" />
                 </View>
               )
             )}
           </Pressable>
-          <Txt variant="h2" style={{ marginTop: 10 }}>
+          <Txt variant="h2" style={{ marginTop: 12 }}>
             {user?.name?.trim() || guestProfile?.name?.trim() || t.guestLabel}
           </Txt>
           {user?.phone && (
@@ -220,14 +225,18 @@ function Row({
   value: string;
   onPress?: () => void;
 }) {
-  const { c } = useTheme();
+  const { c, radius } = useTheme();
   return (
     <View style={[styles.row, { borderColor: c.border }]}>
-      <Ionicons name={icon} size={18} color={c.textDim} />
+      <View style={[styles.rowIcon, { backgroundColor: c.primarySoft, borderRadius: radius.sm }]}>
+        <Ionicons name={icon} size={16} color={c.primaryDark} />
+      </View>
       <Txt variant="body" tone="dim" style={{ flex: 1 }}>
         {label}
       </Txt>
-      <Txt variant="body">{value}</Txt>
+      <Txt variant="body" style={{ fontWeight: '600' }}>
+        {value}
+      </Txt>
       {onPress && (
         <Ionicons
           name="chevron-forward"
@@ -243,16 +252,26 @@ function Row({
 }
 
 const styles = StyleSheet.create({
-  header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 8 },
+  banner: {
+    height: 132,
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  bannerBlob: { position: 'absolute', borderRadius: 999 },
+  bannerBlobA: { width: 140, height: 140, top: -50, right: -30, backgroundColor: 'rgba(255,255,255,0.13)' },
+  bannerBlobB: { width: 100, height: 100, bottom: -50, left: -20, backgroundColor: 'rgba(255,255,255,0.10)' },
   body: { padding: 20, paddingTop: 4, gap: 16 },
   identity: { alignItems: 'center', paddingVertical: 8 },
   avatar: {
-    width: 76,
-    height: 76,
-    borderRadius: 24,
+    width: 96,
+    height: 96,
+    borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+    borderWidth: 4,
   },
   avatarImg: { width: '100%', height: '100%' },
   avatarOverlay: {
@@ -268,13 +287,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: -2,
     bottom: -2,
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    borderWidth: 2,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 3,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  rowIcon: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center' },
   sheetBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   sheet: { borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingTop: 14, paddingBottom: 28, paddingHorizontal: 8 },
   sheetRow: {

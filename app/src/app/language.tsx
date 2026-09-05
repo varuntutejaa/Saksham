@@ -10,7 +10,7 @@ import { useStore } from '@/lib/store';
 import { useTheme } from '@/theme';
 import { Screen, Txt } from '@/ui';
 
-const HERO_GREEN = ['#2FAE60', '#1B7A43', '#0E4A29'] as const;
+const HERO_GREEN = ['#1DD379', '#0E9F6E', '#0B4A32'] as const;
 
 export default function LanguageScreen() {
   const { ready, language, setLanguage } = useStore();
@@ -95,8 +95,8 @@ const styles = StyleSheet.create({
   },
   sheet: {
     flex: 1,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
     borderWidth: 1,
     paddingTop: 22,
     paddingHorizontal: 18,
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, paddingBottom: 40 },
   cell: { flexBasis: '47%', flexGrow: 1, minWidth: 0 },
   langCard: {
-    borderRadius: 18,
+    borderRadius: 22,
     borderWidth: 1.5,
     paddingVertical: 18,
     paddingHorizontal: 8,

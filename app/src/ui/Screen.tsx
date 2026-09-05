@@ -8,7 +8,7 @@ interface Props {
   children: ReactNode;
   /** 'plain' = flat background, 'hero' = gradient wash behind a curved header */
   variant?: 'plain' | 'hero';
-  /** override the hero wash colours (defaults to the theme's blue gradient) */
+  /** override the hero wash colours (defaults to the theme's brand gradient) */
   heroColors?: readonly [string, string, ...string[]];
   edges?: Edge[];
   style?: ViewStyle;
@@ -32,6 +32,10 @@ export function Screen({
           end={{ x: 1, y: 1 }}
           style={styles.heroWash}
         />
+        {/* soft floating colour blobs for depth — no blur lib needed, just
+            oversized low-opacity circles bleeding off the edges */}
+        <View pointerEvents="none" style={[styles.blob, styles.blobA]} />
+        <View pointerEvents="none" style={[styles.blob, styles.blobB]} />
         <SafeAreaView style={[styles.flex, style]} edges={edges}>
           {children}
         </SafeAreaView>
@@ -48,5 +52,20 @@ export function Screen({
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  heroWash: { position: 'absolute', top: 0, left: 0, right: 0, height: 340 },
+  heroWash: { position: 'absolute', top: 0, left: 0, right: 0, height: 380 },
+  blob: { position: 'absolute', borderRadius: 999 },
+  blobA: {
+    width: 220,
+    height: 220,
+    top: -60,
+    right: -70,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+  },
+  blobB: {
+    width: 160,
+    height: 160,
+    top: 140,
+    left: -60,
+    backgroundColor: 'rgba(255,255,255,0.10)',
+  },
 });

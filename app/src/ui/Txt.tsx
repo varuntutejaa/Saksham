@@ -1,7 +1,7 @@
 import { Text, type TextProps, type TextStyle } from 'react-native';
 import { useTheme } from '@/theme';
 
-type Variant = 'display' | 'title' | 'h2' | 'bodyLg' | 'body' | 'label' | 'caption' | 'overline';
+type Variant = 'hero' | 'display' | 'title' | 'h2' | 'bodyLg' | 'body' | 'label' | 'caption' | 'overline';
 type Tone = 'default' | 'dim' | 'faint' | 'primary' | 'onPrimary' | 'success' | 'danger';
 
 interface Props extends TextProps {

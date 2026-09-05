@@ -16,7 +16,7 @@ export interface Theme {
   spacing: typeof spacing;
   radius: typeof radius;
   type: typeof type;
-  elevation: (level: 'card' | 'raised' | 'float') => ReturnType<typeof elevation>;
+  elevation: (level: 'card' | 'raised' | 'float', tint?: string) => ReturnType<typeof elevation>;
 }
 
 export function useTheme(): Theme {
@@ -32,7 +32,7 @@ export function useTheme(): Theme {
     spacing,
     radius,
     type,
-    elevation: (level) => elevation(scheme, level),
+    elevation: (level, tint) => elevation(scheme, level, tint),
   };
 }
 

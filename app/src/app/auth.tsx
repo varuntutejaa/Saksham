@@ -14,7 +14,7 @@ type Tab = 'login' | 'signup';
 export default function AuthScreen() {
   const { language } = useStore();
   const { token, user, login, register } = useAuth();
-  const { c, radius } = useTheme();
+  const { c, radius, elevation } = useTheme();
   const t = language ? UI_STRINGS[language] : UI_STRINGS.hi;
 
   const [tab, setTab] = useState<Tab>('login');
@@ -85,7 +85,7 @@ export default function AuthScreen() {
                 style={[
                   styles.tabBtn,
                   { borderRadius: radius.md },
-                  tab === tb && { backgroundColor: c.surface },
+                  tab === tb && [{ backgroundColor: c.surface }, elevation('card')],
                 ]}>
                 <Txt variant="label" tone={tab === tb ? 'primary' : 'dim'}>
                   {tb === 'login' ? t.loginTab : t.signupTab}
@@ -101,7 +101,7 @@ export default function AuthScreen() {
                 onChangeText={setName}
                 placeholder={t.namePlaceholder}
                 placeholderTextColor={c.textFaint}
-                style={[styles.input, { backgroundColor: c.surface, borderColor: c.border, color: c.text }]}
+                style={[styles.input, { backgroundColor: c.surface, borderColor: c.border, color: c.text, borderRadius: radius.lg }]}
               />
             )}
             <TextInput
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     paddingTop: 4,
   },
   iconBtn: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center' },
-  body: { flex: 1, paddingHorizontal: 24, paddingTop: 20, alignItems: 'center' },
+  body: { flex: 1, paddingHorizontal: 24, alignItems: 'center', justifyContent: 'center', paddingBottom: 60 },
   logo: { width: 56, height: 56, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   tabs: { flexDirection: 'row', borderRadius: 16, padding: 4, marginTop: 24, alignSelf: 'stretch' },
   tabBtn: { flex: 1, paddingVertical: 10, alignItems: 'center' },

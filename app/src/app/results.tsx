@@ -82,7 +82,9 @@ export default function ResultsScreen() {
 
         {/* nsqf */}
         {known.length > 0 ? (
-          known.map((m, i) => <NsqfCard key={m.qpCode} m={m} label={t.nsqfMatch} matchLabel={t.matchLabel} index={i + 1} />)
+          known.map((m, i) => (
+            <NsqfCard key={m.qpCode} m={m} label={t.nsqfMatch} matchLabel={t.matchLabel} index={i + 1} best={i === 0} />
+          ))
         ) : (
           <Card index={1} style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
             <Ionicons name="help-circle-outline" size={26} color={c.warn} />
@@ -105,7 +107,7 @@ export default function ResultsScreen() {
               </View>
             </View>
             {result.recommendations.map((r, i) => (
-              <CourseCard key={r.pmajayCourseId} r={r} t={t} index={i + 2} />
+              <CourseCard key={r.pmajayCourseId} r={r} t={t} index={i + 2} best={i === 0} />
             ))}
           </View>
         )}
@@ -137,17 +139,22 @@ function NsqfCard({
   label,
   matchLabel,
   index,
+  best,
 }: {
   m: NsqfMapping;
   label: string;
   matchLabel: string;
   index: number;
+  best?: boolean;
 }) {
   return (
-    <Card index={index}>
-      <Txt variant="overline" tone="faint">
-        {label}
-      </Txt>
+    <Card index={index} tint={best ? 'primary' : undefined}>
+      <View style={styles.sectionHead}>
+        <Txt variant="overline" tone="faint" style={{ flex: 1 }}>
+          {label}
+        </Txt>
+        {best && <Chip label="Best match" tone="primary" icon="star" />}
+      </View>
       <View style={styles.nsqfRow}>
         <View style={{ flex: 1, gap: 8 }}>
           <Txt variant="h2">{m.title}</Txt>
@@ -167,17 +174,19 @@ function CourseCard({
   r,
   t,
   index,
+  best,
 }: {
   r: CourseRecommendation;
   t: (typeof UI_STRINGS)['hi'];
   index: number;
+  best?: boolean;
 }) {
   const { c, radius } = useTheme();
   return (
-    <Card index={index} style={{ gap: 12 }}>
+    <Card index={index} tint={best ? 'violet' : undefined} style={{ gap: 12 }}>
       <View style={styles.progHead}>
-        <View style={[styles.schemeBadge, { backgroundColor: c.primary }]}>
-          <Txt variant="caption" style={{ color: '#fff' }}>
+        <View style={[styles.schemeBadge, { backgroundColor: best ? c.violet : c.text, borderRadius: radius.sm }]}>
+          <Txt variant="caption" style={{ color: '#fff', fontWeight: '600' }}>
             PM-AJAY · {r.subCourseCode}
           </Txt>
         </View>

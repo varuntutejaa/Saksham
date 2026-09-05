@@ -75,6 +75,8 @@ export interface Strings {
   noConnection: string;
   noMatch: string;
   call: string;
+  apply: string;
+  applyComingSoon: string;
   seats: string;
   weeks: string;
   stipendYes: string;
@@ -227,6 +229,8 @@ const hi: Strings = {
   noConnection: 'सर्वर से संपर्क नहीं हो पा रहा',
   noMatch: 'हुनर पूरी तरह समझ नहीं आया — कृपया दोबारा बताइए',
   call: 'कॉल करें',
+  apply: 'आवेदन करें',
+  applyComingSoon: 'ऑनलाइन आवेदन जल्द शुरू होंगे। तब तक सक्षम से अपने पास का केंद्र पूछें।',
   seats: 'सीटें',
   weeks: 'सप्ताह',
   stipendYes: 'वजीफा',
@@ -374,6 +378,8 @@ const en: Strings = {
   noConnection: 'Cannot reach the server',
   noMatch: 'Could not fully understand the skill — please say it again',
   call: 'Call',
+  apply: 'Apply',
+  applyComingSoon: 'Online applications open soon. Meanwhile, ask Saksham to find a centre near you.',
   seats: 'seats',
   weeks: 'weeks',
   stipendYes: 'Stipend',
@@ -521,6 +527,8 @@ const bn: Strings = {
   noConnection: 'সার্ভারে পৌঁছানো যাচ্ছে না',
   noMatch: 'দক্ষতা পুরোপুরি বোঝা যায়নি — আবার বলুন',
   call: 'কল করুন',
+  apply: 'আবেদন করুন',
+  applyComingSoon: 'অনলাইন আবেদন শীঘ্রই চালু হবে। আপাতত সক্ষমকে আপনার কাছের কেন্দ্র জিজ্ঞাসা করুন।',
   seats: 'আসন',
   weeks: 'সপ্তাহ',
   stipendYes: 'ভাতা',
@@ -668,6 +676,8 @@ const ta: Strings = {
   noConnection: 'சேவையகத்தை அணுக முடியவில்லை',
   noMatch: 'திறன் முழுமையாகப் புரியவில்லை — மீண்டும் சொல்லுங்கள்',
   call: 'அழைக்கவும்',
+  apply: 'விண்ணப்பிக்கவும்',
+  applyComingSoon: 'ஆன்லைன் விண்ணப்பம் விரைவில் தொடங்கும். அதுவரை அருகிலுள்ள மையத்தை சக்ஷமிடம் கேளுங்கள்.',
   seats: 'இடங்கள்',
   weeks: 'வாரங்கள்',
   stipendYes: 'உதவித்தொகை',
@@ -815,6 +825,8 @@ const te: Strings = {
   noConnection: 'సర్వర్‌ను చేరుకోలేకపోయాం',
   noMatch: 'నైపుణ్యం పూర్తిగా అర్థం కాలేదు — దయచేసి మళ్లీ చెప్పండి',
   call: 'కాల్ చేయండి',
+  apply: 'దరఖాస్తు చేయండి',
+  applyComingSoon: 'ఆన్‌లైన్ దరఖాస్తులు త్వరలో ప్రారంభమవుతాయి. అప్పటివరకు మీ దగ్గరి కేంద్రాన్ని సక్షమ్‌ను అడగండి.',
   seats: 'సీట్లు',
   weeks: 'వారాలు',
   stipendYes: 'స్టైపెండ్',
@@ -962,6 +974,8 @@ const mr: Strings = {
   noConnection: 'सर्व्हरशी संपर्क होऊ शकला नाही',
   noMatch: 'कौशल्य पूर्णपणे समजले नाही — कृपया पुन्हा सांगा',
   call: 'कॉल करा',
+  apply: 'अर्ज करा',
+  applyComingSoon: 'ऑनलाइन अर्ज लवकरच सुरू होतील. तोपर्यंत सक्षमला जवळचे केंद्र विचारा.',
   seats: 'जागा',
   weeks: 'आठवडे',
   stipendYes: 'विद्यावेतन',
@@ -1109,6 +1123,8 @@ const kn: Strings = {
   noConnection: 'ಸರ್ವರ್ ಸಂಪರ್ಕಿಸಲು ಆಗಲಿಲ್ಲ',
   noMatch: 'ಕೌಶಲ್ಯ ಸಂಪೂರ್ಣವಾಗಿ ಅರ್ಥವಾಗಲಿಲ್ಲ — ದಯವಿಟ್ಟು ಮತ್ತೆ ಹೇಳಿ',
   call: 'ಕರೆ ಮಾಡಿ',
+  apply: 'ಅರ್ಜಿ ಸಲ್ಲಿಸಿ',
+  applyComingSoon: 'ಆನ್‌ಲೈನ್ ಅರ್ಜಿಗಳು ಶೀಘ್ರದಲ್ಲೇ ಪ್ರಾರಂಭವಾಗುತ್ತವೆ. ಅಲ್ಲಿಯವರೆಗೆ ಸಕ್ಷಮ್‌ಗೆ ಹತ್ತಿರದ ಕೇಂದ್ರ ಕೇಳಿ.',
   seats: 'ಸೀಟುಗಳು',
   weeks: 'ವಾರಗಳು',
   stipendYes: 'ಸ್ಟೈಪೆಂಡ್',
@@ -1256,6 +1272,8 @@ const gu: Strings = {
   noConnection: 'સર્વર સાથે સંપર્ક થઈ શક્યો નહીં',
   noMatch: 'કૌશલ્ય સંપૂર્ણપણે સમજાયું નહીં — કૃપા કરી ફરી કહો',
   call: 'કૉલ કરો',
+  apply: 'અરજી કરો',
+  applyComingSoon: 'ઓનલાઈન અરજી ટૂંક સમયમાં શરૂ થશે. ત્યાં સુધી સક્ષમને નજીકનું કેન્દ્ર પૂછો.',
   seats: 'બેઠકો',
   weeks: 'અઠવાડિયા',
   stipendYes: 'સ્ટાઇપેન્ડ',
@@ -1403,6 +1421,8 @@ const pa: Strings = {
   noConnection: 'ਸਰਵਰ ਨਾਲ ਸੰਪਰਕ ਨਹੀਂ ਹੋ ਸਕਿਆ',
   noMatch: 'ਹੁਨਰ ਪੂਰੀ ਤਰ੍ਹਾਂ ਸਮਝ ਨਹੀਂ ਆਇਆ — ਕਿਰਪਾ ਕਰਕੇ ਮੁੜ ਦੱਸੋ',
   call: 'ਕਾਲ ਕਰੋ',
+  apply: 'ਅਰਜ਼ੀ ਦਿਓ',
+  applyComingSoon: 'ਆਨਲਾਈਨ ਅਰਜ਼ੀਆਂ ਜਲਦੀ ਸ਼ੁਰੂ ਹੋਣਗੀਆਂ। ਉਦੋਂ ਤੱਕ ਸਕਸ਼ਮ ਤੋਂ ਨੇੜਲਾ ਕੇਂਦਰ ਪੁੱਛੋ।',
   seats: 'ਸੀਟਾਂ',
   weeks: 'ਹਫ਼ਤੇ',
   stipendYes: 'ਸਟਾਈਪੈਂਡ',
@@ -1550,6 +1570,8 @@ const or: Strings = {
   noConnection: 'ସର୍ଭର ସହ ସମ୍ପର୍କ ହୋଇପାରିଲା ନାହିଁ',
   noMatch: 'ଦକ୍ଷତା ସମ୍ପୂର୍ଣ୍ଣ ଭାବରେ ବୁଝି ହେଲା ନାହିଁ — ଦୟାକରି ପୁଣି କୁହନ୍ତୁ',
   call: 'କଲ୍ କରନ୍ତୁ',
+  apply: 'ଆବେଦନ କରନ୍ତୁ',
+  applyComingSoon: 'ଅନଲାଇନ ଆବେଦନ ଶୀଘ୍ର ଆରମ୍ଭ ହେବ। ସେପର୍ଯ୍ୟନ୍ତ ସକ୍ଷମଙ୍କୁ ନିକଟସ୍ଥ କେନ୍ଦ୍ର ପଚାରନ୍ତୁ।',
   seats: 'ସିଟ୍',
   weeks: 'ସପ୍ତାହ',
   stipendYes: 'ଷ୍ଟାଇପେଣ୍ଡ',
