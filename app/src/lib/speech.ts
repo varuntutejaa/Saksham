@@ -9,6 +9,7 @@ import { speechTagFor } from '@/constants/languages';
 
 let speaking = false;
 let player: AudioPlayer | null = null;
+let webAudio: HTMLAudioElement | null = null;
 // bumped on every speak()/stopSpeaking() so a slow TTS response that resolves
 // after the user has moved on doesn't start playing over the next prompt.
 let generation = 0;
@@ -21,6 +22,15 @@ function cleanupPlayer() {
       // already released
     }
     player = null;
+  }
+  if (webAudio) {
+    try {
+      webAudio.pause();
+      webAudio.src = '';
+    } catch {
+      // already released
+    }
+    webAudio = null;
   }
 }
 
@@ -44,18 +54,13 @@ function deviceSpeak(text: string, language: LanguageCode) {
 }
 
 /** Speak text aloud in the given language via Sarvam TTS (proxied through the
- *  backend), falling back to the on-device engine on web or any failure.
- *  Any in-progress utterance is stopped first. */
+ *  backend), falling back to the on-device engine on any failure. Any
+ *  in-progress utterance is stopped first. */
 export async function speak(text: string, language: LanguageCode) {
   if (!text) return;
   stopSpeaking();
   const myGeneration = generation;
   speaking = true;
-
-  if (Platform.OS === 'web') {
-    deviceSpeak(text, language);
-    return;
-  }
 
   try {
     console.log('[speech] requesting Sarvam TTS', language, text.slice(0, 40));
@@ -64,6 +69,19 @@ export async function speak(text: string, language: LanguageCode) {
     if (myGeneration !== generation) return;
     if (format === 'text' || !audioUrl.startsWith('data:audio')) {
       deviceSpeak(text, language);
+      return;
+    }
+
+    if (Platform.OS === 'web') {
+      const audio = new Audio(audioUrl);
+      webAudio = audio;
+      audio.onended = () => {
+        speaking = false;
+      };
+      audio.onerror = () => {
+        speaking = false;
+      };
+      await audio.play();
       return;
     }
 
@@ -101,7 +119,7 @@ export async function speak(text: string, language: LanguageCode) {
     });
     player.play();
   } catch (e) {
-    console.warn('[speech] Sarvam TTS playback failed, using on-device voice:', e);
+    console.warn('[speech] Sarvam TTS failed, using on-device voice:', e);
     if (myGeneration === generation) deviceSpeak(text, language);
   }
 }
