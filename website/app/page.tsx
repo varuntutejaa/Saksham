@@ -3,6 +3,8 @@ import { MessageCircle } from "lucide-react";
 import { SkillTryout } from "./skill-tryout";
 import { ProgramList } from "./program-list";
 
+const APP_URL = "https://saksham-website-five.vercel.app/";
+
 export default function Home() {
   return (
     <main className="mx-auto max-w-5xl px-6 py-12">
@@ -11,12 +13,20 @@ export default function Home() {
           <p className="text-sm font-semibold text-brand">सक्षम · Saksham</p>
           <p className="text-xs text-neutral-500">Ministry of Social Justice &amp; Empowerment</p>
         </div>
-        <Link
-          href="/admin"
-          className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
-        >
-          Admin dashboard
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href={APP_URL}
+            className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+          >
+            Try the app
+          </Link>
+          <Link
+            href="/admin"
+            className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-semibold hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-900"
+          >
+            Admin dashboard
+          </Link>
+        </div>
       </header>
 
       <section className="mt-14">
@@ -45,6 +55,14 @@ export default function Home() {
               {f}
             </span>
           ))}
+        </div>
+        <div className="mt-8">
+          <Link
+            href={APP_URL}
+            className="inline-flex rounded-lg bg-brand px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
+          >
+            Try the app
+          </Link>
         </div>
       </section>
 
