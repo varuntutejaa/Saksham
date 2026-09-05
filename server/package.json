@@ -29,6 +29,7 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "multer": "^2.3.0",
+    "pdf-parse": "^2.4.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {

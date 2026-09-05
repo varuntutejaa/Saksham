@@ -15,6 +15,10 @@ User ──< VoiceSession ──< SkillMapping >── NsqfQualification ──<
 
 PmajayCourse  (not FK-linked — matched to the same normalizedSkill token at
                query time, surfaced as SkillMapping.pmajayVerified)
+
+KnowledgeChunk  (not FK-linked to anything — retrieved by free-text search
+                 for POST /api/assistant/ask, independent of the session/
+                 skill-mapping pipeline above)
 ```
 
 ## Enums
@@ -65,18 +69,23 @@ NCVET), across 29 livelihood-relevant sectors. Every `qpCode`, `title`,
 how it was captured (NQR has no API; the search UI is client-rendered but each
 qualification's own detail page is server-rendered, so it was scraped via a
 headless browser for the search results and a plain `fetch` per detail page
-for the code) and its known gaps (partial sector coverage, no Hindi titles,
-only ~64 rows linked into the voice-mapping lexicon).
+for the code) and its known gaps (partial sector coverage, no Hindi titles).
 
-Only qualifications matched to one of
-[`server/src/services/skillLexicon.ts`](../server/src/services/skillLexicon.ts)'s
-normalized-skill tokens carry a non-empty `keywords` array — most of the 1,283
-rows exist for breadth/browsing/legitimacy but aren't (yet) reachable through
-the voice assistant's keyword match. Unlike the old hand-authored dataset,
-there's no invariant that every lexicon token has a matching qualification
-here — a token with no match simply falls through to "no confident match",
-same as any other unmapped skill; it doesn't mean the real qualification
-doesn't exist, only that this scrape didn't reach it.
+Every one of the 1,283 rows has a non-empty `keywords` array, via
+[`server/scripts/link-nsqf-keywords.ts`](../server/scripts/link-nsqf-keywords.ts)
+(reproducible, re-run whenever the data or lexicon changes) — but only **242
+rows** matched a real concept in
+[`server/src/services/skillLexicon.ts`](../server/src/services/skillLexicon.ts)
+by whole-word title matching, which is what the live voice pipeline
+(`extractSkills` → `mapTranscriptToNsqf`) can actually reach today. The other
+**1,041 rows** carry a fallback keyword derived from their own title (generic
+seniority/grade words stripped) — real and traceable, but not voice-matchable
+yet, since `extractSkills` only ever emits one of the lexicon's ~80 fixed
+concept names as a token, never an arbitrary title phrase. A lexicon token
+with genuinely no matching qualification simply falls through to "no
+confident match", same as any other unmapped skill; it doesn't mean the real
+qualification doesn't exist, only that this scrape didn't reach it or the
+lexicon doesn't have a pattern for it yet.
 
 ### `PmajayCourse`
 A course/QP code actually eligible for PM-AJAY skilling funding — a separate
@@ -96,6 +105,24 @@ normalized-skill tokens `NsqfQualification` uses, populated by
 [`server/scripts/link-pmajay-keywords.ts`](../server/scripts/link-pmajay-keywords.ts)
 via whole-word title matching (not substring — see that file's comment on a
 real false-positive it fixes). This feeds `pmajayVerified` below.
+
+### `KnowledgeChunk`
+A retrievable passage for the RAG pipeline behind `POST /api/assistant/ask` —
+answers policy/FAQ questions ("what benefits does PM-AJAY give for
+beekeeping?", "will I get a certificate?", "how do I apply?") that the
+structured tables above can't, because the answer lives in prose government
+guidelines, not a database row. Seeded from
+[`server/prisma/data/knowledge-chunks.json`](../server/prisma/data/knowledge-chunks.json)
+— **177 real passages** extracted from 2 real PDFs (PM-AJAY scheme
+guidelines, the NSQF gazette notification); see
+[`server/prisma/data/README-knowledge-base.md`](../server/prisma/data/README-knowledge-base.md)
+for exactly which documents, why others (PM-DAKSH's own guidelines) couldn't
+be fetched, and how to regenerate. Retrieved by Postgres full-text search
+(`server/src/services/knowledge.ts`) — no vector DB or embeddings API needed
+at this corpus size — then an LLM (Groq) composes a short answer strictly
+from the retrieved passages (`server/src/services/rag.ts`), never from its
+own general knowledge; if nothing relevant is found it says so plainly
+instead of guessing.
 
 ### `SkillMapping`
 The recorded result of mapping one skill phrase in a session:

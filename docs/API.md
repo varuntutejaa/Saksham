@@ -108,6 +108,34 @@ Notes:
   course (`PmajayCourse`, scraped from pmajay.dosje.gov.in/CourseList — see
   `server/prisma/data/README-pmajay-courses.md`). They don't affect scoring.
 
+### `POST /api/assistant/ask`
+RAG: answers a free-text policy/FAQ question from real government documents
+(PM-AJAY guidelines, NSQF gazette notification — see
+`server/prisma/data/README-knowledge-base.md`), not the structured tables.
+For questions the skill-mapping pipeline above can't answer.
+```jsonc
+// request
+{ "question": "PM-AJAY mein beekeeping ke liye kya benefits hain?", "language": "hi" }
+// 200
+{
+  "answer": "PM-AJAY ... [1]",
+  "sources": [
+    { "documentTitle": "PM-AJAY Scheme Guidelines (Ministry of Social Justice & Empowerment, May 2023)",
+      "sourceUrl": "https://pmajay.dosje.gov.in/Writereaddata/Guidelines_PM-Ajay_may2023.pdf", "page": 12 }
+  ],
+  "grounded": true
+}
+```
+Notes:
+- `grounded: false` means nothing relevant was found at all — `answer` is then
+  a fixed "I don't have that information" reply in the requested language, not
+  a guess.
+- With no `GROQ_API_KEY` configured, `answer` is the single top-ranked real
+  passage verbatim (extractive) instead of an LLM-composed sentence — still
+  real, just not synthesized into a direct reply.
+- Not persisted anywhere (no session/mapping created) — this is a stateless
+  lookup, unlike `/converse`.
+
 ### `PATCH /api/assistant/recommendations/:id`
 Advance the funnel when a beneficiary acts on a recommendation.
 ```jsonc

@@ -33,14 +33,23 @@ translation was invented. `nqrId` lets you trace any row back to its source:
   stopped short of their stated total — e.g. Agriculture shows 87 of a stated
   185). Re-running the same scrape would likely surface more. There's no
   dedup/completeness guarantee beyond what's in this file.
-- **`keywords`** (the bridge to `services/skillLexicon.ts`'s voice-mapping
-  lexicon) is populated for only ~64 of the 1,283 rows — one qualification per
-  lexicon concept, matched by searching real titles for the concept's keyword
-  (see `keywordsByDetailId`/`CONCEPT_MATCH` logic, not preserved as a script in
-  this repo — redo by title substring search if you need to regenerate it). A
-  lexicon token with no match here isn't wrong — the app just returns "no
-  confident match" for it, same as any other genuinely unmapped skill. It may
-  simply not have been in the sectors/pages this scrape reached.
+- **`keywords`** — every one of the 1,283 rows has a non-empty array, via
+  [`server/scripts/link-nsqf-keywords.ts`](../../scripts/link-nsqf-keywords.ts)
+  (reproducible; re-run any time this file or the lexicon changes). Two tiers:
+  - **242 rows** matched a real concept in `services/skillLexicon.ts` by
+    whole-word title matching — these are reachable by the live voice
+    pipeline today (`extractSkills` → `mapTranscriptToNsqf`).
+  - **The remaining 1,041 rows** fell back to a keyword derived from their
+    own title (lowercased, generic seniority/grade words like
+    "Assistant"/"Junior"/"Level II" stripped) — real, traceable to the row,
+    but **not yet reachable by voice transcript matching**, since
+    `extractSkills` only ever emits one of the lexicon's ~80 fixed concept
+    names as a token, never an arbitrary title phrase. These exist so no row
+    is left with an empty `keywords` array, and as a foundation for a future
+    title-search feature — don't mistake them for voice-matchable ones.
+  A lexicon token with genuinely no matching qualification isn't wrong — the
+  app just returns "no confident match" for it, same as any other unmapped
+  skill.
 - A handful of `qpCode`s got a `-<nqrId>` suffix appended where NQR itself
   reused the same code across two different qualification ids.
 

@@ -6,6 +6,7 @@ import { transcribeAudio, synthesizeSpeech } from "../services/speech.js";
 import { mapTranscriptToNsqf } from "../services/nsqf.js";
 import { recommendPrograms } from "../services/recommend.js";
 import { buildSpokenReply } from "../services/reply.js";
+import { answerFromDocuments } from "../services/rag.js";
 
 export const assistantRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024 } });
@@ -169,6 +170,25 @@ assistantRouter.post("/transcribe", upload.single("audio"), async (req, res) => 
     languageProbability: stt.confidence,
     stt: { provider: stt.provider, confidence: stt.confidence, language: stt.language },
   });
+});
+
+/**
+ * POST /api/assistant/ask
+ * RAG: answers a free-text policy/FAQ question ("what benefits does PM-AJAY
+ * give for beekeeping?", "will I get a certificate?", "how do I apply?")
+ * from real government documents (services/rag.ts) — for questions the
+ * structured skill-mapping pipeline above can't answer, because the answer
+ * lives in prose guidelines, not a database row.
+ */
+const askSchema = z.object({
+  question: z.string().min(3),
+  language: z.enum(LANGS).default("hi"),
+});
+assistantRouter.post("/ask", async (req, res) => {
+  const parsed = askSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  const result = await answerFromDocuments(parsed.data.question, parsed.data.language);
+  res.json(result);
 });
 
 /** PATCH /api/assistant/recommendations/:id  { status } — track funnel */

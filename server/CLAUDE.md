@@ -20,21 +20,28 @@ src/
   middleware/  auth.ts (signToken, authenticate, requireRole)
   routes/      auth.ts · assistant.ts (the pipeline) · catalog.ts (public) · admin.ts
   services/
-    speech.ts        transcribeAudio / synthesizeSpeech — Bhashini or mock
+    speech.ts        transcribeAudio / synthesizeSpeech — Sarvam (+ Groq fallback) or mock
     skillLexicon.ts  informal phrase -> normalized skill token  (EDIT THIS to add coverage)
     nsqf.ts          normalized skill -> NsqfQualification (keyword match + confidence)
     recommend.ts     NSQF + location -> scored TrainingProgram list
     i18n.ts          templated multilingual "why this" rationale
+    knowledge.ts     RAG retrieval — Postgres full-text search over KnowledgeChunk
+    rag.ts           RAG generation — Groq answers strictly from retrieved chunks
   scripts/
+    link-nsqf-keywords.ts     regenerates NsqfQualification keywords (see below)
     link-pmajay-keywords.ts   regenerates PmajayCourse keywords (see below)
+    ingest-documents.ts       regenerates knowledge-chunks.json from the PDFs in
+                              prisma/data/documents/ (see data/README-knowledge-base.md)
 prisma/
   schema.prisma    source of truth for the DB
   data/
     nsqf-qualifications.json  1,283 REAL NSQF QPs scraped from nqr.gov.in
-                               (see data/README.md for provenance) — only
-                               ~64 rows have a non-empty `keywords` (linked
-                               into skillLexicon.ts); most exist for
-                               breadth/browsing, not voice-mapping yet
+                               (see data/README.md for provenance) — every
+                               row has non-empty `keywords`, but only 242 are
+                               real skillLexicon.ts concept matches (voice-
+                               matchable today); the other 1,041 are a
+                               title-derived fallback (traceable, but not yet
+                               reachable by voice transcript matching)
     pmajay-courses.json       2,366 REAL courses scraped from PM-AJAY's own
                                course catalogue (data/README-pmajay-courses.md)
                                — 871 rows have keywords, feeding
@@ -44,8 +51,15 @@ prisma/
                                still illustrative — no government source
                                publishes that at this granularity (disclosed
                                in schema.prisma's TrainingProgram comment)
-  seed.ts          wipes + reloads NsqfQualification + PmajayCourse from the
-                   above, then 12 PM-AJAY programmes + demo users (idempotent)
+    knowledge-chunks.json     177 REAL passages from 2 government PDFs
+                               (data/README-knowledge-base.md) — powers the
+                               RAG endpoint POST /api/assistant/ask for
+                               policy/FAQ questions the tables above can't
+                               answer (e.g. "will I get a certificate?")
+    documents/                the 2 source PDFs ingest-documents.ts reads
+  seed.ts          wipes + reloads NsqfQualification + PmajayCourse +
+                   KnowledgeChunk from the above, then 12 PM-AJAY programmes
+                   + demo users (idempotent)
 ```
 
 ## Rules

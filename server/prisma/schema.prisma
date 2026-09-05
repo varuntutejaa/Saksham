@@ -121,6 +121,24 @@ model PmajayCourse {
   keywords      String[] // informal-skill keywords that map to this course, same convention as NsqfQualification.keywords
 }
 
+/// One retrievable passage of a real government policy document, for the
+/// RAG-based /api/assistant/ask endpoint — answers policy/FAQ questions
+/// ("will I get a certificate?", "how do I apply?") that the structured
+/// tables above can't, because the answer lives in prose guidelines, not a
+/// database row. See prisma/data/README-knowledge-base.md for provenance and
+/// scripts/ingest-documents.ts for how these are produced (re-run any time
+/// the source PDFs change). Retrieved via Postgres full-text search
+/// (services/knowledge.ts) — no vector DB or embeddings API needed at this
+/// corpus size (177 chunks).
+model KnowledgeChunk {
+  id            String @id @default(cuid())
+  documentTitle String
+  sourceUrl     String
+  page          Int
+  chunkIndex    Int
+  text          String
+}
+
 /// Result of mapping an informal skill phrase to an NSQF qualification.
 model SkillMapping {
   id                 String            @id @default(cuid())

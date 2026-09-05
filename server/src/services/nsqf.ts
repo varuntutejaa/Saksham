@@ -55,9 +55,17 @@ export async function mapTranscriptToNsqf(transcript: string): Promise<MappingRe
   const results: MappingResult[] = [];
 
   for (const token of tokens) {
-    const match = quals.find((q) =>
+    // Now that every one of the 1,283 rows carries keywords (not just ~64),
+    // several can share a broad concept (e.g. "masonry" also matches generic
+    // "construction" job titles like "Road Construction Engineer") — among
+    // all real matches, prefer whichever title most directly names the
+    // concept, so the qualification actually returned is the most
+    // representative one, not just the first row Postgres happened to return.
+    const qualCandidates = quals.filter((q) =>
       q.keywords.map((k) => k.toLowerCase()).includes(token.toLowerCase()),
     );
+    const match =
+      qualCandidates.find((q) => q.title.toLowerCase().includes(token.toLowerCase())) ?? qualCandidates[0];
     // Several courses can share a broad concept (e.g. "masonry" also matches
     // generic "construction" job titles) — among all real matches, prefer
     // whichever course title most directly names the concept itself, so the

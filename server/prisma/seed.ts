@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import nsqfData from "./data/nsqf-qualifications.json" with { type: "json" };
 import pmajayCourseData from "./data/pmajay-courses.json" with { type: "json" };
+import knowledgeChunkData from "./data/knowledge-chunks.json" with { type: "json" };
 
 const prisma = new PrismaClient();
 
@@ -36,6 +37,18 @@ const PMAJAY_COURSES = pmajayCourseData as {
   keywords: string[];
 }[];
 
+/**
+ * 177 chunks from 2 real government PDFs (PM-AJAY guidelines, NSQF gazette
+ * notification) — see prisma/data/README-knowledge-base.md for provenance.
+ */
+const KNOWLEDGE_CHUNKS = knowledgeChunkData as {
+  documentTitle: string;
+  sourceUrl: string;
+  page: number;
+  chunkIndex: number;
+  text: string;
+}[];
+
 async function main() {
   console.log("Clearing old NSQF qualifications (replaced by the real nqr.gov.in scrape)…");
   // qpCode formats differ from any earlier hand-authored batch, so upsert alone
@@ -58,6 +71,11 @@ async function main() {
   await prisma.pmajayCourse.deleteMany({});
   console.log("Seeding PM-AJAY courses…");
   await prisma.pmajayCourse.createMany({ data: PMAJAY_COURSES });
+
+  console.log("Clearing old knowledge-base chunks…");
+  await prisma.knowledgeChunk.deleteMany({});
+  console.log("Seeding knowledge-base chunks…");
+  await prisma.knowledgeChunk.createMany({ data: KNOWLEDGE_CHUNKS });
 
   console.log("Seeding PM-AJAY training programmes…");
   const programs = [
