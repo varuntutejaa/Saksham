@@ -22,6 +22,7 @@ import {
 
 import { converse, type LanguageCode } from '@/lib/api';
 import { LANGUAGES, UI_STRINGS } from '@/constants/languages';
+import { loadHistory, saveConversation, type ConversationRecord } from '@/lib/conversationHistory';
 import { setLastResult } from '@/lib/session';
 import { speak, stopSpeaking } from '@/lib/speech';
 import { transcribeWithSarvam } from '@/lib/transcription';
@@ -53,7 +54,29 @@ export default function SpeakScreen() {
   const [agentMessages, setAgentMessages] = useState<AgentMessage[]>([]);
   const [typed, setTyped] = useState('');
   const [showType, setShowType] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [history, setHistory] = useState<ConversationRecord[]>([]);
   const spoke = useRef(false);
+  const sessionIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    loadHistory().then(setHistory);
+  }, []);
+
+  function ensureSessionId(): string {
+    if (!sessionIdRef.current) sessionIdRef.current = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    return sessionIdRef.current;
+  }
+
+  function openHistoryItem(record: ConversationRecord) {
+    stopSpeaking();
+    setAgentMode(true);
+    setAgentMessages(record.messages);
+    sessionIdRef.current = record.id;
+    setHistoryOpen(false);
+    setTranscript('');
+    setShowType(false);
+  }
 
   const t = language ? UI_STRINGS[language] : UI_STRINGS.hi;
   const langNative = LANGUAGES.find((l) => l.code === language)?.native ?? '';
@@ -96,6 +119,14 @@ export default function SpeakScreen() {
       setLastResult(result);
       setShowType(false);
       setTyped('');
+      const spokenText = payload.transcript ?? result.transcript;
+      if (spokenText) {
+        const updated = await saveConversation(`${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, [
+          { role: 'user', text: spokenText },
+          { role: 'assistant', text: result.reply.text },
+        ]);
+        setHistory(updated);
+      }
       router.push('/confirm');
     } catch (e) {
       Alert.alert(t.tryAgain, String(e));
@@ -125,7 +156,8 @@ export default function SpeakScreen() {
     setTranscript('');
     setShowType(false);
     setTyped('');
-    setAgentMessages((messages) => messages.concat({ role: 'user', text: clean }));
+    const withUser = agentMessages.concat({ role: 'user' as const, text: clean });
+    setAgentMessages(withUser);
     try {
       const result = await converse({
         transcript: clean,
@@ -141,8 +173,11 @@ export default function SpeakScreen() {
       if (result.language && result.language !== language) await setLanguage(result.language);
       setLastResult(result);
       const replyText = result.reply.text || t.agentFallbackReply;
-      setAgentMessages((messages) => messages.concat({ role: 'assistant', text: replyText }));
+      const withReply = withUser.concat({ role: 'assistant' as const, text: replyText });
+      setAgentMessages(withReply);
       speak(replyText, replyLanguage);
+      const updated = await saveConversation(ensureSessionId(), withReply);
+      setHistory(updated);
     } catch (e) {
       Alert.alert(t.tryAgain, String(e));
     } finally {
@@ -202,6 +237,19 @@ export default function SpeakScreen() {
           <Txt variant="h2">{t.navSpeak}</Txt>
           <View style={styles.topActions}>
             <Pressable
+              onPress={() => setHistoryOpen((v) => !v)}
+              accessibilityRole="button"
+              accessibilityLabel={t.historyTitle}
+              style={[
+                styles.historyChip,
+                {
+                  backgroundColor: historyOpen ? c.primary : c.surfaceAlt,
+                  borderColor: historyOpen ? c.primary : c.border,
+                },
+              ]}>
+              <Ionicons name="time-outline" size={16} color={historyOpen ? c.onPrimary : c.textDim} />
+            </Pressable>
+            <Pressable
               onPress={() => {
                 stopSpeaking();
                 setAgentMode((v) => !v);
@@ -236,6 +284,34 @@ export default function SpeakScreen() {
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
+          {historyOpen && (
+            <Animated.View
+              entering={FadeInDown.duration(200)}
+              style={[styles.historyPanel, { backgroundColor: c.surface, borderColor: c.border }, elevation('card')]}>
+              <Txt variant="overline" tone="faint" style={{ marginBottom: 6 }}>
+                {t.historyTitle}
+              </Txt>
+              {history.length === 0 ? (
+                <Txt variant="body" tone="dim">
+                  {t.noHistoryYet}
+                </Txt>
+              ) : (
+                history.slice(0, 3).map((rec) => (
+                  <Pressable
+                    key={rec.id}
+                    onPress={() => openHistoryItem(rec)}
+                    style={[styles.historyRow, { borderColor: c.border }]}>
+                    <Ionicons name="chatbubble-ellipses-outline" size={16} color={c.primary} />
+                    <Txt variant="body" style={{ flex: 1 }} numberOfLines={1}>
+                      {rec.title}
+                    </Txt>
+                    <Ionicons name="chevron-forward" size={15} color={c.textFaint} />
+                  </Pressable>
+                ))
+              )}
+            </Animated.View>
+          )}
+
           <Animated.View entering={FadeIn.duration(500)} style={styles.micWrap}>
             <MicOrb state={micState} onPress={toggleRecord} level={micLevel} />
             <View key={status}>
@@ -294,6 +370,7 @@ export default function SpeakScreen() {
                   onPress={() => {
                     stopSpeaking();
                     setAgentMessages([]);
+                    sessionIdRef.current = null;
                   }}
                 />
                 <Button
@@ -439,6 +516,22 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 999,
     borderWidth: 1,
+  },
+  historyChip: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+  },
+  historyPanel: { borderRadius: 18, borderWidth: 1, padding: 14, gap: 2 },
+  historyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 10,
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   scroll: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 20, paddingVertical: 16, gap: 24 },
   micWrap: { alignItems: 'center', gap: 10 },
