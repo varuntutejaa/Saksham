@@ -98,7 +98,8 @@ export async function speak(text: string, language: LanguageCode) {
       }
     });
     player.play();
-  } catch {
+  } catch (e) {
+    console.warn('[speech] Sarvam TTS playback failed, using on-device voice:', e);
     if (myGeneration === generation) deviceSpeak(text, language);
   }
 }
