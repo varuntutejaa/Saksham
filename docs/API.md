@@ -136,6 +136,31 @@ Notes:
 - Not persisted anywhere (no session/mapping created) — this is a stateless
   lookup, unlike `/converse`.
 
+### `POST /api/assistant/extract-profile-answer`
+Voice onboarding: turns one free-text answer (spoken or typed, any language)
+into the structured profile value it maps to.
+```jsonc
+// request
+{ "field": "age", "answer": "main tees saal ka hoon", "language": "hi" }
+// 200
+{ "value": 30 }   // string for name/gender/education, number for age, null if unclear
+```
+`value: null` means the answer couldn't be classified — the app re-asks rather
+than guessing. With no `GROQ_API_KEY`, only `age` resolves (regex); the rest
+return `null`.
+
+### `POST /api/assistant/tts`
+Sarvam text-to-speech (`bulbul:v3`) for the voice agent and onboarding prompts.
+```jsonc
+// request
+{ "text": "नमस्ते, मैं साक्षम हूं", "language": "hi" }   // text: 1–1500 chars
+// 200
+{ "audioUrl": "data:audio/wav;base64,UklGR...", "format": "wav", "provider": "sarvam" }
+```
+With no `SARVAM_API_KEY` (or on a Sarvam error) it returns
+`{ "audioUrl": "data:text/plain;...", "format": "text", "provider": "mock" }`
+and the client speaks the text with its on-device engine instead.
+
 ### `PATCH /api/assistant/recommendations/:id`
 Advance the funnel when a beneficiary acts on a recommendation.
 ```jsonc

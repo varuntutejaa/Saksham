@@ -193,6 +193,24 @@ assistantRouter.post("/extract-profile-answer", async (req, res) => {
 });
 
 /**
+ * POST /api/assistant/tts
+ * Sarvam text-to-speech for the app's voice agent and onboarding questions.
+ * Returns { audioUrl } as a base64 wav `data:` URI, or a text/plain `data:`
+ * URI when no TTS provider is configured — the client then falls back to
+ * on-device speech.
+ */
+const ttsSchema = z.object({
+  text: z.string().min(1).max(1500),
+  language: z.enum(LANGS).default("hi"),
+});
+assistantRouter.post("/tts", async (req, res) => {
+  const parsed = ttsSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  const audio = await synthesizeSpeech(parsed.data.text, parsed.data.language);
+  res.json(audio);
+});
+
+/**
  * POST /api/assistant/ask
  * RAG: answers a free-text policy/FAQ question ("what benefits does PM-AJAY
  * give for beekeeping?", "will I get a certificate?", "how do I apply?")

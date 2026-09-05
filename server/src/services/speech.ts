@@ -18,9 +18,9 @@ export interface TranscribeResult {
 }
 
 export interface SynthesizeResult {
-  /** data URI (mock) or CDN URL (bhashini) of the spoken audio */
+  /** base64 `data:` URI (sarvam/mock) or CDN URL (bhashini) of the spoken audio */
   audioUrl: string;
-  provider: "bhashini" | "mock";
+  provider: "sarvam" | "bhashini" | "mock";
   format: "wav" | "mp3" | "text";
 }
 
@@ -38,6 +38,7 @@ const MOCK_TRANSCRIPTS: Record<Language, string> = {
 };
 
 const SARVAM_STT_URL = "https://api.sarvam.ai/speech-to-text";
+const SARVAM_TTS_URL = "https://api.sarvam.ai/text-to-speech";
 
 const SARVAM_LANGUAGE_CODES: Record<Language, string> = {
   en: "en-IN",
@@ -217,6 +218,14 @@ export async function synthesizeSpeech(
   text: string,
   language: Language = "hi",
 ): Promise<SynthesizeResult> {
+  const clean = text.trim();
+  if (clean && hasSarvam) {
+    try {
+      return await callSarvamTTS(clean, language);
+    } catch (err) {
+      console.error("[speech] Sarvam TTS failed, falling back to on-device speech:", err);
+    }
+  }
   if (hasBhashini) {
     // return callBhashiniTTS(text, language)
   }
@@ -227,5 +236,42 @@ export async function synthesizeSpeech(
     audioUrl: `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`,
     provider: "mock",
     format: "text",
+  };
+}
+
+interface SarvamTTSResponse {
+  audios?: string[];
+}
+
+/** Sarvam TTS (`bulbul:v2`). Returns the spoken audio as a base64 `data:` URI
+ *  so it needs no file hosting — the app writes it to a cache file and plays
+ *  it. `bulbul:v2` caps `text` at 1,500 characters. */
+async function callSarvamTTS(text: string, language: Language): Promise<SynthesizeResult> {
+  const res = await fetch(SARVAM_TTS_URL, {
+    method: "POST",
+    headers: {
+      "api-subscription-key": env.sarvamApiKey,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      text: text.slice(0, 1500),
+      target_language_code: SARVAM_LANGUAGE_CODES[language],
+      speaker: "priya",
+      model: "bulbul:v3",
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Sarvam TTS failed ${res.status}: ${await res.text()}`);
+  }
+
+  const body = (await res.json()) as SarvamTTSResponse;
+  const base64 = body.audios?.join("");
+  if (!base64) throw new Error("Sarvam TTS returned no audio");
+
+  return {
+    audioUrl: `data:audio/wav;base64,${base64}`,
+    provider: "sarvam",
+    format: "wav",
   };
 }

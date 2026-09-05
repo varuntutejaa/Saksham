@@ -171,6 +171,24 @@ export async function extractProfileAnswer(
   return res.json();
 }
 
+export interface TtsResult {
+  audioUrl: string;
+  format: 'wav' | 'mp3' | 'text';
+  provider: string;
+}
+
+/** Sarvam text-to-speech via the backend. `format: 'text'` means no provider
+ *  is configured and the caller should speak the text on-device instead. */
+export async function synthesizeSpeech(text: string, language: LanguageCode): Promise<TtsResult> {
+  const res = await fetch(`${API_BASE}/api/assistant/tts`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: text.slice(0, 1500), language }),
+  });
+  if (!res.ok) throw new Error(await extractError(res, 'Could not generate speech'));
+  return res.json();
+}
+
 interface LocalSkill {
   normalizedSkill: string;
   qpCode: string;
