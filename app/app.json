@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Saksham",
+    "name": "Saksham AI",
     "slug": "Saksham",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -10,6 +10,7 @@
     "backgroundColor": "#F3F6FC",
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.saksham.ai",
       "icon": "./assets/images/icon.png",
       "infoPlist": {
         "NSMicrophoneUsageDescription": "Saksham needs the microphone so you can speak your skill in your own language.",
@@ -17,6 +18,7 @@
       }
     },
     "android": {
+      "package": "com.saksham.ai",
       "adaptiveIcon": {
         "backgroundColor": "#1462C6",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
