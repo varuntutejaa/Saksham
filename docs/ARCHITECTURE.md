@@ -43,11 +43,14 @@ The one flow that matters. Code in
    matches each token against `NsqfQualification.keywords`. Confidence = keyword
    overlap ratio, capped at 0.95. No match → stored with null qualification,
    `confidence 0.2`, flagged for review.
-4. **NSQF + location → PM-AJAY programmes** —
+4. **NSQF + location → PM-AJAY courses** —
    [`services/recommend.ts`](../server/src/services/recommend.ts).
-   `recommendPrograms()` scores every active `TrainingProgram`:
-   `0.45` same qualification · `0.20` same sector · `0.12` same district ·
-   `0.08` same state · `0.05` seats available · `0.05` stipend. Top 5 returned.
+   `recommendCourses()` scores the real `PmajayCourse` catalogue:
+   `0.50` keyword hit · `0.20` same sector · `0.15` same trade in title ·
+   `0.10` national or user's state · `0.05` mapped to a QP. Top 5 are sorted
+   nearest-first where the PM-AJAY catalogue publishes state scope, then by
+   relevance. The illustrative `TrainingProgram` browse endpoint separately
+   ranks saved-location results by district, then state.
 5. **Rationale** — [`services/i18n.ts`](../server/src/services/i18n.ts).
    Templated "why this" sentence in the beneficiary's language (not free LLM
    text — predictable for audio + auditable).

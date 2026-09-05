@@ -17,6 +17,43 @@ function paginate<T>(items: T[], total: number, page: number, pageSize: number) 
   return { items, total, page, pageSize, totalPages: Math.max(1, Math.ceil(total / pageSize)) };
 }
 
+function normalizeLocation(value: string | null | undefined): string | null {
+  return value?.trim().toLowerCase().replace(/[^a-z0-9]+/g, "") || null;
+}
+
+/** "State [ODISHA]" -> "odisha"; national rows return null. */
+function courseStateName(courseLevel: string): string | null {
+  const match = courseLevel.match(/\[([^\]]+)\]/);
+  return match ? match[1].trim() : null;
+}
+
+function pmajayCourseLocationRank(courseLevel: string, preferredState?: string): number {
+  const scopedState = normalizeLocation(courseStateName(courseLevel));
+  const userState = normalizeLocation(preferredState);
+  if (scopedState && userState && userState.includes(scopedState)) return 2;
+  if (!scopedState) return 1;
+  return 0;
+}
+
+function programLocationRank(
+  program: { state: string | null; district: string | null },
+  preferredState?: string,
+  preferredDistrict?: string,
+): number {
+  const userDistrict = normalizeLocation(preferredDistrict);
+  const userState = normalizeLocation(preferredState);
+  const programDistrict = normalizeLocation(program.district);
+  const programState = normalizeLocation(program.state);
+  if (programDistrict && userDistrict && (programDistrict.includes(userDistrict) || userDistrict.includes(programDistrict))) {
+    return 3;
+  }
+  if (programState && userState && (programState.includes(userState) || userState.includes(programState))) {
+    return 2;
+  }
+  if (!programState && !programDistrict) return 1;
+  return 0;
+}
+
 /** GET /api/nsqf — NSQF qualifications (?sector= &level= &q= &page= &pageSize=) */
 catalogRouter.get("/nsqf", async (req, res) => {
   const parsed = pageQuery.safeParse(req.query);
@@ -69,12 +106,12 @@ catalogRouter.post("/nsqf/map", async (req, res) => {
 });
 
 /** GET /api/pmajay-courses — the real PM-AJAY course catalogue
- *  (?sector= &courseLevel= &q= &page= &pageSize=) */
+ *  (?sector= &courseLevel= &q= &preferredState= &page= &pageSize=) */
 catalogRouter.get("/pmajay-courses", async (req, res) => {
   const parsed = pageQuery.safeParse(req.query);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
   const { page, pageSize } = parsed.data;
-  const { sector, courseLevel, q } = req.query as Record<string, string | undefined>;
+  const { sector, courseLevel, q, preferredState } = req.query as Record<string, string | undefined>;
 
   const where = {
     ...(sector ? { sector } : {}),
@@ -88,16 +125,27 @@ catalogRouter.get("/pmajay-courses", async (req, res) => {
         }
       : {}),
   };
+  const shouldRankByLocation = Boolean(preferredState) && !courseLevel;
   const [items, total] = await Promise.all([
     prisma.pmajayCourse.findMany({
       where,
       orderBy: [{ sector: "asc" }, { subCourseName: "asc" }],
-      skip: (page - 1) * pageSize,
-      take: pageSize,
+      ...(shouldRankByLocation ? {} : { skip: (page - 1) * pageSize, take: pageSize }),
     }),
     prisma.pmajayCourse.count({ where }),
   ]);
-  res.json(paginate(items, total, page, pageSize));
+  const pageItems = shouldRankByLocation
+    ? items
+        .sort(
+          (a, b) =>
+            pmajayCourseLocationRank(b.courseLevel, preferredState) -
+              pmajayCourseLocationRank(a.courseLevel, preferredState) ||
+            a.sector.localeCompare(b.sector) ||
+            a.subCourseName.localeCompare(b.subCourseName),
+        )
+        .slice((page - 1) * pageSize, page * pageSize)
+    : items;
+  res.json(paginate(pageItems, total, page, pageSize));
 });
 
 /** GET /api/pmajay-courses/filters — sector + course-level values that exist */
@@ -113,12 +161,13 @@ catalogRouter.get("/pmajay-courses/filters", async (_req, res) => {
   res.json({ sectors: sectors.map((s) => s.sector), courseLevels: levels.map((l) => l.courseLevel) });
 });
 
-/** GET /api/programs — training programmes (?state= &district= &sector= &page= &pageSize=) */
+/** GET /api/programs — training programmes
+ *  (?state= &district= &sector= &preferredState= &preferredDistrict= &page= &pageSize=) */
 catalogRouter.get("/programs", async (req, res) => {
   const parsed = pageQuery.safeParse(req.query);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
   const { page, pageSize } = parsed.data;
-  const { state, district, sector, q } = req.query as Record<string, string | undefined>;
+  const { state, district, sector, q, preferredState, preferredDistrict } = req.query as Record<string, string | undefined>;
 
   const where = {
     active: true,
@@ -127,17 +176,27 @@ catalogRouter.get("/programs", async (req, res) => {
     ...(sector ? { sector } : {}),
     ...(q ? { name: { contains: q, mode: "insensitive" as const } } : {}),
   };
+  const shouldRankByLocation = Boolean(preferredState || preferredDistrict) && !state && !district;
   const [items, total] = await Promise.all([
     prisma.trainingProgram.findMany({
       where,
       include: { nsqfQualification: true },
       orderBy: { createdAt: "desc" },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
+      ...(shouldRankByLocation ? {} : { skip: (page - 1) * pageSize, take: pageSize }),
     }),
     prisma.trainingProgram.count({ where }),
   ]);
-  res.json(paginate(items, total, page, pageSize));
+  const pageItems = shouldRankByLocation
+    ? items
+        .sort(
+          (a, b) =>
+            programLocationRank(b, preferredState, preferredDistrict) -
+              programLocationRank(a, preferredState, preferredDistrict) ||
+            b.createdAt.getTime() - a.createdAt.getTime(),
+        )
+        .slice((page - 1) * pageSize, page * pageSize)
+    : items;
+  res.json(paginate(pageItems, total, page, pageSize));
 });
 
 /** GET /api/programs/filters — sector values that exist on active programmes */

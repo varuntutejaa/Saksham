@@ -22,6 +22,7 @@ export interface CourseRecommendation {
 interface RecommendInput {
   mappings: MappingResult[];
   state?: string | null;
+  district?: string | null;
   language?: Language;
 }
 
@@ -56,6 +57,10 @@ function titleWords(title: string | null): string[] {
 function courseStateName(courseLevel: string): string | null {
   const match = courseLevel.match(/\[([^\]]+)\]/);
   return match ? match[1].trim().toLowerCase() : null;
+}
+
+function normalizeLocation(value: string | null | undefined): string | null {
+  return value?.trim().toLowerCase().replace(/[^a-z0-9]+/g, "") || null;
 }
 
 /**
@@ -96,7 +101,7 @@ export async function recommendCourses(input: RecommendInput): Promise<CourseRec
     take: 300,
   });
 
-  const beneficiaryState = state?.trim().toLowerCase() ?? null;
+  const beneficiaryState = normalizeLocation(state);
 
   const scored = candidates.map((course) => {
     const courseKeywords = course.keywords.map((k) => k.toLowerCase());
@@ -126,10 +131,18 @@ export async function recommendCourses(input: RecommendInput): Promise<CourseRec
     }
 
     const scopedState = courseStateName(course.courseLevel);
-    if (scopedState && beneficiaryState && beneficiaryState.includes(scopedState)) {
+    const normalizedScopedState = normalizeLocation(scopedState);
+    const locationRank =
+      normalizedScopedState && beneficiaryState && beneficiaryState.includes(normalizedScopedState)
+        ? 2
+        : !normalizedScopedState
+          ? 1
+          : 0;
+
+    if (locationRank === 2) {
       score += 0.1;
       reasons.push("state");
-    } else if (!scopedState) {
+    } else if (locationRank === 1) {
       score += 0.1; // nationally available
     } else {
       score -= 0.15; // scoped to a state this beneficiary isn't in
@@ -149,12 +162,14 @@ export async function recommendCourses(input: RecommendInput): Promise<CourseRec
       nsqfTitle: source?.title ?? null,
       nsqfLevel: source?.nsqfLevel ?? null,
       score: Number(Math.max(0, Math.min(1, score)).toFixed(3)),
+      locationRank,
       rationale: rationalePhrase(language, reasons, { sector: course.sector }),
     };
   });
 
   return scored
     .filter((s) => s.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 5);
+    .sort((a, b) => b.locationRank - a.locationRank || b.score - a.score)
+    .slice(0, 5)
+    .map(({ locationRank: _locationRank, ...recommendation }) => recommendation);
 }

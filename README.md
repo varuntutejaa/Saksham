@@ -86,7 +86,8 @@ grounded in real government data, not fabricated placeholders.
 - **Recommendations out of the real catalogue** — a matched qualification is
   scored against all 2,366 real PM-AJAY courses, and each card carries the QP
   code it came from, so any recommendation can be traced back to its
-  government source.
+  government source. When the user's location is known, courses scoped to their
+  state are shown before national or other-state options.
 - **Only qualifications that are still valid** — every one of the 1,283 NSQF
   detail pages was scraped, and **464 of them (36%) turned out to be past their
   `Valid Till` date**. Expired qualifications are excluded from skill mapping
@@ -97,6 +98,8 @@ grounded in real government data, not fabricated placeholders.
   syllabus, and the theory/practical hour split.
 - **Browse both catalogues** — search and filter all 1,283 NSQF qualifications
   and 2,366 PM-AJAY courses by sector, level and free text, five rows a page.
+  PM-AJAY course browsing uses the saved device location to place state-near
+  results first where the catalogue exposes location scope.
 - **RAG for policy questions** — "will I get a certificate?", "how do I
   apply?" aren't in any database row; they're answered by retrieving real
   passages from government PDFs and having an LLM compose an answer
@@ -344,7 +347,8 @@ notification asset are the real uploaded Saksham logo — see
    contain the spoken skill (0.50), sector matches (0.20), the course title
    names the same trade (0.15), nationally available or scoped to the
    beneficiary's own state (0.10), mapped to a QP at all (0.05). Each result
-   carries the QP code, title and level it was matched from.
+   carries the QP code, title and level it was matched from. Results are sorted
+   nearest-first where PM-AJAY publishes state scope, then by relevance score.
    *The two datasets spell sectors differently — "Handicrafts & Carpet" vs
    "Handicrafts and Carpet" — so both sides are normalized before comparing.*
 4. **Rationale** (`i18n.ts`) — templated "why this" sentence in the
@@ -375,8 +379,8 @@ notification asset are the real uploaded Saksham logo — see
 | `GET`  | `/api/stitch/projects/:projectId/screens` | List screens in a Stitch project |
 | `POST` | `/api/nsqf/map` | Map free text to NSQF (no persistence) — the website try-out |
 | `GET`  | `/api/nsqf` · `/api/nsqf/filters` | Browse the NSQF qualifications (paginated, filterable; expired ones hidden unless `?includeExpired=true`) |
-| `GET`  | `/api/pmajay-courses` · `/filters` | Browse the 2,366 real PM-AJAY courses (paginated, filterable) |
-| `GET`  | `/api/programs` · `/filters` · `/:id` | Training programmes (paginated) |
+| `GET`  | `/api/pmajay-courses` · `/filters` | Browse the 2,366 real PM-AJAY courses (paginated, filterable, state-near ordering with `preferredState`) |
+| `GET`  | `/api/programs` · `/filters` · `/:id` | Training programmes (paginated, nearest-first with `preferredState`/`preferredDistrict`) |
 | `POST` | `/api/auth/login` · `/register` · `GET /me` | JWT auth |
 | `POST` | `/api/auth/forgot-password` · `/reset-password` | OTP-based password reset |
 | `PATCH`| `/api/auth/profile` | Onboarding answers + profile photo |

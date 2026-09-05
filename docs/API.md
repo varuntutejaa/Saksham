@@ -104,7 +104,8 @@ Notes:
   data. `nsqfQpCode`/`nsqfTitle`/`nsqfLevel` carry that qualification so the
   match stays auditable. Scoring: keyword hit 0.50, sector match 0.20, title
   names the trade 0.15, nationally available or in the beneficiary's state
-  0.10, mapped to a QP at all 0.05.
+  0.10, mapped to a QP at all 0.05. Results are ordered nearest-first where
+  the PM-AJAY catalogue publishes state scope, then by score.
 - If nothing maps, `mappings` has one entry with `normalizedSkill: "unknown"` and
   `recommendations` is empty.
 - `reply.format` is `"text"` from the mock engine — clients speak it with
@@ -303,7 +304,9 @@ The filter values that actually exist, for the app's filter chips.
 
 ### `GET /api/pmajay-courses`
 The real PM-AJAY course catalogue (`server/prisma/data/README-pmajay-courses.md`).
-Query: `?sector=&courseLevel=&q=&page=&pageSize=`.
+Query: `?sector=&courseLevel=&q=&preferredState=&page=&pageSize=`.
+When `preferredState` is supplied and `courseLevel` is not fixed, state-scoped
+rows for that state are paged before national rows and other-state rows.
 ```jsonc
 { "items": [ { "id", "srNo", "courseLevel": "National", "sector": "Apparel",
     "subSector", "courseName", "subCourseCode": "AMH/Q1947",
@@ -318,7 +321,10 @@ Query: `?sector=&courseLevel=&q=&page=&pageSize=`.
 ```
 
 ### `GET /api/programs`
-Active PM-AJAY training programmes. Query: `?state=&district=&sector=&q=&page=&pageSize=`.
+Active PM-AJAY training programmes.
+Query: `?state=&district=&sector=&q=&preferredState=&preferredDistrict=&page=&pageSize=`.
+When explicit `state`/`district` filters are absent, preferred location sorts
+district matches first, then state matches, then unscoped/other rows.
 ```jsonc
 { "items": [ { "id", "name", "nameHindi", "scheme": "PM-AJAY", "component": "GIA",
     "providerName", "sector", "nsqfLevel", "mode": "OFFLINE",

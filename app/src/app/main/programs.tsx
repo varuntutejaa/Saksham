@@ -29,7 +29,7 @@ const TABS: { key: Tab; label: string }[] = [
 ];
 
 export default function CatalogScreen() {
-  const { language } = useStore();
+  const { language, state } = useStore();
   const { c, radius, elevation } = useTheme();
 
   const [tab, setTab] = useState<Tab>('pmajay-courses');
@@ -83,7 +83,7 @@ export default function CatalogScreen() {
     const common = { page, sector, q: search || undefined };
     const request =
       tab === 'pmajay-courses'
-        ? getPmajayCourses({ ...common, courseLevel: subFilter }).then((r) => ({
+        ? getPmajayCourses({ ...common, courseLevel: subFilter, preferredState: state }).then((r) => ({
             ...r,
             rows: r.items.map((item) => ({ kind: 'pmajay-courses' as const, item })),
           }))
@@ -99,7 +99,7 @@ export default function CatalogScreen() {
         setTotalPages(r.totalPages);
       })
       .catch(() => setError(true));
-  }, [tab, page, sector, subFilter, search]);
+  }, [tab, page, sector, subFilter, search, state]);
 
   useEffect(load, [load]);
 

@@ -191,7 +191,16 @@ async function getPage<T>(path: string, params: Record<string, string | number |
 }
 
 export function getPrograms(
-  params: { state?: string; district?: string; sector?: string; q?: string; page?: number; pageSize?: number } = {},
+  params: {
+    state?: string;
+    district?: string;
+    preferredState?: string;
+    preferredDistrict?: string;
+    sector?: string;
+    q?: string;
+    page?: number;
+    pageSize?: number;
+  } = {},
 ): Promise<Paginated<Program>> {
   return getPage<Program>('/api/programs', { pageSize: CATALOG_PAGE_SIZE, ...params });
 }
@@ -203,7 +212,7 @@ export function getNsqfQualifications(
 }
 
 export function getPmajayCourses(
-  params: { sector?: string; courseLevel?: string; q?: string; page?: number; pageSize?: number } = {},
+  params: { sector?: string; courseLevel?: string; preferredState?: string; q?: string; page?: number; pageSize?: number } = {},
 ): Promise<Paginated<PmajayCourse>> {
   return getPage<PmajayCourse>('/api/pmajay-courses', { pageSize: CATALOG_PAGE_SIZE, ...params });
 }
