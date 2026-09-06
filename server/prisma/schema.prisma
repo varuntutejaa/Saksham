@@ -49,6 +49,26 @@ enum JobSource {
   MANUAL // entered directly by a programme admin
 }
 
+/// A one-time code sent to a phone for signup verification or password reset.
+///
+/// These used to live in an in-memory Map, which lost every pending code when
+/// the process restarted — on Render's free tier the service spins down when
+/// idle, so a beneficiary could request a code, the service would sleep, and
+/// their code would be gone. Storing them here also means the flow still works
+/// if the API ever runs on more than one instance.
+///
+/// One row per phone: requesting a new code replaces any pending one.
+model OtpCode {
+  phone     String   @id
+  /// bcrypt hash — a leaked database row must not hand over a working code
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
+}
+
 model User {
   id            String   @id @default(cuid())
   phone         String?  @unique

@@ -1,34 +1,33 @@
+import bcrypt from "bcryptjs";
+import { prisma } from "../lib/prisma.js";
 import { hasSms } from "../lib/env.js";
 
 /**
- * Phone-based password reset OTP.
+ * One-time codes for signup phone verification and password reset.
  *
- * There's no SMS provider wired up yet (no SMS_API_KEY set anywhere in this
- * project), so — same pattern as services/speech.ts — this falls back to a
- * "mock" mode: the OTP is generated and stored, but the response ALSO carries
- * `devOtp` so the flow is fully testable without a real phone. A real
- * provider (set SMS_API_KEY) would drop `devOtp` from the response and
- * actually send the SMS in `deliverOtp`.
+ * Codes are stored in Postgres (model OtpCode), not in memory: Render's free
+ * tier spins the service down when idle, and an in-memory store lost every
+ * pending code on restart — a beneficiary could request a code, the service
+ * would sleep, and the code would be gone. The table also keeps the flow
+ * working if the API ever runs on more than one instance.
  *
- * Storage is in-memory (Map), which is fine for a single dev/demo server but
- * does NOT survive a restart or work across multiple server instances — if
- * this goes to real production, back this with a DB table instead.
+ * The code is stored as a bcrypt hash, so a leaked database row does not hand
+ * an attacker a working code. Brute force is bounded by MAX_ATTEMPTS and the
+ * 10-minute expiry.
+ *
+ * No SMS provider is wired up yet (no SMS_API_KEY), so — same pattern as
+ * services/speech.ts — this falls back to "mock" mode: the code is generated
+ * and stored, and the response also carries `devOtp` so the flow is testable
+ * without a real handset. Implement deliverOtp and set SMS_API_KEY to send
+ * real messages; `devOtp` is then omitted.
  */
-
-interface OtpRecord {
-  code: string;
-  expiresAt: number;
-  attempts: number;
-}
 
 const OTP_TTL_MS = 10 * 60 * 1000; // 10 minutes
 const MAX_ATTEMPTS = 5;
 
-const store = new Map<string, OtpRecord>();
-
-/** 4 digits: shorter is materially easier to hear, remember and type for a
- *  beneficiary reading an SMS aloud or entering it on a feature phone. The
- *  brute-force risk is bounded by MAX_ATTEMPTS and the 10-minute TTL. */
+/** 4 digits: materially easier to hear, remember and type for a beneficiary
+ *  reading an SMS aloud or using a feature phone. Brute force stays bounded by
+ *  MAX_ATTEMPTS and the TTL above. */
 function generateCode(): string {
   return String(Math.floor(1000 + Math.random() * 9000));
 }
@@ -41,7 +40,17 @@ export interface RequestOtpResult {
 
 export async function requestOtp(phone: string): Promise<RequestOtpResult> {
   const code = generateCode();
-  store.set(phone, { code, expiresAt: Date.now() + OTP_TTL_MS, attempts: 0 });
+  const record = {
+    codeHash: await bcrypt.hash(code, 10),
+    expiresAt: new Date(Date.now() + OTP_TTL_MS),
+    attempts: 0,
+  };
+  // one pending code per phone — requesting again replaces the previous one
+  await prisma.otpCode.upsert({
+    where: { phone },
+    update: record,
+    create: { phone, ...record },
+  });
 
   if (hasSms) {
     // await deliverOtp(phone, code) — wire a real SMS provider here.
@@ -53,21 +62,31 @@ export async function requestOtp(phone: string): Promise<RequestOtpResult> {
 
 export type VerifyOtpResult = "ok" | "not_found" | "expired" | "too_many_attempts" | "mismatch";
 
-export function verifyOtp(phone: string, code: string): VerifyOtpResult {
-  const rec = store.get(phone);
+export async function verifyOtp(phone: string, code: string): Promise<VerifyOtpResult> {
+  const rec = await prisma.otpCode.findUnique({ where: { phone } });
   if (!rec) return "not_found";
-  if (Date.now() > rec.expiresAt) {
-    store.delete(phone);
+
+  if (Date.now() > rec.expiresAt.getTime()) {
+    await prisma.otpCode.delete({ where: { phone } }).catch(() => {});
     return "expired";
   }
   if (rec.attempts >= MAX_ATTEMPTS) {
-    store.delete(phone);
+    await prisma.otpCode.delete({ where: { phone } }).catch(() => {});
     return "too_many_attempts";
   }
-  if (rec.code !== code) {
-    rec.attempts += 1;
+  if (!(await bcrypt.compare(code, rec.codeHash))) {
+    await prisma.otpCode.update({ where: { phone }, data: { attempts: { increment: 1 } } });
     return "mismatch";
   }
-  store.delete(phone);
+
+  // single use: consume the code so it cannot be replayed
+  await prisma.otpCode.delete({ where: { phone } }).catch(() => {});
   return "ok";
+}
+
+/** Housekeeping: drop codes that expired long ago. Safe to call on a timer;
+ *  verification already rejects expired rows, so this is only tidying. */
+export async function purgeExpiredOtps(): Promise<number> {
+  const { count } = await prisma.otpCode.deleteMany({ where: { expiresAt: { lt: new Date() } } });
+  return count;
 }

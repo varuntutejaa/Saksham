@@ -45,7 +45,7 @@ authRouter.post("/register", async (req, res) => {
 
   // The phone number is how a beneficiary is contacted about a training place,
   // so it has to be verified before the account exists — not after.
-  const otpResult = verifyOtp(rest.phone, otp);
+  const otpResult = await verifyOtp(rest.phone, otp);
   if (otpResult !== "ok") return res.status(400).json({ error: otpMessage(otpResult) });
 
   const user = await prisma.user.create({
@@ -160,7 +160,7 @@ authRouter.post("/reset-password", async (req, res) => {
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
   const { phone, otp, newPassword } = parsed.data;
 
-  const result = verifyOtp(phone, otp);
+  const result = await verifyOtp(phone, otp);
   if (result !== "ok") return res.status(400).json({ error: otpMessage(result) });
 
   const user = await prisma.user.findUnique({ where: { phone } });
