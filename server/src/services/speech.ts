@@ -214,16 +214,33 @@ async function callGroqASR(
   };
 }
 
+/** Sarvam quota/auth failures (402/401/403) are not transient — they stay
+ *  broken until the account is topped up or the key is replaced. Retrying on
+ *  every request only added latency to a call we already knew would fail, so
+ *  once we see one we stop calling out for a while and go straight to the
+ *  on-device fallback. Cleared by a restart, or after the cool-off. */
+let sarvamDisabledUntil = 0;
+const SARVAM_COOLOFF_MS = 15 * 60 * 1000;
+
 export async function synthesizeSpeech(
   text: string,
   language: Language = "hi",
 ): Promise<SynthesizeResult> {
   const clean = text.trim();
-  if (clean && hasSarvam) {
+  if (clean && hasSarvam && Date.now() >= sarvamDisabledUntil) {
     try {
       return await callSarvamTTS(clean, language);
     } catch (err) {
-      console.error("[speech] Sarvam TTS failed, falling back to on-device speech:", err);
+      const message = err instanceof Error ? err.message : String(err);
+      // 402 = no credits, 401/403 = bad key: back off instead of retrying
+      if (/\b(401|402|403)\b/.test(message)) {
+        sarvamDisabledUntil = Date.now() + SARVAM_COOLOFF_MS;
+        console.error(
+          `[speech] Sarvam TTS unavailable (${message.slice(0, 120)}) — using on-device speech for the next ${SARVAM_COOLOFF_MS / 60000} minutes`,
+        );
+      } else {
+        console.error("[speech] Sarvam TTS failed, falling back to on-device speech:", err);
+      }
     }
   }
   if (hasBhashini) {
