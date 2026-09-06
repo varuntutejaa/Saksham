@@ -602,9 +602,14 @@ function isLatinText(value: string): boolean {
   return /^[a-z0-9\s]+$/.test(value);
 }
 
+/** Fuzzy match to absorb STT spelling variance ("silai"/"silaai"). Requires
+ *  the same first letter: transcription wobbles on vowels and endings, not on
+ *  the opening consonant, and without this "weather" matched "leather" — a
+ *  beneficiary remarking on the weather was told they work in leather. */
 function isCloseWord(word: string, pattern: string): boolean {
   if (Math.abs(word.length - pattern.length) > 2) return false;
   if (word.length < 5 || pattern.length < 5) return false;
+  if (word[0] !== pattern[0]) return false;
   return levenshtein(word, pattern) <= (pattern.length > 8 ? 2 : 1);
 }
 

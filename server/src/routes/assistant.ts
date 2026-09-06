@@ -67,7 +67,9 @@ assistantRouter.post("/converse", upload.single("audio"), async (req, res) => {
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
   const { language, state, district, userId, channel, bandwidthKbps, autoDetectLanguage, intent } = parsed.data;
   const history = parseHistory(parsed.data.history);
-  let effectiveLanguage = language;
+  // The language the beneficiary chose. Never overwritten by STT detection —
+  // see the note in the transcription step below.
+  const effectiveLanguage = language;
 
   // 1. Speech -> text
   let transcript = parsed.data.transcript;
@@ -80,7 +82,11 @@ assistantRouter.post("/converse", upload.single("audio"), async (req, res) => {
       fileName: req.file?.originalname,
     });
     transcript = stt.transcript;
-    effectiveLanguage = stt.language;
+    // Auto-detect helps STT transcribe accurately, but it must NOT change the
+    // language we answer in: the beneficiary deliberately chose one, and a
+    // person who says an English word or two — or whose dialect is misread —
+    // should not suddenly be answered in a language they may not read.
+    // stt.language is kept for analytics only.
     sttProvider = stt.provider;
     sttConfidence = stt.confidence;
   }

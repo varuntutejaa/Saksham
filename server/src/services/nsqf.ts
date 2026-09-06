@@ -1,5 +1,6 @@
 import { prisma } from "../lib/prisma.js";
 import { extractSkills, patternHitCount } from "./skillLexicon.js";
+import { classifySkillsWithLlm } from "./skillLlm.js";
 
 export interface MappingResult {
   rawSkillText: string;
@@ -142,7 +143,16 @@ type CourseRow = { subCourseCode: string; subCourseName: string; sector: string;
  *     this is an independent real-data signal, not a scoring input.
  */
 export async function mapTranscriptToNsqf(transcript: string): Promise<MappingResult[]> {
-  const tokens = extractSkills(transcript);
+  // The lexicon only fires on phrases someone thought to write down, so a
+  // beneficiary describing their trade in their own words ("I do something
+  // related to honey") matched nothing. Fall back to the LLM, which is
+  // constrained to the same token vocabulary.
+  let tokens = extractSkills(transcript);
+  let matchedByLlm = false;
+  if (tokens.length === 0) {
+    tokens = await classifySkillsWithLlm(transcript);
+    matchedByLlm = tokens.length > 0;
+  }
   if (tokens.length === 0) {
     return [
       {
@@ -227,7 +237,11 @@ export async function mapTranscriptToNsqf(transcript: string): Promise<MappingRe
     const hay = transcript.toLowerCase();
     const qualificationHits = match.keywords.filter((k) => hay.includes(k.toLowerCase())).length;
     const spokenHits = patternHitCount(transcript, token);
-    const confidence = Math.min(0.55 + 0.1 * (qualificationHits + spokenHits), 0.95);
+    // an LLM match is a genuine reading of what they said, but it is inferred
+    // rather than a literal phrase hit, so it does not claim keyword certainty
+    const confidence = matchedByLlm
+      ? 0.6
+      : Math.min(0.55 + 0.1 * (qualificationHits + spokenHits), 0.95);
 
     results.push({
       rawSkillText: transcript,
@@ -238,7 +252,7 @@ export async function mapTranscriptToNsqf(transcript: string): Promise<MappingRe
       sector: match.sector,
       nsqfLevel: match.nsqfLevel,
       confidence,
-      method: "keyword",
+      method: matchedByLlm ? "llm" : "keyword",
       pmajayVerified: Boolean(pmajayMatch),
       pmajayCourse,
       nsqfExpired: matchExpired,
