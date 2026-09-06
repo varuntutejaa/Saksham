@@ -540,6 +540,18 @@ export const SKILL_LEXICON: LexiconEntry[] = [
 ];
 
 /** Extract normalized skill tokens from a free-text transcript. */
+
+/** How many of a concept's spoken patterns the transcript matches. Used as a
+ *  confidence signal: someone who says "mitti ke bartan" AND "kumhar" has
+ *  evidenced pottery more strongly than someone who said one word in passing.
+ *  Counts only `patterns` (how people speak), never `titleTerms`. */
+export function patternHitCount(transcript: string, normalized: string): number {
+  const entry = SKILL_LEXICON.find((e) => e.normalized === normalized);
+  if (!entry) return 0;
+  const hay = normalizeText(transcript);
+  return entry.patterns.filter((p) => patternMatches(hay, normalizeText(p))).length;
+}
+
 export function extractSkills(transcript: string): string[] {
   const hay = normalizeText(transcript);
   const found = new Set<string>();

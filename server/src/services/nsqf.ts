@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma.js";
-import { extractSkills } from "./skillLexicon.js";
+import { extractSkills, patternHitCount } from "./skillLexicon.js";
 
 export interface MappingResult {
   rawSkillText: string;
@@ -172,10 +172,17 @@ export async function mapTranscriptToNsqf(transcript: string): Promise<MappingRe
       continue;
     }
 
-    const transcriptHits = match.keywords.filter((k) =>
-      transcript.toLowerCase().includes(k.toLowerCase()),
-    ).length;
-    const confidence = Math.min(0.55 + 0.1 * transcriptHits, 0.95);
+    // Confidence reflects how strongly the transcript evidences this skill.
+    // The qualification's own keywords are mostly formal English ("pottery",
+    // "terracotta"), so counting only those punished beneficiaries who speak
+    // in their own language: "mitti ke bartan" scored 0 hits and floored at
+    // the base, while "silai" happened to be a keyword and scored higher.
+    // Count the LEXICON patterns that actually fired too — that is the real
+    // evidence the beneficiary named this trade.
+    const hay = transcript.toLowerCase();
+    const qualificationHits = match.keywords.filter((k) => hay.includes(k.toLowerCase())).length;
+    const spokenHits = patternHitCount(transcript, token);
+    const confidence = Math.min(0.55 + 0.1 * (qualificationHits + spokenHits), 0.95);
 
     results.push({
       rawSkillText: transcript,
