@@ -18,10 +18,6 @@ const OPTIONS: { intent: Intent; icon: keyof typeof Ionicons.glyphMap }[] = [
   { intent: 'jobs', icon: 'briefcase' },
   { intent: 'training', icon: 'school' },
   { intent: 'certificate', icon: 'ribbon' },
-  // Many beneficiaries don't yet know whether they need training or just
-  // certification for work they already do — this option skips the choice
-  // and shows the full livelihood map instead of a narrowed view.
-  { intent: 'guidance', icon: 'help-circle' },
 ];
 
 export default function ConfirmScreen() {

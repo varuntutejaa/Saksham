@@ -235,6 +235,19 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     ],
   },
   {
+    normalized: "medical-care",
+    patterns: [
+      "doctor", "medical doctor", "clinic", "clinical work", "medical practice",
+      "patient treatment", "treat patients", "healthcare worker", "health worker",
+      "hospital work", "दवाखाना", "डॉक्टर", "चिकित्सक", "मरीजों का इलाज",
+      "अस्पताल में काम",
+    ],
+    titleTerms: [
+      "frontline health caregiving", "general duty assistant", "foundation course in healthcare",
+      "emergency medical technician", "medical", "healthcare",
+    ],
+  },
+  {
     normalized: "retail",
     patterns: [
       "dukan", "shop", "kirana", "retail", "sales", "billing",

@@ -186,6 +186,7 @@ export default function SpeakScreen() {
       });
       const updated = await saveConversation(ensureSessionId(), withReply);
       setHistory(updated);
+      router.push('/confirm');
     } catch (e) {
       Alert.alert(t.tryAgain, String(e));
     } finally {

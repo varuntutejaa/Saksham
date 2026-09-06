@@ -473,6 +473,26 @@ const LOCAL_SKILLS: LocalSkill[] = [
     nsqfLevel: 4,
     patterns: ['video editing', 'video edit', 'make videos', 'making videos', 'video banana', 'content creator', 'वीडियो एडिटिंग'],
   },
+  {
+    normalizedSkill: 'medical-care',
+    qpCode: 'QG-03-HE-01989-2024-V2-HSSC',
+    title: 'Frontline Health Caregiving Assistant',
+    sector: 'Healthcare',
+    nsqfLevel: 3,
+    patterns: [
+      'doctor',
+      'medical doctor',
+      'clinic',
+      'clinical work',
+      'medical practice',
+      'patient treatment',
+      'treat patients',
+      'healthcare worker',
+      'hospital work',
+      'डॉक्टर',
+      'चिकित्सक',
+    ],
+  },
 ];
 
 const LOCAL_AGENT_COPY: Record<LanguageCode, { found: string; unknown: string; rationale: string }> = {
