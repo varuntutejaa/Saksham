@@ -219,3 +219,39 @@ catalogRouter.get("/programs/:id", async (req, res) => {
   if (!item) return res.status(404).json({ error: "Not found" });
   res.json(item);
 });
+
+/** GET /api/jobs — job roles beneficiaries can become eligible for
+ *  (?sector= &q= &page= &pageSize=), each with its required NSQF qualifications. */
+catalogRouter.get("/jobs", async (req, res) => {
+  const parsed = pageQuery.safeParse(req.query);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  const { page, pageSize } = parsed.data;
+  const { sector, q } = req.query as Record<string, string | undefined>;
+
+  const where = {
+    active: true,
+    ...(sector ? { sector } : {}),
+    ...(q ? { title: { contains: q, mode: "insensitive" as const } } : {}),
+  };
+  const [items, total] = await Promise.all([
+    prisma.job.findMany({
+      where,
+      include: { requirements: { include: { nsqfQualification: true } } },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.job.count({ where }),
+  ]);
+  res.json(paginate(items, total, page, pageSize));
+});
+
+/** GET /api/jobs/:id */
+catalogRouter.get("/jobs/:id", async (req, res) => {
+  const item = await prisma.job.findUnique({
+    where: { id: req.params.id },
+    include: { requirements: { include: { nsqfQualification: true } } },
+  });
+  if (!item) return res.status(404).json({ error: "Not found" });
+  res.json(item);
+});

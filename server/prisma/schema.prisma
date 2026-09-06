@@ -44,6 +44,11 @@ enum RecommendationStatus {
   REJECTED
 }
 
+enum JobSource {
+  NCS // fetched from National Career Service (ncs.gov.in) — not yet wired up, see Job.sourceUrl
+  MANUAL // entered directly by a programme admin
+}
+
 model User {
   id            String   @id @default(cuid())
   phone         String?  @unique
@@ -130,6 +135,7 @@ model NsqfQualification {
 
   mappings         SkillMapping[]
   trainingPrograms TrainingProgram[]
+  jobRequirements  JobRequirement[]
 }
 
 /// A course/QP code actually eligible for PM-AJAY skilling funding, scraped
@@ -243,4 +249,36 @@ model Recommendation {
   status            RecommendationStatus @default(SUGGESTED)
   createdAt         DateTime             @default(now())
   updatedAt         DateTime             @updatedAt
+}
+
+/// A real job role a beneficiary can become eligible for by holding certain
+/// NSQF qualifications. Admin-managed for now (source = MANUAL); `sourceUrl`
+/// and `source = NCS` are reserved for a future National Career Service feed
+/// — ncs.gov.in has no public API today, so nothing fetches automatically yet.
+model Job {
+  id          String    @id @default(cuid())
+  title       String
+  titleHindi  String?
+  sector      String?
+  description String?
+  source      JobSource @default(MANUAL)
+  sourceUrl   String? // NCS listing URL, when source = NCS
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  requirements JobRequirement[]
+}
+
+/// One NSQF qualification required for a Job. A beneficiary is "eligible"
+/// for a job once their SkillMapping history covers every requirement row;
+/// missing rows are surfaced as "complete these to become eligible".
+model JobRequirement {
+  id                  String            @id @default(cuid())
+  jobId               String
+  job                 Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  nsqfQualificationId String
+  nsqfQualification   NsqfQualification @relation(fields: [nsqfQualificationId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, nsqfQualificationId])
 }
