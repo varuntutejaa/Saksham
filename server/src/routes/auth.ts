@@ -67,6 +67,9 @@ authRouter.post("/login", async (req, res) => {
   if (!user?.passwordHash || !(await bcrypt.compare(parsed.data.password, user.passwordHash))) {
     return res.status(401).json({ error: "Invalid credentials" });
   }
+  if (user.suspended) {
+    return res.status(403).json({ error: "This account has been suspended. Contact support for help." });
+  }
   const token = signToken({ userId: user.id, role: user.role });
   res.json({ token, user: safeUser(user) });
 });
@@ -86,6 +89,9 @@ const profileSchema = z.object({
     .optional(),
   onboarded: z.boolean().optional(),
   avatarUrl: z.string().max(1_500_000).nullable().optional(),
+  /** true once the app has asked for and received location permission —
+   *  surfaced to admins on the consent/privacy dashboard */
+  locationConsent: z.boolean().optional(),
 });
 
 /** PATCH /api/auth/profile — fill in the post-signup gender/age/education questions. */
@@ -96,6 +102,17 @@ authRouter.patch("/profile", authenticate, async (req, res) => {
   const user = await prisma.user.update({
     where: { id: req.auth!.userId },
     data: parsed.data,
+  });
+  res.json({ user: safeUser(user) });
+});
+
+/** POST /api/auth/request-deletion — a beneficiary asks for their account
+ *  and data to be deleted. Recorded for an admin to action manually (see the
+ *  consent/privacy dashboard) — deletion itself isn't automatic. */
+authRouter.post("/request-deletion", authenticate, async (req, res) => {
+  const user = await prisma.user.update({
+    where: { id: req.auth!.userId },
+    data: { deletionRequestedAt: new Date() },
   });
   res.json({ user: safeUser(user) });
 });

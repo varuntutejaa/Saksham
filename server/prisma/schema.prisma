@@ -80,11 +80,42 @@ model User {
   state         String?
   district      String?
   pincode       String?
+  /// set by an admin (see admin.ts POST /users/:id/suspend) — a suspended
+  /// beneficiary's login is refused; does not delete any of their data.
+  suspended       Boolean   @default(false)
+  /// free-text note visible only to admins, e.g. why an account was
+  /// suspended or a data-correction request received by phone
+  adminNote       String?
+  /// true once the beneficiary has explicitly granted location access in
+  /// the app — set by the client via PATCH /api/auth/profile, surfaced to
+  /// admins on the consent/privacy dashboard
+  locationConsent Boolean   @default(false)
+  /// set when a beneficiary requests account/data deletion (see the
+  /// website's /profile "Request data deletion" link) — recorded here so
+  /// admins can see and action the request; deletion itself stays manual
+  deletionRequestedAt DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   sessions        VoiceSession[]
   recommendations Recommendation[]
+  auditLogEntries AuditLogEntry[] @relation("AuditLogAdmin")
+}
+
+/// One admin action against another record, for accountability once more
+/// than one admin manages the same data (job postings, programs, users).
+model AuditLogEntry {
+  id         String   @id @default(cuid())
+  adminId    String
+  admin      User     @relation("AuditLogAdmin", fields: [adminId], references: [id], onDelete: Cascade)
+  action     String // e.g. "job_posting.create", "user.suspend"
+  entityType String
+  entityId   String
+  details    Json?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
 }
 
 /// One conversation with the voice assistant.

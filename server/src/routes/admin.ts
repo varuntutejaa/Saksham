@@ -8,6 +8,14 @@ export const adminRouter = Router();
 
 adminRouter.use(authenticate, requireRole("ADMIN"));
 
+/** Records one admin action to AuditLogEntry. Never blocks the response —
+ *  a logging failure must not fail the action it's logging. */
+function logAdmin(adminId: string, action: string, entityType: string, entityId: string, details?: object) {
+  prisma.auditLogEntry.create({ data: { adminId, action, entityType, entityId, details } }).catch((err) => {
+    console.error("[admin] audit log write failed:", err);
+  });
+}
+
 /** GET /api/admin/stats — headline numbers for the dashboard */
 adminRouter.get("/stats", async (_req, res) => {
   const [sessions, users, recommendations, byStatus, byLanguage, bySector, lowBandwidth] =
@@ -75,6 +83,16 @@ adminRouter.get("/geo", async (_req, res) => {
   res.json(rows.filter((r) => r.state));
 });
 
+/** GET /api/admin/programs — every training programme, including inactive
+ *  ones, for the admin Training Programs manager. */
+adminRouter.get("/programs", async (_req, res) => {
+  const programs = await prisma.trainingProgram.findMany({
+    include: { nsqfQualification: true },
+    orderBy: { createdAt: "desc" },
+  });
+  res.json(programs);
+});
+
 /** POST /api/admin/programs — create a training programme */
 adminRouter.post("/programs", async (req, res) => {
   const schema = z.object({
@@ -101,6 +119,7 @@ adminRouter.post("/programs", async (req, res) => {
   const parsed = schema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
   const created = await prisma.trainingProgram.create({ data: parsed.data });
+  logAdmin(req.auth!.userId, "program.create", "TrainingProgram", created.id);
   res.status(201).json(created);
 });
 
@@ -111,7 +130,19 @@ adminRouter.patch("/programs/:id", async (req, res) => {
       where: { id: req.params.id },
       data: req.body,
     });
+    logAdmin(req.auth!.userId, "program.update", "TrainingProgram", updated.id, req.body);
     res.json(updated);
+  } catch {
+    res.status(404).json({ error: "Not found" });
+  }
+});
+
+/** DELETE /api/admin/programs/:id */
+adminRouter.delete("/programs/:id", async (req, res) => {
+  try {
+    await prisma.trainingProgram.delete({ where: { id: req.params.id } });
+    logAdmin(req.auth!.userId, "program.delete", "TrainingProgram", req.params.id);
+    res.status(204).end();
   } catch {
     res.status(404).json({ error: "Not found" });
   }
@@ -215,6 +246,7 @@ adminRouter.post("/job-postings", async (req, res) => {
     data: { ...parsed.data, source: "EMPLOYER" },
     include: { nsqfQualification: true },
   });
+  logAdmin(req.auth!.userId, "job_posting.create", "JobPosting", created.id);
   res.status(201).json(created);
 });
 
@@ -228,6 +260,7 @@ adminRouter.patch("/job-postings/:id", async (req, res) => {
       data: parsed.data,
       include: { nsqfQualification: true },
     });
+    logAdmin(req.auth!.userId, "job_posting.update", "JobPosting", updated.id, parsed.data);
     res.json(updated);
   } catch {
     res.status(404).json({ error: "Not found" });
@@ -238,8 +271,227 @@ adminRouter.patch("/job-postings/:id", async (req, res) => {
 adminRouter.delete("/job-postings/:id", async (req, res) => {
   try {
     await prisma.jobPosting.delete({ where: { id: req.params.id } });
+    logAdmin(req.auth!.userId, "job_posting.delete", "JobPosting", req.params.id);
     res.status(204).end();
   } catch {
     res.status(404).json({ error: "Not found" });
   }
+});
+
+/** PATCH /api/admin/nsqf/:id — edit a small, admin-safe subset of a scraped
+ *  NSQF qualification (keywords the voice pipeline matches on, and whether
+ *  it's excluded as expired). Everything else is scraped/traceable data and
+ *  stays read-only from here — see scripts/scrape-nsqf-details.ts. */
+const nsqfEditSchema = z.object({
+  keywords: z.array(z.string()).optional(),
+  expired: z.boolean().optional(),
+  description: z.string().optional(),
+});
+adminRouter.patch("/nsqf/:id", async (req, res) => {
+  const parsed = nsqfEditSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  try {
+    const updated = await prisma.nsqfQualification.update({ where: { id: req.params.id }, data: parsed.data });
+    logAdmin(req.auth!.userId, "nsqf.update", "NsqfQualification", updated.id, parsed.data);
+    res.json(updated);
+  } catch {
+    res.status(404).json({ error: "Not found" });
+  }
+});
+
+const knowledgeSchema = z.object({
+  documentTitle: z.string().min(2),
+  sourceUrl: z.string().min(2),
+  page: z.number().int().default(1),
+  chunkIndex: z.number().int().default(0),
+  text: z.string().min(1),
+});
+
+/** GET /api/admin/knowledge — every RAG chunk backing /api/assistant/ask */
+adminRouter.get("/knowledge", async (_req, res) => {
+  res.json(await prisma.knowledgeChunk.findMany({ orderBy: [{ documentTitle: "asc" }, { page: "asc" }, { chunkIndex: "asc" }] }));
+});
+
+/** POST /api/admin/knowledge — add a new policy-document passage */
+adminRouter.post("/knowledge", async (req, res) => {
+  const parsed = knowledgeSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  const created = await prisma.knowledgeChunk.create({ data: parsed.data });
+  logAdmin(req.auth!.userId, "knowledge.create", "KnowledgeChunk", created.id);
+  res.status(201).json(created);
+});
+
+/** PATCH /api/admin/knowledge/:id */
+adminRouter.patch("/knowledge/:id", async (req, res) => {
+  const parsed = knowledgeSchema.partial().safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  try {
+    const updated = await prisma.knowledgeChunk.update({ where: { id: req.params.id }, data: parsed.data });
+    logAdmin(req.auth!.userId, "knowledge.update", "KnowledgeChunk", updated.id);
+    res.json(updated);
+  } catch {
+    res.status(404).json({ error: "Not found" });
+  }
+});
+
+/** DELETE /api/admin/knowledge/:id */
+adminRouter.delete("/knowledge/:id", async (req, res) => {
+  try {
+    await prisma.knowledgeChunk.delete({ where: { id: req.params.id } });
+    logAdmin(req.auth!.userId, "knowledge.delete", "KnowledgeChunk", req.params.id);
+    res.status(204).end();
+  } catch {
+    res.status(404).json({ error: "Not found" });
+  }
+});
+
+/** PATCH /api/admin/recommendations/:id — manually correct a beneficiary's
+ *  funnel status, e.g. confirming ENROLLED after a phone follow-up. */
+adminRouter.patch("/recommendations/:id", async (req, res) => {
+  const parsed = z
+    .object({ status: z.enum(["SUGGESTED", "VIEWED", "INTERESTED", "APPLIED", "ENROLLED", "REJECTED"]) })
+    .safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  try {
+    const updated = await prisma.recommendation.update({ where: { id: req.params.id }, data: parsed.data });
+    logAdmin(req.auth!.userId, "recommendation.update_status", "Recommendation", updated.id, parsed.data);
+    res.json(updated);
+  } catch {
+    res.status(404).json({ error: "Not found" });
+  }
+});
+
+/** PATCH /api/admin/users/:id/moderation — suspend/unsuspend a beneficiary
+ *  and/or set an admin-only note. Does not touch or delete their data. */
+adminRouter.patch("/users/:id/moderation", async (req, res) => {
+  const parsed = z.object({ suspended: z.boolean().optional(), adminNote: z.string().optional() }).safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  try {
+    const updated = await prisma.user.update({ where: { id: req.params.id }, data: parsed.data });
+    logAdmin(req.auth!.userId, "user.moderate", "User", updated.id, parsed.data);
+    res.json({ id: updated.id, suspended: updated.suspended, adminNote: updated.adminNote });
+  } catch {
+    res.status(404).json({ error: "Not found" });
+  }
+});
+
+/** GET /api/admin/consent — counts for the consent/privacy dashboard:
+ *  beneficiaries who granted location consent, and pending deletion requests. */
+adminRouter.get("/consent", async (_req, res) => {
+  const [totalBeneficiaries, locationConsented, deletionRequests] = await Promise.all([
+    prisma.user.count({ where: { role: "BENEFICIARY" } }),
+    prisma.user.count({ where: { role: "BENEFICIARY", locationConsent: true } }),
+    prisma.user.findMany({
+      where: { deletionRequestedAt: { not: null } },
+      select: { id: true, name: true, phone: true, deletionRequestedAt: true },
+      orderBy: { deletionRequestedAt: "asc" },
+    }),
+  ]);
+  res.json({ totalBeneficiaries, locationConsented, deletionRequests });
+});
+
+/** GET /api/admin/admins — every ADMIN-role account, for the admin-user manager */
+adminRouter.get("/admins", async (_req, res) => {
+  const admins = await prisma.user.findMany({
+    where: { role: "ADMIN" },
+    select: { id: true, name: true, phone: true, createdAt: true },
+    orderBy: { createdAt: "asc" },
+  });
+  res.json(admins);
+});
+
+/** POST /api/admin/admins — create a new admin account */
+adminRouter.post("/admins", async (req, res) => {
+  const parsed = z
+    .object({ phone: z.string().min(6).max(15), name: z.string().min(1), password: z.string().min(8) })
+    .safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  const existing = await prisma.user.findUnique({ where: { phone: parsed.data.phone } });
+  if (existing) return res.status(409).json({ error: "Phone already registered" });
+  const bcrypt = await import("bcryptjs");
+  const created = await prisma.user.create({
+    data: {
+      phone: parsed.data.phone,
+      name: parsed.data.name,
+      role: "ADMIN",
+      passwordHash: await bcrypt.hash(parsed.data.password, 10),
+    },
+  });
+  logAdmin(req.auth!.userId, "admin.create", "User", created.id);
+  res.status(201).json({ id: created.id, name: created.name, phone: created.phone });
+});
+
+/** GET /api/admin/audit-log?take=&entityType= — recent admin actions */
+adminRouter.get("/audit-log", async (req, res) => {
+  const take = Math.min(Number(req.query.take ?? 100), 500);
+  const where = req.query.entityType ? { entityType: String(req.query.entityType) } : {};
+  const entries = await prisma.auditLogEntry.findMany({
+    where,
+    include: { admin: { select: { id: true, name: true, phone: true } } },
+    orderBy: { createdAt: "desc" },
+    take,
+  });
+  res.json(entries);
+});
+
+/** GET /api/admin/otp-activity — recent OTP requests, for abuse monitoring.
+ *  codeHash is never returned. */
+adminRouter.get("/otp-activity", async (_req, res) => {
+  const rows = await prisma.otpCode.findMany({
+    select: { phone: true, attempts: true, expiresAt: true, createdAt: true },
+    orderBy: { createdAt: "desc" },
+    take: 200,
+  });
+  res.json(rows);
+});
+
+/** GET /api/admin/leaderboard — district conversion rates (SUGGESTED -> ENROLLED),
+ *  and language coverage, for the analytics dashboard. */
+adminRouter.get("/leaderboard", async (_req, res) => {
+  const sessions = await prisma.voiceSession.findMany({
+    where: { district: { not: null } },
+    select: { district: true, recommendations: { select: { status: true } } },
+  });
+  const byDistrict = new Map<string, { suggested: number; enrolled: number }>();
+  for (const s of sessions) {
+    if (!s.district) continue;
+    const row = byDistrict.get(s.district) ?? { suggested: 0, enrolled: 0 };
+    row.suggested += s.recommendations.length;
+    row.enrolled += s.recommendations.filter((r) => r.status === "ENROLLED").length;
+    byDistrict.set(s.district, row);
+  }
+  const districts = [...byDistrict.entries()]
+    .map(([district, r]) => ({
+      district,
+      ...r,
+      conversionRate: r.suggested ? Number((r.enrolled / r.suggested).toFixed(3)) : 0,
+    }))
+    .sort((a, b) => b.conversionRate - a.conversionRate);
+
+  const languageCounts = await prisma.voiceSession.groupBy({ by: ["language"], _count: true });
+
+  res.json({ districts, languageCounts });
+});
+
+/** GET /api/admin/coverage-gaps — sectors with active job postings but no
+ *  linked NSQF qualification, and qualifications with no postings at all —
+ *  a gap-analysis view for the Ministry dashboard. */
+adminRouter.get("/coverage-gaps", async (_req, res) => {
+  const [postingsWithoutQualification, sectorsWithQualificationsOnly] = await Promise.all([
+    prisma.jobPosting.findMany({
+      where: { active: true, nsqfQualificationId: null },
+      select: { id: true, title: true, sector: true, employerName: true },
+    }),
+    prisma.nsqfQualification.groupBy({
+      by: ["sector"],
+      where: { expired: false, jobPostings: { none: {} } },
+      _count: true,
+    }),
+  ]);
+  res.json({
+    postingsWithoutQualification,
+    sectorsWithNoPostings: sectorsWithQualificationsOnly
+      .map((s) => ({ sector: s.sector, qualificationCount: s._count }))
+      .sort((a, b) => b.qualificationCount - a.qualificationCount),
+  });
 });
