@@ -2,7 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { authenticate, requireRole } from "../middleware/auth.js";
-import { computeEligibility } from "../services/eligibility.js";
+import { SKILL_LEXICON } from "../services/skillLexicon.js";
 
 export const adminRouter = Router();
 
@@ -117,71 +117,116 @@ adminRouter.patch("/programs/:id", async (req, res) => {
   }
 });
 
-/** GET /api/admin/users/:id/eligibility — which jobs this beneficiary already
- *  qualifies for, and which they're close to (with the missing certifications). */
-adminRouter.get("/users/:id/eligibility", async (req, res) => {
-  const user = await prisma.user.findUnique({ where: { id: req.params.id } });
-  if (!user) return res.status(404).json({ error: "Not found" });
-  res.json(await computeEligibility(user.id));
+/** GET /api/admin/skill-tokens — the full normalized-skill vocabulary the
+ *  voice pipeline understands (services/skillLexicon.ts). A posting whose
+ *  skillTokens aren't from this list can never match a beneficiary's spoken
+ *  skill, so the admin picker is restricted to it rather than free text. */
+adminRouter.get("/skill-tokens", (_req, res) => {
+  res.json(SKILL_LEXICON.map((e) => e.normalized).sort());
 });
 
-const jobSchema = z.object({
+/**
+ * GET /api/admin/job-postings/suggest?skillToken=pottery — recommendations to
+ * help an admin fill in a posting for this trade: the real NSQF
+ * qualification(s) it maps to (the same `keywords` lookup the voice pipeline
+ * itself uses, so this is provably in sync with matching behaviour, not a
+ * guess), the real job titles those qualifications lead to
+ * (proposedOccupations), and which PM-AJAY scheme/component + real course
+ * names fund training for that sector — the "which yojana are we targeting"
+ * context.
+ */
+adminRouter.get("/job-postings/suggest", async (req, res) => {
+  const skillToken = String(req.query.skillToken ?? "").toLowerCase();
+  if (!skillToken) return res.status(400).json({ error: "skillToken is required" });
+
+  const qualifications = await prisma.nsqfQualification.findMany({
+    where: { expired: false, keywords: { has: skillToken } },
+    orderBy: { nsqfLevel: "asc" },
+    take: 5,
+  });
+  const sectors = [...new Set(qualifications.map((q) => q.sector))];
+
+  const [schemeRows, pmajayCourses] = await Promise.all([
+    sectors.length
+      ? prisma.trainingProgram.findMany({
+          where: { active: true, sector: { in: sectors } },
+          select: { scheme: true, component: true, sector: true },
+          distinct: ["scheme", "component"],
+          take: 10,
+        })
+      : Promise.resolve([]),
+    sectors.length
+      ? prisma.pmajayCourse.findMany({
+          where: { sector: { in: sectors } },
+          select: { courseName: true, subCourseName: true, sector: true, courseLevel: true },
+          take: 10,
+        })
+      : Promise.resolve([]),
+  ]);
+
+  res.json({
+    qualifications: qualifications.map((q) => ({
+      id: q.id,
+      qpCode: q.qpCode,
+      title: q.title,
+      sector: q.sector,
+      nsqfLevel: q.nsqfLevel,
+    })),
+    suggestedTitles: [...new Set(qualifications.flatMap((q) => q.proposedOccupations))].slice(0, 8),
+    sectors,
+    schemes: schemeRows,
+    pmajayCourses,
+  });
+});
+
+const jobPostingSchema = z.object({
   title: z.string().min(2),
   titleHindi: z.string().optional(),
+  employerName: z.string().min(2),
+  skillTokens: z.array(z.string()).min(1),
+  nsqfQualificationId: z.string().optional(),
   sector: z.string().optional(),
+  nsqfLevel: z.number().int().optional(),
+  state: z.string().optional(),
+  district: z.string().optional(),
+  wageMin: z.number().int().optional(),
+  wageMax: z.number().int().optional(),
+  positions: z.number().int().default(1),
+  contactPhone: z.string().optional(),
   description: z.string().optional(),
-  source: z.enum(["NCS", "MANUAL"]).default("MANUAL"),
-  sourceUrl: z.string().url().optional(),
   active: z.boolean().default(true),
-  requiredQualificationIds: z.array(z.string()).default([]),
 });
 
-/** GET /api/admin/jobs — every job (including inactive), each with its
- *  required NSQF qualifications, for the admin jobs manager. */
-adminRouter.get("/jobs", async (_req, res) => {
-  const jobs = await prisma.job.findMany({
-    include: { requirements: { include: { nsqfQualification: true } } },
-    orderBy: { createdAt: "desc" },
+/** GET /api/admin/job-postings — every posting (including inactive and
+ *  SAMPLE demonstration rows), for the admin job-postings manager. */
+adminRouter.get("/job-postings", async (_req, res) => {
+  const jobs = await prisma.jobPosting.findMany({
+    include: { nsqfQualification: true },
+    orderBy: { postedAt: "desc" },
   });
   res.json(jobs);
 });
 
-/** POST /api/admin/jobs — create a job and its required-qualification set */
-adminRouter.post("/jobs", async (req, res) => {
-  const parsed = jobSchema.safeParse(req.body);
+/** POST /api/admin/job-postings — create a real vacancy (source: EMPLOYER) */
+adminRouter.post("/job-postings", async (req, res) => {
+  const parsed = jobPostingSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
-  const { requiredQualificationIds, ...data } = parsed.data;
-  const created = await prisma.job.create({
-    data: {
-      ...data,
-      requirements: { create: requiredQualificationIds.map((nsqfQualificationId) => ({ nsqfQualificationId })) },
-    },
-    include: { requirements: { include: { nsqfQualification: true } } },
+  const created = await prisma.jobPosting.create({
+    data: { ...parsed.data, source: "EMPLOYER" },
+    include: { nsqfQualification: true },
   });
   res.status(201).json(created);
 });
 
-/** PATCH /api/admin/jobs/:id — update a job; pass requiredQualificationIds
- *  to replace its full requirement set. */
-adminRouter.patch("/jobs/:id", async (req, res) => {
-  const parsed = jobSchema.partial().safeParse(req.body);
+/** PATCH /api/admin/job-postings/:id */
+adminRouter.patch("/job-postings/:id", async (req, res) => {
+  const parsed = jobPostingSchema.partial().safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
-  const { requiredQualificationIds, ...data } = parsed.data;
   try {
-    const updated = await prisma.job.update({
+    const updated = await prisma.jobPosting.update({
       where: { id: req.params.id },
-      data: {
-        ...data,
-        ...(requiredQualificationIds
-          ? {
-              requirements: {
-                deleteMany: {},
-                create: requiredQualificationIds.map((nsqfQualificationId) => ({ nsqfQualificationId })),
-              },
-            }
-          : {}),
-      },
-      include: { requirements: { include: { nsqfQualification: true } } },
+      data: parsed.data,
+      include: { nsqfQualification: true },
     });
     res.json(updated);
   } catch {
@@ -189,10 +234,10 @@ adminRouter.patch("/jobs/:id", async (req, res) => {
   }
 });
 
-/** DELETE /api/admin/jobs/:id */
-adminRouter.delete("/jobs/:id", async (req, res) => {
+/** DELETE /api/admin/job-postings/:id */
+adminRouter.delete("/job-postings/:id", async (req, res) => {
   try {
-    await prisma.job.delete({ where: { id: req.params.id } });
+    await prisma.jobPosting.delete({ where: { id: req.params.id } });
     res.status(204).end();
   } catch {
     res.status(404).json({ error: "Not found" });

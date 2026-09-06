@@ -4,7 +4,6 @@ import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
 import { signToken, authenticate } from "../middleware/auth.js";
 import { requestOtp, verifyOtp, type VerifyOtpResult } from "../services/otp.js";
-import { computeEligibility } from "../services/eligibility.js";
 
 export const authRouter = Router();
 
@@ -76,12 +75,6 @@ authRouter.get("/me", authenticate, async (req, res) => {
   const user = await prisma.user.findUnique({ where: { id: req.auth!.userId } });
   if (!user) return res.status(404).json({ error: "Not found" });
   res.json({ user: safeUser(user) });
-});
-
-/** GET /api/auth/me/eligibility — jobs you already qualify for, and jobs
- *  you're close to qualifying for (with the specific missing certifications). */
-authRouter.get("/me/eligibility", authenticate, async (req, res) => {
-  res.json(await computeEligibility(req.auth!.userId));
 });
 
 const profileSchema = z.object({
