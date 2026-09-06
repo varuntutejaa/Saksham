@@ -6,6 +6,7 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 import { reprioritise } from '@/lib/api';
 import { UI_STRINGS } from '@/constants/languages';
+import { resolveDeviceLocation } from '@/lib/location';
 import { getLastResult, setLastResult } from '@/lib/session';
 import type { Intent } from '@/lib/session';
 import { setIntent } from '@/lib/session';
@@ -21,7 +22,7 @@ const OPTIONS: { intent: Intent; icon: keyof typeof Ionicons.glyphMap }[] = [
 ];
 
 export default function ConfirmScreen() {
-  const { language } = useStore();
+  const { language, state, district, setLocation } = useStore();
   const { c, radius, elevation } = useTheme();
   const result = getLastResult();
   const [busy, setBusy] = useState<Intent | null>(null);
@@ -64,8 +65,21 @@ export default function ConfirmScreen() {
     // the network is down reprioritise() returns null and we simply keep the
     // ordering we already have, so the flow never blocks on it.
     const current = getLastResult();
+    let effectiveState = state ?? undefined;
+    let effectiveDistrict = district ?? undefined;
+    if (!effectiveState && !effectiveDistrict) {
+      const loc = await resolveDeviceLocation();
+      if (loc?.state || loc?.district) {
+        effectiveState = loc.state;
+        effectiveDistrict = loc.district;
+        await setLocation(effectiveState, effectiveDistrict);
+      }
+    }
     if (current?.sessionId) {
-      const ranked = await reprioritise(current.sessionId, intent);
+      const ranked = await reprioritise(current.sessionId, intent, {
+        state: effectiveState,
+        district: effectiveDistrict,
+      });
       if (ranked?.recommendations?.length) {
         setLastResult({
           ...current,

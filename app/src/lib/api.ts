@@ -347,12 +347,13 @@ export async function converse(input: ConverseInput): Promise<ConverseResponse> 
 export async function reprioritise(
   sessionId: string,
   intent: 'jobs' | 'training' | 'certificate' | 'guidance',
+  location?: { state?: string | null; district?: string | null },
 ): Promise<{ mappings: NsqfMapping[]; recommendations: CourseRecommendation[]; jobs?: JobMatch[] } | null> {
   try {
     const res = await fetch(`${API_BASE}/api/assistant/reprioritise`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId, intent }),
+      body: JSON.stringify({ sessionId, intent, state: location?.state, district: location?.district }),
     });
     if (!res.ok) return null;
     return await res.json();
@@ -365,6 +366,15 @@ export async function reprioritise(
 export type ProfileField = 'name' | 'gender' | 'age' | 'education' | 'experienceYears' | 'workPreference';
 
 const HINDI_AGE_WORDS: [RegExp, number][] = [
+  [/\b(ek|one)\b|एक/u, 1],
+  [/\b(do|two)\b|दो/u, 2],
+  [/\b(teen|three)\b|तीन/u, 3],
+  [/\b(chaar|char|four)\b|चार/u, 4],
+  [/\b(paanch|panch|five)\b|पांच|पाँच/u, 5],
+  [/\b(chhe|cheh|six)\b|छह|छः/u, 6],
+  [/\b(saat|seven)\b|सात/u, 7],
+  [/\b(aath|eight)\b|आठ/u, 8],
+  [/\b(nau|nine)\b|नौ/u, 9],
   [/\b(das|dus)\b|दस/u, 10],
   [/\b(gyarah|gyaarah)\b|ग्यारह/u, 11],
   [/\b(barah|baarah)\b|बारह/u, 12],
@@ -388,6 +398,15 @@ const HINDI_AGE_WORDS: [RegExp, number][] = [
 ];
 
 const URDU_AGE_WORDS: [RegExp, number][] = [
+  [/ایک/u, 1],
+  [/دو/u, 2],
+  [/تین/u, 3],
+  [/چار/u, 4],
+  [/پانچ/u, 5],
+  [/چھ/u, 6],
+  [/سات/u, 7],
+  [/آٹھ/u, 8],
+  [/نو/u, 9],
   [/دس/u, 10],
   [/گیارہ/u, 11],
   [/بارہ/u, 12],
@@ -447,10 +466,10 @@ function localProfileAnswer(field: ProfileField, answer: string): string | numbe
       if (age >= 10 && age <= 100) return age;
     }
     for (const [pattern, age] of HINDI_AGE_WORDS) {
-      if (pattern.test(text)) return age;
+      if (age >= 10 && pattern.test(text)) return age;
     }
     for (const [pattern, age] of URDU_AGE_WORDS) {
-      if (pattern.test(text)) return age;
+      if (age >= 10 && pattern.test(text)) return age;
     }
     return null;
   }
@@ -458,6 +477,23 @@ function localProfileAnswer(field: ProfileField, answer: string): string | numbe
     if (/\b(female|woman|girl|lady|mahila|ladki)\b|महिला|औरत|लड़की|स्त्री/u.test(text)) return 'female';
     if (/\b(male|man|boy|aadmi|ladka|purush)\b|पुरुष|आदमी|लड़का/u.test(text)) return 'male';
     if (/\b(other|transgender|non binary|non-binary)\b|अन्य|ट्रांसजेंडर/u.test(text)) return 'other';
+    return null;
+  }
+  if (field === 'experienceYears') {
+    if (/\b(no experience|none|fresher|new|naya|nayi|abhi shuru|just started)\b|कोई नहीं|नया|नई|अभी शुरू/u.test(text)) return 0;
+    const match = text.match(/\d{1,2}/);
+    if (match) {
+      const years = Number(match[0]);
+      if (years >= 0 && years <= 70) return years;
+    }
+    for (const [pattern, years] of [...HINDI_AGE_WORDS, ...URDU_AGE_WORDS]) {
+      if (years <= 70 && pattern.test(text)) return years;
+    }
+    return null;
+  }
+  if (field === 'workPreference') {
+    if (/\b(home|ghar|apne ghar|yahin|yaha|nearby|paas|pass|local|same place)\b|घर|यहीं|यहाँ|पास/u.test(text)) return 'home';
+    if (/\b(other|another|different|bahar|dusri|doosri|kahin aur|shehar|city)\b|बाहर|दूसरी|कहीं और|शहर/u.test(text)) return 'other';
     return null;
   }
   if (/\b(postgrad|post graduate|post graduation|masters?|m\.?a|m\.?com|m\.?sc|pg)\b|स्नातकोत्तर|मास्टर/u.test(text)) return 'postgrad';

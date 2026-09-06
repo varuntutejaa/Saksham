@@ -18,6 +18,11 @@ export interface GuestProfile {
   gender?: Gender;
   age?: number;
   education?: Education;
+  experienceYears?: number;
+  workPreference?: 'home' | 'other';
+  preferredLocation?: string;
+  state?: string;
+  district?: string;
 }
 
 interface StoreValue extends Profile {

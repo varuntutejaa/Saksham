@@ -25,6 +25,15 @@ function regexAgeFallback(answer: string): number | null {
 }
 
 const HINDI_AGE_WORDS: [RegExp, number][] = [
+  [/\b(ek|one)\b|एक/u, 1],
+  [/\b(do|two)\b|दो/u, 2],
+  [/\b(teen|three)\b|तीन/u, 3],
+  [/\b(chaar|char|four)\b|चार/u, 4],
+  [/\b(paanch|panch|five)\b|पांच|पाँच/u, 5],
+  [/\b(chhe|cheh|six)\b|छह|छः/u, 6],
+  [/\b(saat|seven)\b|सात/u, 7],
+  [/\b(aath|eight)\b|आठ/u, 8],
+  [/\b(nau|nine)\b|नौ/u, 9],
   [/\b(das|dus)\b|दस/u, 10],
   [/\b(gyarah|gyaarah)\b|ग्यारह/u, 11],
   [/\b(barah|baarah)\b|बारह/u, 12],
@@ -66,6 +75,15 @@ const HINDI_AGE_WORDS: [RegExp, number][] = [
 ];
 
 const URDU_AGE_WORDS: [RegExp, number][] = [
+  [/ایک/u, 1],
+  [/دو/u, 2],
+  [/تین/u, 3],
+  [/چار/u, 4],
+  [/پانچ/u, 5],
+  [/چھ/u, 6],
+  [/سات/u, 7],
+  [/آٹھ/u, 8],
+  [/نو/u, 9],
   [/دس/u, 10],
   [/گیارہ/u, 11],
   [/بارہ/u, 12],
@@ -122,10 +140,10 @@ function fallbackAge(answer: string): number | null {
   if (digit !== null) return digit;
   const text = normalizeAnswer(answer);
   for (const [pattern, value] of HINDI_AGE_WORDS) {
-    if (pattern.test(text)) return value;
+    if (value >= 10 && pattern.test(text)) return value;
   }
   for (const [pattern, value] of URDU_AGE_WORDS) {
-    if (pattern.test(text)) return value;
+    if (value >= 10 && pattern.test(text)) return value;
   }
   return null;
 }
@@ -156,9 +174,14 @@ function fallbackExperience(answer: string): number | null {
   const text = normalizeAnswer(answer);
   if (/\b(no experience|none|fresher|new|naya|nayi|abhi shuru|just started)\b|कोई नहीं|नया|नई|अभी शुरू/u.test(text)) return 0;
   const match = text.match(/\d{1,2}/);
-  if (!match) return null;
-  const n = Number(match[0]);
-  return n >= 0 && n <= 70 ? n : null;
+  if (match) {
+    const n = Number(match[0]);
+    return n >= 0 && n <= 70 ? n : null;
+  }
+  for (const [pattern, value] of [...HINDI_AGE_WORDS, ...URDU_AGE_WORDS]) {
+    if (value <= 70 && pattern.test(text)) return value;
+  }
+  return null;
 }
 
 function fallbackWorkPreference(answer: string): string | null {

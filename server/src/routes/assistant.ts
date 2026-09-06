@@ -184,13 +184,27 @@ assistantRouter.post("/reprioritise", async (req, res) => {
   const schema = z.object({
     sessionId: z.string().min(1),
     intent: z.enum(["jobs", "training", "certificate", "guidance"]),
+    state: z.string().optional(),
+    district: z.string().optional(),
   });
   const parsed = schema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
-  const { sessionId, intent } = parsed.data;
+  const { sessionId, intent, state, district } = parsed.data;
 
   const session = await prisma.voiceSession.findUnique({ where: { id: sessionId } });
   if (!session) return res.status(404).json({ error: "Session not found" });
+
+  const effectiveState = state ?? session.state;
+  const effectiveDistrict = district ?? session.district;
+  if (state !== undefined || district !== undefined) {
+    await prisma.voiceSession.update({
+      where: { id: sessionId },
+      data: {
+        state: effectiveState ?? null,
+        district: effectiveDistrict ?? null,
+      },
+    });
+  }
 
   // a session recorded with no usable transcript has nothing to re-rank
   if (!session.rawTranscript) return res.json({ sessionId, intent, mappings: [], recommendations: [], jobs: [] });
@@ -199,12 +213,12 @@ assistantRouter.post("/reprioritise", async (req, res) => {
   const [recommendations, jobs] = await Promise.all([
     recommendCourses({
       mappings,
-      state: session.state,
-      district: session.district,
+      state: effectiveState,
+      district: effectiveDistrict,
       language: session.language,
       intent,
     }),
-    matchJobs({ mappings, state: session.state, district: session.district }),
+    matchJobs({ mappings, state: effectiveState, district: effectiveDistrict }),
   ]);
 
   res.json({ sessionId, intent, mappings, recommendations, jobs });
