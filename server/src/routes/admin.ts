@@ -6,7 +6,12 @@ import { SKILL_LEXICON } from "../services/skillLexicon.js";
 
 export const adminRouter = Router();
 
-adminRouter.use(authenticate, requireRole("ADMIN"));
+adminRouter.use(authenticate, requireRole("ADMIN", "VIEWER"));
+/** VIEWER can read every route below; only ADMIN can write. */
+adminRouter.use((req, res, next) => {
+  if (req.method === "GET" || req.auth!.role === "ADMIN") return next();
+  res.status(403).json({ error: "Viewer accounts cannot make changes" });
+});
 
 /** Records one admin action to AuditLogEntry. Never blocks the response —
  *  a logging failure must not fail the action it's logging. */
@@ -390,20 +395,25 @@ adminRouter.get("/consent", async (_req, res) => {
   res.json({ totalBeneficiaries, locationConsented, deletionRequests });
 });
 
-/** GET /api/admin/admins — every ADMIN-role account, for the admin-user manager */
+/** GET /api/admin/admins — every ADMIN or VIEWER account, for the admin-user manager */
 adminRouter.get("/admins", async (_req, res) => {
   const admins = await prisma.user.findMany({
-    where: { role: "ADMIN" },
-    select: { id: true, name: true, phone: true, createdAt: true },
+    where: { role: { in: ["ADMIN", "VIEWER"] } },
+    select: { id: true, name: true, phone: true, role: true, createdAt: true },
     orderBy: { createdAt: "asc" },
   });
   res.json(admins);
 });
 
-/** POST /api/admin/admins — create a new admin account */
+/** POST /api/admin/admins — create a new admin or read-only viewer account */
 adminRouter.post("/admins", async (req, res) => {
   const parsed = z
-    .object({ phone: z.string().min(6).max(15), name: z.string().min(1), password: z.string().min(8) })
+    .object({
+      phone: z.string().min(6).max(15),
+      name: z.string().min(1),
+      password: z.string().min(8),
+      role: z.enum(["ADMIN", "VIEWER"]).default("ADMIN"),
+    })
     .safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
   const existing = await prisma.user.findUnique({ where: { phone: parsed.data.phone } });
@@ -413,12 +423,12 @@ adminRouter.post("/admins", async (req, res) => {
     data: {
       phone: parsed.data.phone,
       name: parsed.data.name,
-      role: "ADMIN",
+      role: parsed.data.role,
       passwordHash: await bcrypt.hash(parsed.data.password, 10),
     },
   });
-  logAdmin(req.auth!.userId, "admin.create", "User", created.id);
-  res.status(201).json({ id: created.id, name: created.name, phone: created.phone });
+  logAdmin(req.auth!.userId, "admin.create", "User", created.id, { role: parsed.data.role });
+  res.status(201).json({ id: created.id, name: created.name, phone: created.phone, role: created.role });
 });
 
 /** GET /api/admin/audit-log?take=&entityType= — recent admin actions */
@@ -493,5 +503,51 @@ adminRouter.get("/coverage-gaps", async (_req, res) => {
     sectorsWithNoPostings: sectorsWithQualificationsOnly
       .map((s) => ({ sector: s.sector, qualificationCount: s._count }))
       .sort((a, b) => b.qualificationCount - a.qualificationCount),
+  });
+});
+
+/** GET /api/admin/needs-review — SkillMappings the pipeline could not match
+ *  to a real NSQF qualification, for manual review/correction. */
+adminRouter.get("/needs-review", async (_req, res) => {
+  const rows = await prisma.skillMapping.findMany({
+    where: { nsqfQualificationId: null, normalizedSkill: { not: "unknown" } },
+    include: { session: { select: { id: true, createdAt: true, language: true, rawTranscript: true } } },
+    orderBy: { createdAt: "desc" },
+    take: 200,
+  });
+  res.json(rows);
+});
+
+/** GET /api/admin/sessions/:id — one session with everything the list view
+ *  summarizes, for a per-session detail page. */
+adminRouter.get("/sessions/:id", async (req, res) => {
+  const session = await prisma.voiceSession.findUnique({
+    where: { id: req.params.id },
+    include: {
+      user: { select: { id: true, name: true, phone: true, district: true, state: true } },
+      mappings: { include: { nsqfQualification: true } },
+      recommendations: { include: { pmajayCourse: true, trainingProgram: true } },
+    },
+  });
+  if (!session) return res.status(404).json({ error: "Not found" });
+  res.json(session);
+});
+
+/** GET /api/admin/config-status — which optional providers are actually
+ *  configured (booleans only — never the secret values themselves), so an
+ *  admin can see setup gaps without reading Render's environment directly. */
+adminRouter.get("/config-status", async (_req, res) => {
+  const { hasLLM, hasSarvam, hasGroq, hasBhashini, hasSms, hasTwilio, hasStitch, useDemoOtp } = await import(
+    "../lib/env.js"
+  );
+  res.json({
+    llm: hasLLM,
+    sarvamSpeech: hasSarvam,
+    groq: hasGroq,
+    bhashini: hasBhashini,
+    sms: hasSms,
+    twilioWhatsapp: hasTwilio,
+    stitch: hasStitch,
+    otpMode: useDemoOtp ? "demo (fixed code)" : "real (random code via SMS)",
   });
 });

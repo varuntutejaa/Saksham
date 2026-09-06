@@ -13,6 +13,9 @@ datasource db {
 enum Role {
   BENEFICIARY
   ADMIN
+  /// read-only admin access — can view every /api/admin/* GET route but
+  /// every mutating route (POST/PATCH/DELETE) is refused (see admin.ts)
+  VIEWER
 }
 
 enum Language {
