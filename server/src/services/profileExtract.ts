@@ -65,11 +65,44 @@ const HINDI_AGE_WORDS: [RegExp, number][] = [
   [/\b(sau|sao)\b|सौ/u, 100],
 ];
 
+const URDU_AGE_WORDS: [RegExp, number][] = [
+  [/دس/u, 10],
+  [/گیارہ/u, 11],
+  [/بارہ/u, 12],
+  [/تیرہ/u, 13],
+  [/چودہ/u, 14],
+  [/پندرہ/u, 15],
+  [/سولہ/u, 16],
+  [/سترہ/u, 17],
+  [/اٹھارہ|اٹهارہ|اٹھارا|اس ورش|اس برس/u, 18],
+  [/انیس/u, 19],
+  [/بیس/u, 20],
+  [/اکیس/u, 21],
+  [/بائیس/u, 22],
+  [/تیئس/u, 23],
+  [/چوبیس/u, 24],
+  [/پچیس/u, 25],
+  [/چھبیس/u, 26],
+  [/ستائیس/u, 27],
+  [/اٹھائیس/u, 28],
+  [/انتیس/u, 29],
+  [/تیس/u, 30],
+  [/چالیس/u, 40],
+  [/پچاس/u, 50],
+  [/ساٹھ/u, 60],
+  [/ستر/u, 70],
+  [/اسی/u, 80],
+  [/نوے/u, 90],
+  [/سو/u, 100],
+];
+
 function normalizeAnswer(answer: string): string {
   return answer
     .toLowerCase()
     .normalize("NFC")
     .replace(/[०-९]/g, (digit) => String("०१२३४५६७८९".indexOf(digit)))
+    .replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
+    .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
     .replace(/[।,.;:!?'"()]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -89,6 +122,9 @@ function fallbackAge(answer: string): number | null {
   if (digit !== null) return digit;
   const text = normalizeAnswer(answer);
   for (const [pattern, value] of HINDI_AGE_WORDS) {
+    if (pattern.test(text)) return value;
+  }
+  for (const [pattern, value] of URDU_AGE_WORDS) {
     if (pattern.test(text)) return value;
   }
   return null;
