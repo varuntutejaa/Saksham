@@ -17,6 +17,7 @@ import { useAuth } from '@/lib/auth';
 import { revealPortion, speak, stopSpeaking } from '@/lib/speech';
 import { transcribeWithSarvam } from '@/lib/transcription';
 import { useAutoStopRecording } from '@/lib/useAutoStopRecording';
+import { resolveDeviceLocation } from '@/lib/location';
 import { useStore } from '@/lib/store';
 import { useTheme } from '@/theme';
 import { Button, MicOrb, Screen, StepProgress, TypingDots, Txt, type MicState } from '@/ui';
@@ -24,7 +25,7 @@ import { Button, MicOrb, Screen, StepProgress, TypingDots, Txt, type MicState } 
 type ProfileMessage = { id: number; role: 'user' | 'assistant'; text: string };
 
 export default function VoiceProfileStep() {
-  const { language, setGuestProfile } = useStore();
+  const { language, setGuestProfile, setLocation } = useStore();
   const { updateProfile, token, user } = useAuth();
   const { c, radius, elevation } = useTheme();
   const recorder = useAudioRecorder({ ...RecordingPresets.HIGH_QUALITY, isMeteringEnabled: true });
@@ -46,11 +47,15 @@ export default function VoiceProfileStep() {
           question: `${t.voiceProfileGreetingNamed.replace('{name}', knownName)} ${t.ageQuestion}`,
         },
         { field: 'education', question: t.eduQuestion },
+        { field: 'experienceYears', question: t.experienceQuestion },
+        { field: 'workPreference', question: t.workPreferenceQuestion },
       ]
     : [
         { field: 'name', question: t.voiceProfileGreeting },
         { field: 'age', question: t.ageQuestion },
         { field: 'education', question: t.eduQuestion },
+        { field: 'experienceYears', question: t.experienceQuestion },
+        { field: 'workPreference', question: t.workPreferenceQuestion },
       ];
 
   const eduLabel: Record<string, string> = {
@@ -62,6 +67,9 @@ export default function VoiceProfileStep() {
     postgrad: t.eduPostgrad,
   };
 
+  // "other" adds a follow-up asking WHICH place; "home" captures the device
+  // location instead, so a beneficiary never has to name their own village.
+  const [askingWhere, setAskingWhere] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [messages, setMessages] = useState<ProfileMessage[]>([]);
   const [collected, setCollected] = useState<Record<string, string | number>>({});
@@ -103,12 +111,43 @@ export default function VoiceProfileStep() {
   function labelFor(field: ProfileField, value: string | number): string {
     if (field === 'name') return t.nameConfirmedGreeting.replace('{name}', String(value));
     if (field === 'age') return `${value} ${t.yearsSuffix}`;
+    if (field === 'experienceYears') {
+      return value === 0 ? t.experienceNone : `${value} ${t.yearsSuffix}`;
+    }
+    if (field === 'workPreference') return value === 'home' ? t.workNearHome : t.workElsewhere;
     return eduLabel[value as string] ?? String(value);
+  }
+
+  async function finish(data: Record<string, string | number>) {
+    if (token) {
+      await updateProfile({ ...data, onboarded: true } as Parameters<typeof updateProfile>[0]);
+    } else {
+      setGuestProfile(data as Parameters<typeof setGuestProfile>[0]);
+    }
+    setTimeout(() => router.replace('/onboarding/done'), 700);
   }
 
   async function submitAnswer(rawText: string) {
     const clean = rawText.trim();
     if (!clean) return;
+
+    // free-text place name — kept as spoken, since it may be a village the
+    // catalogue has no district row for
+    if (askingWhere) {
+      setBusy(true);
+      setTyped('');
+      setShowType(false);
+      addUser(clean);
+      try {
+        addAssistant(t.locationSaved.replace('{place}', clean));
+        await finish({ ...collected, preferredLocation: clean });
+      } catch (e) {
+        Alert.alert(t.tryAgain, e instanceof Error ? e.message : String(e));
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
     setBusy(true);
     setTyped('');
     setShowType(false);
@@ -123,18 +162,33 @@ export default function VoiceProfileStep() {
       const label = labelFor(currentStep.field, value);
       addAssistant(label);
 
-      const nextCollected = { ...collected, [currentStep.field]: value };
+      let nextCollected = { ...collected, [currentStep.field]: value };
+
+      if (currentStep.field === 'workPreference') {
+        if (value === 'other') {
+          // ask which place, and finish on that answer instead of this one
+          setCollected(nextCollected);
+          setAskingWhere(true);
+          setTimeout(() => addAssistant(t.whereQuestion), 700);
+          return;
+        }
+        // "home": use the device location so they don't have to name it
+        const loc = await resolveDeviceLocation();
+        if (loc) {
+          await setLocation(loc.state, loc.district);
+          nextCollected = { ...nextCollected, ...(loc.state && { state: loc.state }), ...(loc.district && { district: loc.district }) };
+          if (loc.district || loc.state) {
+            addAssistant(t.locationSaved.replace('{place}', [loc.district, loc.state].filter(Boolean).join(', ')));
+          }
+        }
+      }
+
       setCollected(nextCollected);
 
       if (stepIndex < STEPS.length - 1) {
         setTimeout(() => setStepIndex((i) => i + 1), 700);
       } else {
-        if (token) {
-          await updateProfile({ ...nextCollected, onboarded: true } as Parameters<typeof updateProfile>[0]);
-        } else {
-          setGuestProfile(nextCollected as Parameters<typeof setGuestProfile>[0]);
-        }
-        setTimeout(() => router.replace('/onboarding/done'), 700);
+        await finish(nextCollected);
       }
     } catch (e) {
       Alert.alert(t.tryAgain, e instanceof Error ? e.message : String(e));

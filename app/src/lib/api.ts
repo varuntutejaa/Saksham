@@ -350,7 +350,7 @@ export async function reprioritise(
   }
 }
 
-export type ProfileField = 'name' | 'gender' | 'age' | 'education';
+export type ProfileField = 'name' | 'gender' | 'age' | 'education' | 'experienceYears' | 'workPreference';
 
 const HINDI_AGE_WORDS: [RegExp, number][] = [
   [/\b(das|dus)\b|दस/u, 10],
@@ -773,6 +773,11 @@ export interface AuthUser {
   gender?: Gender | null;
   age?: number | null;
   education?: Education | null;
+  experienceYears?: number | null;
+  workPreference?: 'home' | 'other' | null;
+  preferredLocation?: string | null;
+  state?: string | null;
+  district?: string | null;
   onboarded?: boolean;
   avatarUrl?: string | null;
 }
@@ -856,6 +861,11 @@ export async function updateProfile(
     gender?: Gender;
     age?: number;
     education?: Education;
+    experienceYears?: number;
+    workPreference?: 'home' | 'other';
+    preferredLocation?: string;
+    state?: string;
+    district?: string;
     onboarded?: boolean;
     avatarUrl?: string | null;
   },

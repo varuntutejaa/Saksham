@@ -3,11 +3,13 @@ import { env, hasGroq } from "../lib/env.js";
 const GROQ_CHAT_URL = "https://api.groq.com/openai/v1/chat/completions";
 const GROQ_CHAT_MODEL = "openai/gpt-oss-120b";
 
-export type ProfileField = "name" | "gender" | "age" | "education";
+export type ProfileField = "name" | "gender" | "age" | "education" | "experienceYears" | "workPreference";
 
-const ENUM_OPTIONS: Record<"gender" | "education", string[]> = {
+const ENUM_OPTIONS: Record<"gender" | "education" | "workPreference", string[]> = {
   gender: ["male", "female", "other"],
   education: ["below_10th", "10th", "12th", "iti_diploma", "undergrad", "postgrad"],
+  // where they want to work: at/near where they live, or somewhere else
+  workPreference: ["home", "other"],
 };
 
 interface GroqChatResponse {
@@ -112,10 +114,30 @@ function fallbackEducation(answer: string): string | null {
   return null;
 }
 
+/** Years of experience. "no experience"/"naya" is a real answer meaning 0,
+ *  not a failure to understand, so it maps to 0 rather than null. */
+function fallbackExperience(answer: string): number | null {
+  const text = normalizeAnswer(answer);
+  if (/\b(no experience|none|fresher|new|naya|nayi|abhi shuru|just started)\b|कोई नहीं|नया|नई|अभी शुरू/u.test(text)) return 0;
+  const match = text.match(/\d{1,2}/);
+  if (!match) return null;
+  const n = Number(match[0]);
+  return n >= 0 && n <= 70 ? n : null;
+}
+
+function fallbackWorkPreference(answer: string): string | null {
+  const text = normalizeAnswer(answer);
+  if (/\b(home|ghar|apne ghar|yahin|yaha|nearby|paas|pass|local|same place)\b|घर|यहीं|यहाँ|पास/u.test(text)) return "home";
+  if (/\b(other|another|different|bahar|dusri|doosri|kahin aur|shehar|city)\b|बाहर|दूसरी|कहीं और|शहर/u.test(text)) return "other";
+  return null;
+}
+
 function localProfileFallback(field: ProfileField, answer: string): string | number | null {
   if (field === "name") return fallbackName(answer);
   if (field === "age") return fallbackAge(answer);
   if (field === "gender") return fallbackGender(answer);
+  if (field === "experienceYears") return fallbackExperience(answer);
+  if (field === "workPreference") return fallbackWorkPreference(answer);
   return fallbackEducation(answer);
 }
 
@@ -136,7 +158,11 @@ export async function extractProfileAnswer(
   }
 
   const instruction =
-    field === "age"
+    field === "experienceYears"
+      ? "Extract how many YEARS the person has been doing their work, as a single integer 0-70. The number may be spoken as a word in any language (Hindi \"do saal\" = 2, \"paanch saal\" = 5, \"das saal\" = 10). If they say they are new, a beginner, or have no experience, reply exactly: 0. Reply with ONLY the integer. If no clear duration is stated, reply exactly: unclear"
+      : field === "workPreference"
+        ? "Decide where the person wants to work. Reply exactly \"home\" if they want to work at home, from home, near home, in their own village or their current area. Reply exactly \"other\" if they want to work somewhere else, in another city, town or district, or are willing to relocate. Reply with ONLY one of those two words. If it is not clear, reply exactly: unclear"
+      : field === "age"
       ? "Extract the person's age as a single integer between 10 and 100. The number may be spoken as a word in any language (e.g. Hindi \"paccis\" = 25, \"tees\" = 30, \"chalis\" = 40, \"pachaas\" = 50) rather than digits — convert it carefully and precisely, do not guess a rounder nearby number. Reply with ONLY the final integer, nothing else. If no clear age is stated, reply exactly: unclear"
       : field === "name"
         ? "Extract just the person's own name from their answer, dropping filler words like \"my name is\" / \"mera naam ... hai\". Reply with ONLY their name, properly capitalized, transliterated to plain Latin letters if it was spoken in another script or language. If no name is clearly stated, reply exactly: unclear"
@@ -186,9 +212,14 @@ export async function extractProfileAnswer(
   }
 
   const raw = rawContent.toLowerCase();
-  if (field === "age") {
-    const n = Number(raw.replace(/[^\d]/g, ""));
-    return Number.isFinite(n) && n >= 10 && n <= 100 ? n : localProfileFallback(field, answer);
+  if (field === "age" || field === "experienceYears") {
+    const digits = raw.replace(/[^\d]/g, "");
+    // "0" is a real answer for experience (a beginner), so an empty string —
+    // not a falsy number — is what means "nothing extracted"
+    if (digits === "") return localProfileFallback(field, answer);
+    const n = Number(digits);
+    const [min, max] = field === "age" ? [10, 100] : [0, 70];
+    return Number.isFinite(n) && n >= min && n <= max ? n : localProfileFallback(field, answer);
   }
   return ENUM_OPTIONS[field].includes(raw) ? raw : localProfileFallback(field, answer);
 }

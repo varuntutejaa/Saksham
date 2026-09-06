@@ -87,6 +87,12 @@ const profileSchema = z.object({
   education: z
     .enum(["below_10th", "10th", "12th", "iti_diploma", "undergrad", "postgrad"])
     .optional(),
+  experienceYears: z.number().int().min(0).max(70).optional(),
+  workPreference: z.enum(["home", "other"]).optional(),
+  /** free text as spoken — may be a village the catalogue has no district for */
+  preferredLocation: z.string().max(120).optional(),
+  state: z.string().max(80).optional(),
+  district: z.string().max(80).optional(),
   onboarded: z.boolean().optional(),
   avatarUrl: z.string().max(1_500_000).nullable().optional(),
   /** true once the app has asked for and received location permission —

@@ -20,6 +20,11 @@ interface AuthValue {
     gender?: Gender;
     age?: number;
     education?: Education;
+    experienceYears?: number;
+    workPreference?: 'home' | 'other';
+    preferredLocation?: string;
+    state?: string;
+    district?: string;
     onboarded?: boolean;
     avatarUrl?: string | null;
   }) => Promise<void>;

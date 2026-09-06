@@ -249,11 +249,12 @@ assistantRouter.post("/transcribe", upload.single("audio"), async (req, res) => 
  * POST /api/assistant/extract-profile-answer
  * Voice onboarding (app/src/app/onboarding/voice-profile.tsx): turns a free-
  * text answer (spoken or typed, any language) into the structured
- * gender/age/education value the profile needs. `value: null` means the
+ * profile value the app needs (name, gender, age, education, years of
+ * experience, or where they want to work). `value: null` means the
  * answer couldn't be classified — the app should re-ask, not guess.
  */
 const extractProfileSchema = z.object({
-  field: z.enum(["name", "gender", "age", "education"]),
+  field: z.enum(["name", "gender", "age", "education", "experienceYears", "workPreference"]),
   answer: z.string().min(1),
   language: z.enum(LANGS).default("hi"),
 });

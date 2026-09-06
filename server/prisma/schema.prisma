@@ -78,6 +78,17 @@ model User {
   gender        String?
   age           Int?
   education     String? // below_10th | 10th | 12th | iti_diploma | undergrad | postgrad — self-declared
+  /// years doing their trade, self-declared during voice profiling. Informal
+  /// work carries no certificate, so this is the only evidence of experience
+  /// we have — it is what an RPL (Recognition of Prior Learning) claim rests on.
+  experienceYears Int?
+  /// where they want to work: "home" (at or near where they live, captured
+  /// from the device) | "other" (somewhere else, named in preferredLocation)
+  workPreference  String?
+  /// the place they named when workPreference is "other" — free text as
+  /// spoken, e.g. "Jaipur", since it may be a village the catalogue has no
+  /// district row for
+  preferredLocation String?
   onboarded     Boolean  @default(false) // has completed the post-signup profile questions
   category      String? // SC / ST / OBC / GEN — self-declared
   state         String?
