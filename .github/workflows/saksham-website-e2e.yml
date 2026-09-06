@@ -1,0 +1,34 @@
+name: E2E smoke tests
+
+on:
+  # Runs against the live production deployment after Vercel's own deploy
+  # finishes — this is a post-deploy health check, not a pre-merge gate, so
+  # it needs no build secrets (GEMINI_API_KEY etc. stay server-side on Vercel).
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 3 * * *" # daily, catches a live backend/API regression even with no code changes
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Wait for Vercel deployment to be live
+        run: sleep 30
+      - name: Run smoke tests against production
+        env:
+          BASE_URL: https://saksham-website-five.vercel.app
+        run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14

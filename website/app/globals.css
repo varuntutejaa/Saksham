@@ -1,26 +1,133 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f8fa;
-  --foreground: #16181d;
-  --brand: #208aef;
+  --background: #fbf7f1;
+  --surface: #ffffff;
+  --surface-alt: #f3ece1;
+  --foreground: #241b11;
+  --foreground-dim: #6b5d4c;
+  --foreground-faint: #a2917c;
+  --border: #e7ddcc;
+
+  /* clay terracotta — the primary craft/artisan identity color */
+  --brand: #bd4e1c;
+  --brand-strong: #9a3d14;
+  --on-brand: #fff8f1;
+
+  /* deep forest teal — trust / certification / government accent */
+  --accent: #0e6e5c;
+  --accent-strong: #095546;
+  --on-accent: #f4fbf8;
+
+  --success: #1f8b4c;
+  --success-soft: #e6f4ea;
+  --warning: #a8681a;
+  --warning-soft: #faf0dd;
+  --danger: #c0392b;
+  --danger-soft: #fbe9e7;
+
+  --shadow-color: 22 27 15;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
   --color-foreground: var(--foreground);
+  --color-foreground-dim: var(--foreground-dim);
+  --color-foreground-faint: var(--foreground-faint);
+  --color-border: var(--border);
+
   --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-on-brand: var(--on-brand);
+
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-on-accent: var(--on-accent);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
+
+  --shadow-soft: 0 1px 2px rgb(var(--shadow-color) / 0.06), 0 6px 20px -4px rgb(var(--shadow-color) / 0.12);
+  --shadow-float: 0 4px 10px rgb(var(--shadow-color) / 0.08), 0 16px 40px -8px rgb(var(--shadow-color) / 0.22);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0d0f12;
-    --foreground: #ededed;
+    --background: #15120d;
+    --surface: #1e1a14;
+    --surface-alt: #2a241b;
+    --foreground: #f3ece1;
+    --foreground-dim: #c9bba5;
+    --foreground-faint: #8a7c68;
+    --border: #382f22;
+
+    --brand: #e1793d;
+    --brand-strong: #f09b5c;
+    --on-brand: #1c0f06;
+
+    --accent: #2bb095;
+    --accent-strong: #59cbb3;
+    --on-accent: #06231d;
+
+    --success: #48c17e;
+    --success-soft: #163524;
+    --warning: #e0a937;
+    --warning-soft: #3a2c10;
+    --danger: #e4675a;
+    --danger-soft: #3a1815;
+
+    --shadow-color: 0 0 0;
   }
+}
+
+* {
+  border-color: var(--border);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--brand) 30%, transparent);
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.font-display {
+  font-family: var(--font-display);
 }
