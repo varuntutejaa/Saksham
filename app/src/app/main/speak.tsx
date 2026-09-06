@@ -80,13 +80,13 @@ export default function SpeakScreen() {
     setShowType(false);
   }
 
-  function shouldCollectProfileAfterSkill(): boolean {
-    if (user) return !user.onboarded;
-    return !guestProfile;
+  function shouldAskSkillQuestions(): boolean {
+    if (user) return user.experienceYears == null || !user.workPreference;
+    return guestProfile?.experienceYears == null || !guestProfile.workPreference;
   }
 
   function routeAfterSkill() {
-    router.push(shouldCollectProfileAfterSkill() ? '/onboarding/voice-profile?returnTo=/confirm' : '/confirm');
+    router.push(shouldAskSkillQuestions() ? '/onboarding/voice-profile?mode=skill&returnTo=/confirm' : '/confirm');
   }
 
   const t = language ? UI_STRINGS[language] : UI_STRINGS.hi;

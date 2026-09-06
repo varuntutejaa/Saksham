@@ -25,8 +25,8 @@ import { Button, MicOrb, Screen, StepProgress, TypingDots, Txt, type MicState } 
 type ProfileMessage = { id: number; role: 'user' | 'assistant'; text: string };
 
 export default function VoiceProfileStep() {
-  const params = useLocalSearchParams<{ returnTo?: string }>();
-  const { language, setGuestProfile, setLocation } = useStore();
+  const params = useLocalSearchParams<{ mode?: string; returnTo?: string }>();
+  const { language, guestProfile, setGuestProfile, setLocation } = useStore();
   const { updateProfile, token, user } = useAuth();
   const { c, radius, elevation } = useTheme();
   const recorder = useAudioRecorder({ ...RecordingPresets.HIGH_QUALITY, isMeteringEnabled: true });
@@ -38,26 +38,25 @@ export default function VoiceProfileStep() {
   const t = language ? UI_STRINGS[language] : UI_STRINGS.hi;
   const effectiveLanguage = language ?? 'hi';
 
-  // A signed-in beneficiary already gave their name at sign-up — greet them by
-  // it and go straight to the next question instead of asking again.
+  const mode = params.mode === 'skill' ? 'skill' : 'basic';
+  // Basic onboarding is deliberately short: name, age, qualification. The
+  // work-specific questions happen only after the beneficiary has told a skill.
   const knownName = user?.name?.trim() || null;
-  const STEPS: { field: ProfileField; question: string }[] = knownName
+  const basicSteps: { field: ProfileField; question: string }[] = knownName
     ? [
-        {
-          field: 'age',
-          question: `${t.voiceProfileGreetingNamed.replace('{name}', knownName)} ${t.ageQuestion}`,
-        },
+        { field: 'age', question: `${t.voiceProfileGreetingNamed.replace('{name}', knownName)} ${t.ageQuestion}` },
         { field: 'education', question: t.eduQuestion },
-        { field: 'experienceYears', question: t.experienceQuestion },
-        { field: 'workPreference', question: t.workPreferenceQuestion },
       ]
     : [
         { field: 'name', question: t.voiceProfileGreeting },
         { field: 'age', question: t.ageQuestion },
         { field: 'education', question: t.eduQuestion },
-        { field: 'experienceYears', question: t.experienceQuestion },
-        { field: 'workPreference', question: t.workPreferenceQuestion },
       ];
+  const skillSteps: { field: ProfileField; question: string }[] = [
+    { field: 'experienceYears', question: t.experienceQuestion },
+    { field: 'workPreference', question: t.workPreferenceQuestion },
+  ];
+  const STEPS = mode === 'skill' ? skillSteps : basicSteps;
 
   const eduLabel: Record<string, string> = {
     below_10th: t.eduBelow10th,
@@ -121,9 +120,9 @@ export default function VoiceProfileStep() {
 
   async function finish(data: Record<string, string | number>) {
     if (token) {
-      await updateProfile({ ...data, onboarded: true } as Parameters<typeof updateProfile>[0]);
+      await updateProfile({ ...data, ...(mode === 'skill' && { onboarded: true }) } as Parameters<typeof updateProfile>[0]);
     } else {
-      setGuestProfile(data as Parameters<typeof setGuestProfile>[0]);
+      setGuestProfile({ ...(mode === 'skill' ? guestProfile ?? {} : {}), ...data } as Parameters<typeof setGuestProfile>[0]);
     }
     setTimeout(
       () =>

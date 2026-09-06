@@ -41,10 +41,12 @@ export default function AuthScreen() {
     setConfirmPassword('');
   }
 
+  function hasBasicProfile() {
+    return Boolean(user?.name?.trim() && user.age != null && user.education);
+  }
+
   if (!language) return <Redirect href="/language" />;
-  // Let beneficiaries describe their work first; profile questions now happen
-  // after skill capture so the experience feels contextual.
-  if (token) return <Redirect href="/main/speak" />;
+  if (token) return <Redirect href={hasBasicProfile() ? '/main' : '/onboarding/voice-profile?mode=basic'} />;
 
   async function submit() {
     setError(null);
@@ -96,7 +98,7 @@ export default function AuthScreen() {
             style={[styles.iconBtn, { backgroundColor: c.surfaceAlt }]}>
             <Txt variant="h2">‹</Txt>
           </Pressable>
-          <Pressable onPress={() => router.replace('/main/speak')} hitSlop={8}>
+          <Pressable onPress={() => router.replace('/onboarding/voice-profile?mode=basic')} hitSlop={8}>
             <Txt variant="label" tone="primary">
               {t.continueGuest}
             </Txt>

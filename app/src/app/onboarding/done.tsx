@@ -22,7 +22,7 @@ export default function OnboardingDone() {
   const { language } = useStore();
   const { c } = useTheme();
   const t = language ? UI_STRINGS[language] : UI_STRINGS.hi;
-  const nextRoute = params.returnTo === '/confirm' ? '/confirm' : '/main/speak';
+  const nextRoute = params.returnTo === '/confirm' ? '/confirm' : '/main';
 
   const ring = useSharedValue(0);
   const check = useSharedValue(0);
