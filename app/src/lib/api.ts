@@ -312,7 +312,14 @@ export async function converse(input: ConverseInput): Promise<ConverseResponse> 
       body: form,
     });
     if (!res.ok) throw new Error(`Assistant error ${res.status}: ${await res.text()}`);
-    return res.json();
+    const result = (await res.json()) as ConverseResponse;
+    const hasKnownSkill = result.mappings.some((m) => m.normalizedSkill !== 'unknown' && (m.title || m.qpCode));
+    if (!hasKnownSkill && result.transcript) {
+      const local = localConverse(result.transcript, result.language ?? input.language, input.state, input.district, input.history);
+      const localHasKnownSkill = local.mappings.some((m) => m.normalizedSkill !== 'unknown' && (m.title || m.qpCode));
+      if (localHasKnownSkill) return { ...local, sessionId: result.sessionId, stt: result.stt };
+    }
+    return result;
   } catch {
     if (!input.transcript) throw new Error('Assistant server is unavailable');
     return localConverse(input.transcript, input.language, input.state, input.district, input.history);
@@ -499,7 +506,7 @@ const LOCAL_AGENT_COPY: Record<LanguageCode, { found: string; unknown: string; r
   en: {
     found: 'I understood your skill as {skill}. You can explore matching training programmes and certification options.',
     unknown: 'I heard you, but I could not confidently match one exact skill. Please describe the work you do in a little more detail.',
-    rationale: 'Suggested locally because the backend server is not running right now.',
+    rationale: 'Matched on device because the server could not confidently classify this transcript.',
   },
   hi: {
     found: 'मैंने आपका हुनर {skill} समझा। आप इससे जुड़े प्रशिक्षण और प्रमाणन विकल्प देख सकते हैं।',
