@@ -92,7 +92,7 @@ handler becomes a `500` instead of crashing the process. If Postgres is down,
 |-------|------|---------|
 | server | 4000 | `server/.env` → `DATABASE_URL`, `JWT_SECRET`, `PORT` |
 | website | 3000 | `website/.env.local` → `NEXT_PUBLIC_API_URL` |
-| app | Metro 8081 | `app/.env` → `EXPO_PUBLIC_API_URL` |
+| app | Metro 8081 | defaults to the deployed backend; override with `app/.env` → `EXPO_PUBLIC_API_URL` |
 
 `npm run dev` (root) runs server + website together via `concurrently`.
 `npm run dev:app` runs Expo separately.

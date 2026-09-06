@@ -1,24 +1,36 @@
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
+/** The deployed backend. Used by default so a fresh clone works with no setup:
+ *  `npm start` and the app talks to the real API, same as website/lib/site-api.ts. */
+export const DEFAULT_API_URL = 'https://saksham-api-82mn.onrender.com';
+
 /**
  * Resolve the backend base URL.
- *  - Set EXPO_PUBLIC_API_URL for a deployed server (recommended for demos on real devices).
- *  - Otherwise we derive the LAN host from the Expo dev server so a phone on the
- *    same Wi-Fi can reach the API running on your laptop.
+ *  - Defaults to the deployed Render backend, so cloning and running needs no
+ *    configuration and every developer sees the same data.
+ *  - Set EXPO_PUBLIC_API_URL to point somewhere else — most usefully
+ *    http://localhost:4000 when working on the server itself. On a physical
+ *    device that address is the phone, not your laptop, so
+ *    EXPO_PUBLIC_API_URL=lan resolves your machine's LAN IP from the Expo dev
+ *    server instead.
  */
 function resolveBaseUrl(): string {
-  const fromEnv = process.env.EXPO_PUBLIC_API_URL;
-  if (fromEnv) return fromEnv.replace(/\/$/, '');
+  const fromEnv = process.env.EXPO_PUBLIC_API_URL?.trim();
 
-  const hostUri =
-    Constants.expoConfig?.hostUri ??
-    (Constants as { manifest2?: { extra?: { expoClient?: { hostUri?: string } } } }).manifest2
-      ?.extra?.expoClient?.hostUri;
-  const host = hostUri?.split(':')[0];
-  if (host && Platform.OS !== 'web') return `http://${host}:4000`;
+  if (fromEnv && fromEnv.toLowerCase() !== 'lan') return fromEnv.replace(/\/$/, '');
 
-  return 'http://localhost:4000';
+  if (fromEnv?.toLowerCase() === 'lan') {
+    const hostUri =
+      Constants.expoConfig?.hostUri ??
+      (Constants as { manifest2?: { extra?: { expoClient?: { hostUri?: string } } } }).manifest2
+        ?.extra?.expoClient?.hostUri;
+    const host = hostUri?.split(':')[0];
+    if (host && Platform.OS !== 'web') return `http://${host}:4000`;
+    return 'http://localhost:4000';
+  }
+
+  return DEFAULT_API_URL;
 }
 
 export const API_BASE = resolveBaseUrl();

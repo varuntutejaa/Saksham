@@ -311,11 +311,18 @@ npm run dev:app         # the Expo app (separate terminal)
 
 ### Pointing the app at a backend
 
+**You don't need to configure anything.** With no `app/.env`, the app talks to
+the deployed backend at `https://saksham-api-82mn.onrender.com`, so a fresh
+clone runs against real data straight away.
+
+Override it only when you're working on the server itself:
+
 ```bash
 # app/.env
-EXPO_PUBLIC_API_URL=http://localhost:4000                       # simulator
-EXPO_PUBLIC_API_URL=http://<your-laptop-lan-ip>:4000             # physical device
-EXPO_PUBLIC_API_URL=https://saksham-api-82mn.onrender.com        # the live deployment
+EXPO_PUBLIC_API_URL=http://localhost:4000   # a server on this machine (simulator, emulator, web)
+EXPO_PUBLIC_API_URL=lan                     # a server on this machine, from a real phone on
+                                            # the same Wi-Fi — the LAN IP is resolved for you
+EXPO_PUBLIC_API_URL=https://…               # any other deployment
 ```
 
 ---
