@@ -26,8 +26,11 @@ const MAX_ATTEMPTS = 5;
 
 const store = new Map<string, OtpRecord>();
 
+/** 4 digits: shorter is materially easier to hear, remember and type for a
+ *  beneficiary reading an SMS aloud or entering it on a feature phone. The
+ *  brute-force risk is bounded by MAX_ATTEMPTS and the 10-minute TTL. */
 function generateCode(): string {
-  return String(Math.floor(100000 + Math.random() * 900000));
+  return String(Math.floor(1000 + Math.random() * 9000));
 }
 
 export interface RequestOtpResult {

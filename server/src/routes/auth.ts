@@ -12,6 +12,8 @@ const registerSchema = z.object({
   phone: z.string().min(6).max(15),
   name: z.string().min(1).optional(),
   password: z.string().min(4),
+  /** 6-digit code from POST /api/auth/signup-otp, proving the phone is theirs */
+  otp: z.string().length(4),
   language: z
     .enum(["hi", "en", "bn", "ta", "te", "mr", "kn", "gu", "pa", "or"])
     .optional(),
@@ -20,14 +22,31 @@ const registerSchema = z.object({
   district: z.string().optional(),
 });
 
+/** Human-readable reason an OTP check failed, in the same words everywhere. */
+function otpMessage(result: VerifyOtpResult): string {
+  const messages: Record<VerifyOtpResult, string> = {
+    not_found: "Please request a new code",
+    expired: "This code has expired, please request a new one",
+    too_many_attempts: "Too many incorrect attempts, please request a new code",
+    mismatch: "Incorrect code",
+    ok: "",
+  };
+  return messages[result];
+}
+
 authRouter.post("/register", async (req, res) => {
   const parsed = registerSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: parsed.error.flatten() });
   }
-  const { password, ...rest } = parsed.data;
+  const { password, otp, ...rest } = parsed.data;
   const existing = await prisma.user.findUnique({ where: { phone: rest.phone } });
   if (existing) return res.status(409).json({ error: "Phone already registered" });
+
+  // The phone number is how a beneficiary is contacted about a training place,
+  // so it has to be verified before the account exists — not after.
+  const otpResult = verifyOtp(rest.phone, otp);
+  if (otpResult !== "ok") return res.status(400).json({ error: otpMessage(otpResult) });
 
   const user = await prisma.user.create({
     data: { ...rest, passwordHash: await bcrypt.hash(password, 10) },
@@ -88,6 +107,28 @@ authRouter.patch("/profile", authenticate, async (req, res) => {
   res.json({ user: safeUser(user) });
 });
 
+const signupOtpSchema = z.object({ phone: z.string().min(6).max(15) });
+
+/**
+ * POST /api/auth/signup-otp — send a verification code to a phone that is
+ * about to register. Refuses numbers that already have an account, so this
+ * cannot be used to probe for or spam existing users.
+ *
+ * No SMS provider is configured (see services/otp.ts), so in mock mode the
+ * response carries `devOtp` and the app shows it inline — the flow is fully
+ * testable without real SMS.
+ */
+authRouter.post("/signup-otp", async (req, res) => {
+  const parsed = signupOtpSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+
+  const existing = await prisma.user.findUnique({ where: { phone: parsed.data.phone } });
+  if (existing) return res.status(409).json({ error: "Phone already registered" });
+
+  const result = await requestOtp(parsed.data.phone);
+  res.json({ sent: true, ...result });
+});
+
 const forgotPasswordSchema = z.object({ phone: z.string().min(6).max(15) });
 
 /**
@@ -109,7 +150,7 @@ authRouter.post("/forgot-password", async (req, res) => {
 
 const resetPasswordSchema = z.object({
   phone: z.string().min(6).max(15),
-  otp: z.string().length(6),
+  otp: z.string().length(4),
   newPassword: z.string().min(4),
 });
 
@@ -120,16 +161,7 @@ authRouter.post("/reset-password", async (req, res) => {
   const { phone, otp, newPassword } = parsed.data;
 
   const result = verifyOtp(phone, otp);
-  if (result !== "ok") {
-    const messages: Record<VerifyOtpResult, string> = {
-      not_found: "Please request a new code",
-      expired: "This code has expired, please request a new one",
-      too_many_attempts: "Too many incorrect attempts, please request a new code",
-      mismatch: "Incorrect code",
-      ok: "",
-    };
-    return res.status(400).json({ error: messages[result] });
-  }
+  if (result !== "ok") return res.status(400).json({ error: otpMessage(result) });
 
   const user = await prisma.user.findUnique({ where: { phone } });
   if (!user) return res.status(404).json({ error: "No account found with this phone number" });

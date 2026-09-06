@@ -591,11 +591,26 @@ export async function login(phone: string, password: string): Promise<AuthRespon
   return res.json();
 }
 
+/** Ask the server to text a verification code to a phone that is signing up.
+ *  In mock mode (no SMS provider) the response carries `devOtp` so the flow
+ *  is testable without a real handset. */
+export async function requestSignupOtp(phone: string): Promise<{ sent: boolean; provider: string; devOtp?: string }> {
+  const res = await fetch(`${API_BASE}/api/auth/signup-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone }),
+  });
+  if (!res.ok) throw new Error(await extractError(res, 'Could not send the code'));
+  return res.json();
+}
+
 export async function register(input: {
   phone: string;
   password: string;
   name?: string;
   language: LanguageCode;
+  /** code from requestSignupOtp — the server rejects registration without it */
+  otp: string;
 }): Promise<AuthResponse> {
   const res = await fetch(`${API_BASE}/api/auth/register`, {
     method: 'POST',

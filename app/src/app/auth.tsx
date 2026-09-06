@@ -4,6 +4,7 @@ import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, TextInput, View 
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { UI_STRINGS } from '@/constants/languages';
+import { requestSignupOtp } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useStore } from '@/lib/store';
 import { useTheme } from '@/theme';
@@ -21,8 +22,24 @@ export default function AuthScreen() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  // Signing up is two steps: details -> a code texted to the phone. The phone
+  // is how a beneficiary is contacted about a training place, so it is
+  // verified before the account exists.
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [devOtp, setDevOtp] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function switchTab(next: Tab) {
+    setTab(next);
+    setError(null);
+    setOtpSent(false);
+    setOtp('');
+    setDevOtp(null);
+    setConfirmPassword('');
+  }
 
   if (!language) return <Redirect href="/language" />;
   // once signed in, send new/incomplete profiles through onboarding once —
@@ -36,12 +53,32 @@ export default function AuthScreen() {
       setError(t.authError);
       return;
     }
+    if (tab === 'signup' && !otpSent && password !== confirmPassword) {
+      setError(t.passwordMismatch);
+      return;
+    }
+    if (tab === 'signup' && otpSent && otp.trim().length !== 4) {
+      setError(t.otpLengthError);
+      return;
+    }
     setBusy(true);
     try {
       if (tab === 'login') {
         await login(phone.trim(), password);
+      } else if (!otpSent) {
+        // step 1: ask the server to text a code to this number
+        const res = await requestSignupOtp(phone.trim());
+        setDevOtp(res.devOtp ?? null);
+        setOtpSent(true);
       } else {
-        await register({ phone: phone.trim(), password, name: name.trim() || undefined, language: language! });
+        // step 2: the code proves the phone is theirs
+        await register({
+          phone: phone.trim(),
+          password,
+          name: name.trim() || undefined,
+          language: language!,
+          otp: otp.trim(),
+        });
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : t.authError);
@@ -78,10 +115,7 @@ export default function AuthScreen() {
             {(['login', 'signup'] as Tab[]).map((tb) => (
               <Pressable
                 key={tb}
-                onPress={() => {
-                  setTab(tb);
-                  setError(null);
-                }}
+                onPress={() => switchTab(tb)}
                 style={[
                   styles.tabBtn,
                   { borderRadius: radius.md },
@@ -95,7 +129,7 @@ export default function AuthScreen() {
           </View>
 
           <View style={styles.form}>
-            {tab === 'signup' && (
+            {tab === 'signup' && !otpSent && (
               <TextInput
                 value={name}
                 onChangeText={setName}
@@ -104,22 +138,74 @@ export default function AuthScreen() {
                 style={[styles.input, { backgroundColor: c.surface, borderColor: c.border, color: c.text, borderRadius: radius.lg }]}
               />
             )}
-            <TextInput
-              value={phone}
-              onChangeText={setPhone}
-              placeholder={t.phonePlaceholder}
-              placeholderTextColor={c.textFaint}
-              keyboardType="phone-pad"
-              style={[styles.input, { backgroundColor: c.surface, borderColor: c.border, color: c.text }]}
-            />
-            <TextInput
-              value={password}
-              onChangeText={setPassword}
-              placeholder={t.passwordPlaceholder}
-              placeholderTextColor={c.textFaint}
-              secureTextEntry
-              style={[styles.input, { backgroundColor: c.surface, borderColor: c.border, color: c.text }]}
-            />
+            {!otpSent && (
+              <>
+                <TextInput
+                  value={phone}
+                  onChangeText={setPhone}
+                  placeholder={t.phonePlaceholder}
+                  placeholderTextColor={c.textFaint}
+                  keyboardType="phone-pad"
+                  style={[styles.input, { backgroundColor: c.surface, borderColor: c.border, color: c.text }]}
+                />
+                <TextInput
+                  value={password}
+                  onChangeText={setPassword}
+                  placeholder={t.passwordPlaceholder}
+                  placeholderTextColor={c.textFaint}
+                  secureTextEntry
+                  style={[styles.input, { backgroundColor: c.surface, borderColor: c.border, color: c.text }]}
+                />
+              </>
+            )}
+
+            {/* confirm the password only when setting one, i.e. signing up */}
+            {tab === 'signup' && !otpSent && (
+              <TextInput
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                placeholder={t.confirmPasswordPlaceholder}
+                placeholderTextColor={c.textFaint}
+                secureTextEntry
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: c.surface,
+                    // flag a mismatch as they type, not only on submit
+                    borderColor: confirmPassword.length > 0 && confirmPassword !== password ? c.danger : c.border,
+                    color: c.text,
+                  },
+                ]}
+              />
+            )}
+
+            {/* step 2: the code we texted to that number */}
+            {tab === 'signup' && otpSent && (
+              <>
+                <Txt variant="body" tone="dim">
+                  {t.otpSentTo.replace('{phone}', phone.trim())}
+                </Txt>
+                <TextInput
+                  value={otp}
+                  onChangeText={setOtp}
+                  placeholder={t.otpPlaceholder}
+                  placeholderTextColor={c.textFaint}
+                  keyboardType="number-pad"
+                  maxLength={4}
+                  autoFocus
+                  style={[
+                    styles.input,
+                    { backgroundColor: c.surface, borderColor: c.border, color: c.text, letterSpacing: 6, textAlign: 'center' },
+                  ]}
+                />
+                {/* no SMS provider configured — surface the code so the flow is usable */}
+                {devOtp && (
+                  <Txt variant="caption" tone="faint">
+                    {t.devOtpNotice.replace('{otp}', devOtp)}
+                  </Txt>
+                )}
+              </>
+            )}
 
             {error && (
               <Txt variant="caption" tone="danger">
@@ -128,12 +214,20 @@ export default function AuthScreen() {
             )}
 
             <Button
-              label={tab === 'login' ? t.loginBtn : t.signupBtn}
+              label={tab === 'login' ? t.loginBtn : otpSent ? t.signupBtn : t.sendOtp}
               onPress={submit}
               loading={busy}
               variant="green"
               style={{ marginTop: 6 }}
             />
+
+            {tab === 'signup' && otpSent && (
+              <Pressable onPress={() => switchTab('signup')} hitSlop={8} style={{ alignSelf: 'center' }}>
+                <Txt variant="label" tone="primary">
+                  {t.changeNumber}
+                </Txt>
+              </Pressable>
+            )}
 
             {tab === 'login' && (
               <Pressable

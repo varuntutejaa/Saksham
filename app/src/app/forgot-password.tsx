@@ -53,7 +53,7 @@ export default function ForgotPasswordScreen() {
 
   async function submitReset() {
     setError(null);
-    if (otp.trim().length !== 6) {
+    if (otp.trim().length !== 4) {
       setError(t.invalidOtp);
       return;
     }
@@ -136,7 +136,7 @@ export default function ForgotPasswordScreen() {
                   placeholder={t.otpPlaceholder}
                   placeholderTextColor={c.textFaint}
                   keyboardType="number-pad"
-                  maxLength={6}
+                  maxLength={4}
                   autoFocus
                   style={[styles.input, { backgroundColor: c.surface, borderColor: c.border, color: c.text }]}
                 />

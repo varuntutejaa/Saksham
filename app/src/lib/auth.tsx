@@ -13,7 +13,7 @@ interface AuthValue {
   token: string | null;
   user: AuthUser | null;
   login: (phone: string, password: string) => Promise<void>;
-  register: (input: { phone: string; password: string; name?: string; language: LanguageCode }) => Promise<void>;
+  register: (input: { phone: string; password: string; name?: string; language: LanguageCode; otp: string }) => Promise<void>;
   resetPassword: (phone: string, otp: string, newPassword: string) => Promise<void>;
   updateProfile: (input: {
     name?: string;
