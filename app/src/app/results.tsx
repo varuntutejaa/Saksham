@@ -223,14 +223,12 @@ function JobCard({
       </View>
 
       <View style={styles.jobMetaRow}>
-        {!!(j.district || j.state) && (
-          <View style={styles.jobMeta}>
-            <Ionicons name="location-outline" size={14} color={c.textFaint} />
-            <Txt variant="caption" tone="dim">
-              {[j.district, j.state].filter(Boolean).join(', ')}
-            </Txt>
-          </View>
-        )}
+        <View style={styles.jobMeta}>
+          <Ionicons name="location-outline" size={14} color={c.textFaint} />
+          <Txt variant="caption" tone="dim">
+            {[j.district, j.state].filter(Boolean).join(', ') || 'Location not listed'}
+          </Txt>
+        </View>
         {!!wage && (
           <View style={styles.jobMeta}>
             <Ionicons name="cash-outline" size={14} color={c.textFaint} />
@@ -283,6 +281,7 @@ function CourseCard({
   best?: boolean;
 }) {
   const { c, radius } = useTheme();
+  const locationLabel = courseLocationLabel(r.courseLevel);
   return (
     <Card index={index} tint={best ? 'violet' : undefined} style={{ gap: 12 }}>
       <View style={styles.progHead}>
@@ -307,6 +306,13 @@ function CourseCard({
         </View>
       )}
 
+      <View style={styles.jobMeta}>
+        <Ionicons name="location-outline" size={14} color={c.textFaint} />
+        <Txt variant="caption" tone="dim">
+          {locationLabel}
+        </Txt>
+      </View>
+
       <View style={styles.chipRow}>
         <Chip label={r.sector} />
         {r.nsqfLevel != null && <Chip label={`NSQF ${r.nsqfLevel}`} icon="layers" tone="primary" />}
@@ -320,6 +326,13 @@ function CourseCard({
       )}
     </Card>
   );
+}
+
+function courseLocationLabel(courseLevel: string): string {
+  const state = courseLevel.match(/\[([^\]]+)\]/)?.[1]?.trim();
+  if (state) return `State: ${state}`;
+  if (/national/i.test(courseLevel)) return 'All India';
+  return courseLevel;
 }
 
 const styles = StyleSheet.create({
