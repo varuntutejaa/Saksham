@@ -77,6 +77,60 @@ export function pickBestByTitle<T>(candidates: T[], token: string, titleOf: (ite
   return best ?? candidates[0];
 }
 
+/** The only qualification columns the mapping reads. */
+const QUAL_FIELDS = {
+  id: true,
+  qpCode: true,
+  title: true,
+  sector: true,
+  nsqfLevel: true,
+  keywords: true,
+  proposedOccupations: true,
+} as const;
+
+/** The NSQF + PM-AJAY catalogues, cached in-process.
+ *
+ *  This is government reference data: it only changes when the service is
+ *  redeployed and reseeded, but it was being refetched in full on every single
+ *  request — ~2,400 rows over the network, which dominated response time on
+ *  Render's free tier. Cached for an hour; a redeploy restarts the process and
+ *  therefore clears it. */
+let catalogCache: {
+  quals: QualRow[];
+  expiredQuals: QualRow[];
+  pmajayCourses: CourseRow[];
+  fetchedAt: number;
+} | null = null;
+const CATALOG_TTL_MS = 60 * 60 * 1000;
+
+async function loadCatalog() {
+  if (catalogCache && Date.now() - catalogCache.fetchedAt < CATALOG_TTL_MS) return catalogCache;
+  const [quals, expiredQuals, pmajayCourses] = await Promise.all([
+    // Select only what the mapping actually reads. The full row carries the
+    // scraped NQR detail blobs (nos, eligibility, progressionPathway); pulling
+    // those for all 1,283 rows dominated response time.
+    prisma.nsqfQualification.findMany({ where: { expired: false }, select: QUAL_FIELDS }),
+    prisma.nsqfQualification.findMany({ where: { expired: true }, select: QUAL_FIELDS }),
+    prisma.pmajayCourse.findMany({
+      where: { keywords: { isEmpty: false } },
+      select: { subCourseCode: true, subCourseName: true, sector: true, keywords: true },
+    }),
+  ]);
+  catalogCache = { quals, expiredQuals, pmajayCourses, fetchedAt: Date.now() };
+  return catalogCache;
+}
+
+type QualRow = {
+  id: string;
+  qpCode: string;
+  title: string;
+  sector: string;
+  nsqfLevel: number;
+  keywords: string[];
+  proposedOccupations: string[];
+};
+type CourseRow = { subCourseCode: string; subCourseName: string; sector: string; keywords: string[] };
+
 /**
  * Map a raw transcript to NSQF qualifications.
  *
@@ -109,16 +163,7 @@ export async function mapTranscriptToNsqf(transcript: string): Promise<MappingRe
     ];
   }
 
-  const [quals, expiredQuals, pmajayCourses] = await Promise.all([
-    // NQR qualifications genuinely expire. A live qualification always wins,
-    // but for trades whose only QP has lapsed (pottery, basket weaving, stone
-    // carving — exactly the traditional occupations this app serves) we fall
-    // back to the expired row and flag it, rather than telling the beneficiary
-    // their skill wasn't understood while PM-AJAY still funds that training.
-    prisma.nsqfQualification.findMany({ where: { expired: false } }),
-    prisma.nsqfQualification.findMany({ where: { expired: true } }),
-    prisma.pmajayCourse.findMany({ where: { keywords: { isEmpty: false } } }),
-  ]);
+  const { quals, expiredQuals, pmajayCourses } = await loadCatalog();
   const results: MappingResult[] = [];
 
   for (const token of tokens) {
