@@ -1,5 +1,5 @@
 import { Redirect, router } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
@@ -48,7 +48,7 @@ export default function LanguageScreen() {
       <Animated.View
         entering={FadeInDown.duration(450).springify().damping(18)}
         style={[styles.sheet, { backgroundColor: c.bg, borderColor: c.border }, elevation('float')]}>
-        <ScrollView contentContainerStyle={styles.grid} showsVerticalScrollIndicator={false}>
+        <View style={styles.grid}>
           {LANGUAGES.map((l, i) => (
             <Animated.View
               key={l.code}
@@ -75,7 +75,7 @@ export default function LanguageScreen() {
               </Pressable>
             </Animated.View>
           ))}
-        </ScrollView>
+        </View>
       </Animated.View>
     </Screen>
   );
@@ -101,17 +101,27 @@ const styles = StyleSheet.create({
     paddingTop: 22,
     paddingHorizontal: 18,
   },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, paddingBottom: 40 },
-  cell: { flexBasis: '47%', flexGrow: 1, minWidth: 0 },
+  // The full set of languages always fits, so the grid fills the sheet rather
+  // than scrolling and leaving dead space under the last row.
+  grid: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    alignContent: 'stretch',
+    gap: 12,
+    paddingBottom: 18,
+  },
+  // two per row, five rows sharing the height evenly
+  cell: { width: '47.5%', height: '18%', minWidth: 0 },
   langCard: {
+    flex: 1,
     borderRadius: 22,
     borderWidth: 1.5,
-    paddingVertical: 18,
     paddingHorizontal: 8,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 4,
-    minHeight: 92,
   },
   englishLabel: { textAlign: 'center' },
   nativeLabel: { fontSize: 22, fontWeight: '600', textAlign: 'center', lineHeight: 28 },
