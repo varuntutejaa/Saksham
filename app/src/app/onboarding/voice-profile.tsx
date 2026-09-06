@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,6 +25,7 @@ import { Button, MicOrb, Screen, StepProgress, TypingDots, Txt, type MicState } 
 type ProfileMessage = { id: number; role: 'user' | 'assistant'; text: string };
 
 export default function VoiceProfileStep() {
+  const params = useLocalSearchParams<{ returnTo?: string }>();
   const { language, setGuestProfile, setLocation } = useStore();
   const { updateProfile, token, user } = useAuth();
   const { c, radius, elevation } = useTheme();
@@ -124,7 +125,14 @@ export default function VoiceProfileStep() {
     } else {
       setGuestProfile(data as Parameters<typeof setGuestProfile>[0]);
     }
-    setTimeout(() => router.replace('/onboarding/done'), 700);
+    setTimeout(
+      () =>
+        router.replace({
+          pathname: '/onboarding/done',
+          params: params.returnTo ? { returnTo: params.returnTo } : undefined,
+        }),
+      700,
+    );
   }
 
   async function submitAnswer(rawText: string) {

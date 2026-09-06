@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,9 +18,11 @@ import { useTheme } from '@/theme';
 import { Button, Screen, Txt } from '@/ui';
 
 export default function OnboardingDone() {
+  const params = useLocalSearchParams<{ returnTo?: string }>();
   const { language } = useStore();
   const { c } = useTheme();
   const t = language ? UI_STRINGS[language] : UI_STRINGS.hi;
+  const nextRoute = params.returnTo === '/confirm' ? '/confirm' : '/main/speak';
 
   const ring = useSharedValue(0);
   const check = useSharedValue(0);
@@ -62,7 +64,7 @@ export default function OnboardingDone() {
         </View>
 
         <Animated.View entering={FadeIn.delay(600).duration(400)}>
-          <Button label={t.onboardContinue} icon="arrow-forward" variant="green" onPress={() => router.replace('/main')} />
+          <Button label={t.onboardContinue} icon="arrow-forward" variant="green" onPress={() => router.replace(nextRoute)} />
         </Animated.View>
       </View>
     </Screen>

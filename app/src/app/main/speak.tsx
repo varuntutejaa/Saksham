@@ -38,7 +38,7 @@ type AgentMessage = {
 };
 
 export default function SpeakScreen() {
-  const { language, setLanguage, state, district } = useStore();
+  const { language, setLanguage, state, district, guestProfile } = useStore();
   const { user } = useAuth();
   const { c, radius, elevation } = useTheme();
   const recorder = useAudioRecorder({ ...RecordingPresets.HIGH_QUALITY, isMeteringEnabled: true });
@@ -78,6 +78,15 @@ export default function SpeakScreen() {
     sessionIdRef.current = record.id;
     setHistoryOpen(false);
     setShowType(false);
+  }
+
+  function shouldCollectProfileAfterSkill(): boolean {
+    if (user) return !user.onboarded;
+    return !guestProfile;
+  }
+
+  function routeAfterSkill() {
+    router.push(shouldCollectProfileAfterSkill() ? '/onboarding/voice-profile?returnTo=/confirm' : '/confirm');
   }
 
   const t = language ? UI_STRINGS[language] : UI_STRINGS.hi;
@@ -134,7 +143,7 @@ export default function SpeakScreen() {
         ]);
         setHistory(updated);
       }
-      router.push('/confirm');
+      routeAfterSkill();
     } catch (e) {
       Alert.alert(t.tryAgain, String(e));
     } finally {
@@ -186,7 +195,7 @@ export default function SpeakScreen() {
       });
       const updated = await saveConversation(ensureSessionId(), withReply);
       setHistory(updated);
-      router.push('/confirm');
+      routeAfterSkill();
     } catch (e) {
       Alert.alert(t.tryAgain, String(e));
     } finally {

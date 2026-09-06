@@ -42,10 +42,9 @@ export default function AuthScreen() {
   }
 
   if (!language) return <Redirect href="/language" />;
-  // once signed in, send new/incomplete profiles through onboarding once —
-  // handled here (not with an imperative router call in submit()) so it can
-  // never race the login/register state update.
-  if (token) return <Redirect href={user?.onboarded ? '/main' : '/onboarding/voice-profile'} />;
+  // Let beneficiaries describe their work first; profile questions now happen
+  // after skill capture so the experience feels contextual.
+  if (token) return <Redirect href="/main/speak" />;
 
   async function submit() {
     setError(null);
@@ -97,7 +96,7 @@ export default function AuthScreen() {
             style={[styles.iconBtn, { backgroundColor: c.surfaceAlt }]}>
             <Txt variant="h2">‹</Txt>
           </Pressable>
-          <Pressable onPress={() => router.replace('/onboarding/voice-profile')} hitSlop={8}>
+          <Pressable onPress={() => router.replace('/main/speak')} hitSlop={8}>
             <Txt variant="label" tone="primary">
               {t.continueGuest}
             </Txt>

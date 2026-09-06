@@ -40,7 +40,7 @@ export default function OnboardingIntro() {
 
         <Animated.View entering={FadeIn.delay(400).duration(400)} style={styles.bottom}>
           <Button label={t.onboardStart} icon="arrow-forward" variant="green" onPress={start} />
-          <Button label={t.onboardSkip} variant="ghost" size="md" onPress={() => router.replace('/main')} />
+          <Button label={t.onboardSkip} variant="ghost" size="md" onPress={() => router.replace('/main/speak')} />
         </Animated.View>
       </View>
     </Screen>
