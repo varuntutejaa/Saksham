@@ -475,6 +475,15 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: ["computer chalana", "data entry", "computer operator", "कंप्यूटर ऑपरेटर", "डेटा एंट्री"],
   },
   {
+    normalized: "clerk-office-assistant",
+    patterns: [
+      "clerk", "office clerk", "office assistant", "clerical work", "office work",
+      "file work", "record keeping", "documents manage", "dak clerk", "admin assistant",
+      "क्लर्क", "ऑफिस असिस्टेंट", "दफ्तर का काम", "फाइल का काम", "रिकॉर्ड रखना",
+    ],
+    titleTerms: ["office assistant", "clerk", "clerical", "record keeping", "office administration"],
+  },
+  {
     normalized: "customer-support",
     patterns: ["call center", "customer care", "bpo", "कॉल सेंटर", "ग्राहक सेवा"],
   },
