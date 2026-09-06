@@ -6,14 +6,13 @@ import type { Language } from "@prisma/client";
  *
  * STT priority: Sarvam (best accuracy for Indian languages) -> Groq Whisper
  * (multilingual fallback, used only if a configured Sarvam call actually
- * fails) -> Bhashini (stubbed) -> a deterministic mock so the whole flow —
- * and the demo — works fully offline with zero external dependencies.
+ * fails). Real recordings must never be replaced with canned text.
  */
 
 export interface TranscribeResult {
   transcript: string;
   language: Language;
-  provider: "sarvam" | "groq" | "bhashini" | "mock";
+  provider: "sarvam" | "groq" | "bhashini";
   confidence: number;
 }
 
@@ -24,18 +23,12 @@ export interface SynthesizeResult {
   format: "wav" | "mp3" | "text";
 }
 
-const MOCK_TRANSCRIPTS: Record<Language, string> = {
-  hi: "main apne gaon mein mitti ke bartan aur matka banata hoon, silai ka kaam bhi jaanta hoon",
-  bn: "ami amar grame matir bhanda banai ebong tailoring kaj jani",
-  ta: "naan en kiraamathil mann paanaigal seiginren, thaiyal velaiyum theriyum",
-  en: "i make clay pots and matka in my village and i also know tailoring",
-  te: "nenu maa oorlo matka panulu chestanu, tailoring kuda telusu",
-  mr: "mi mazya gavat matka cha kaam karto, tailoring pan yete",
-  kn: "naanu nam ooru alli matka kelsa madtini, tailoring gottu",
-  gu: "hoo mara gaam ma matka nu kaam karu chhu, tailoring pan aavde chhe",
-  pa: "main apne pind vich matka da kaam karda haan, tailoring vi aundi hai",
-  or: "mu mo gaon re matka kaam kare, tailoring vi jane",
-};
+export class TranscriptionUnavailableError extends Error {
+  constructor() {
+    super("Speech transcription is not configured. Add SARVAM_API_KEY or GROQ_API_KEY to server/.env, then restart the server.");
+    this.name = "TranscriptionUnavailableError";
+  }
+}
 
 const SARVAM_STT_URL = "https://api.sarvam.ai/speech-to-text";
 const SARVAM_TTS_URL = "https://api.sarvam.ai/text-to-speech";
@@ -90,12 +83,7 @@ export async function transcribeAudio(
   if (hasBhashini) {
     // return callBhashiniASR(audio, language)
   }
-  return {
-    transcript: MOCK_TRANSCRIPTS[language],
-    language,
-    provider: "mock",
-    confidence: 0.82,
-  };
+  throw new TranscriptionUnavailableError();
 }
 
 /** `audio/m4a` isn't in Sarvam's accepted MIME list (it wants `audio/x-m4a`), but

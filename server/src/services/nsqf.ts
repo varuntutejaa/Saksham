@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma.js";
-import { extractSkills, patternHitCount } from "./skillLexicon.js";
+import { extractSkills, patternHitCount, titleTermsForSkill } from "./skillLexicon.js";
 import { classifySkillsWithLlm } from "./skillLlm.js";
 
 export interface MappingResult {
@@ -35,7 +35,7 @@ export interface MappingResult {
  *  are dropped because NQR titles name the worker ("Mason"), not the craft. */
 export function tradeStems(token: string): string[] {
   const stems: string[] = [];
-  for (const word of token.split("-")) {
+  for (const word of token.split(/[-\s]+/)) {
     if (word.length < 3) continue;
     stems.push(word);
     for (const suffix of ["ing", "ry", "y", "s"]) {
@@ -60,10 +60,10 @@ export function pickBestByTitle<T>(candidates: T[], token: string, titleOf: (ite
   let best: T | undefined;
   let bestScore = -Infinity;
   for (const candidate of candidates) {
-    const title = titleOf(candidate).toLowerCase();
+    const title = normalizeTitle(titleOf(candidate));
     let score = 0;
     // naming the trade at all is the dominant signal
-    if (title.includes(token.toLowerCase())) score += 10;
+    if (title.includes(normalizeTitle(token))) score += 10;
     for (const stem of stems) if (new RegExp(`\\b${stem}`, "i").test(title)) score += 6;
     // prefer the worker over the manager of the worker
     if (SENIOR_TITLE.test(title)) score -= 8;
@@ -76,6 +76,18 @@ export function pickBestByTitle<T>(candidates: T[], token: string, titleOf: (ite
     }
   }
   return best ?? candidates[0];
+}
+
+function normalizeTitle(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function normalizeSectorForFallback(value: string): string {
+  return value.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "");
+}
+
+function cleanDisplayTitle(value: string): string {
+  return value.replace(/\s+/g, " ").trim();
 }
 
 /** The only qualification columns the mapping reads. */
@@ -113,7 +125,6 @@ async function loadCatalog() {
     prisma.nsqfQualification.findMany({ where: { expired: false }, select: QUAL_FIELDS }),
     prisma.nsqfQualification.findMany({ where: { expired: true }, select: QUAL_FIELDS }),
     prisma.pmajayCourse.findMany({
-      where: { keywords: { isEmpty: false } },
       select: { subCourseCode: true, subCourseName: true, sector: true, keywords: true },
     }),
   ]);
@@ -132,6 +143,84 @@ type QualRow = {
 };
 type CourseRow = { subCourseCode: string; subCourseName: string; sector: string; keywords: string[] };
 
+const TRANSCRIPT_STOPWORDS = new Set([
+  "about", "also", "and", "any", "are", "can", "does", "doing", "for", "from",
+  "have", "help", "her", "him", "his", "job", "know", "learn", "like", "need",
+  "operator", "please", "repair", "repairs", "service", "services", "she",
+  "skill", "skills", "that", "the", "their", "them", "this", "want", "with",
+  "make", "maker", "makes", "making", "work", "worker", "working", "would",
+  "main", "maintenance", "maintain", "mera", "meri",
+  "mere", "mujhe", "karta", "karti", "karte", "hoon", "hun", "hai", "hain",
+]);
+
+function lowerKeywords(keywords: string[]): string[] {
+  return keywords.map((k) => k.toLowerCase());
+}
+
+function titleTermMatches(title: string, terms: string[]): boolean {
+  const hay = normalizeTitle(title);
+  return terms.some((term) => hay.includes(normalizeTitle(term)));
+}
+
+function qualificationCandidates(quals: QualRow[], token: string): { candidates: QualRow[]; pickToken: string } {
+  const normalizedToken = token.toLowerCase();
+  const keywordMatches = quals.filter((q) => lowerKeywords(q.keywords).includes(normalizedToken));
+  const terms = titleTermsForSkill(token);
+  const titleMatches = quals.filter((q) => titleTermMatches(q.title, terms));
+  return { candidates: [...new Map([...titleMatches, ...keywordMatches].map((q) => [q.id, q])).values()], pickToken: terms[0] ?? token };
+}
+
+function courseCandidates(courses: CourseRow[], token: string): { candidates: CourseRow[]; pickToken: string } {
+  const normalizedToken = token.toLowerCase();
+  const keywordMatches = courses.filter((c) => lowerKeywords(c.keywords).includes(normalizedToken));
+  const terms = titleTermsForSkill(token);
+  const titleMatches = courses.filter((c) => titleTermMatches(c.subCourseName, terms) || titleTermMatches(c.sector, terms));
+  return {
+    candidates: [...new Map([...titleMatches, ...keywordMatches].map((c) => [c.subCourseCode, c])).values()],
+    pickToken: terms[0] ?? token,
+  };
+}
+
+function transcriptWords(transcript: string): string[] {
+  return [
+    ...new Set(
+      normalizeTitle(transcript)
+        .split(" ")
+        .map((word) => spokenStem(word))
+        .filter((word) => word.length >= 4 && !TRANSCRIPT_STOPWORDS.has(word)),
+    ),
+  ];
+}
+
+function spokenStem(word: string): string {
+  if (word.length < 6) return word;
+  return word.replace(/(ing|ed|er|ers|na|ta|ti|te|ya|ye|yi|ne)$/u, "");
+}
+
+function catalogFallbackMatch(transcript: string, quals: QualRow[]): { match: QualRow; score: number } | null {
+  const words = transcriptWords(transcript);
+  if (words.length === 0) return null;
+
+  let best: { match: QualRow; score: number } | null = null;
+  for (const qual of quals) {
+    const title = normalizeTitle(qual.title);
+    const occupations = normalizeTitle((qual.proposedOccupations ?? []).join(" "));
+    const hay = `${title} ${occupations}`;
+    let score = 0;
+
+    for (const word of words) {
+      if (new RegExp(`\\b${word}`, "i").test(hay)) score += 2;
+      else if (word.length >= 5 && hay.includes(word)) score += 1;
+    }
+    if (score === 0) continue;
+    score -= Math.max(0, qual.nsqfLevel - 4) * 0.2;
+
+    if (!best || score > best.score) best = { match: qual, score };
+  }
+
+  return best && best.score >= 2 ? best : null;
+}
+
 /**
  * Map a raw transcript to NSQF qualifications.
  *
@@ -143,17 +232,43 @@ type CourseRow = { subCourseCode: string; subCourseName: string; sector: string;
  *     this is an independent real-data signal, not a scoring input.
  */
 export async function mapTranscriptToNsqf(transcript: string): Promise<MappingResult[]> {
-  // The lexicon only fires on phrases someone thought to write down, so a
-  // beneficiary describing their trade in their own words ("I do something
-  // related to honey") matched nothing. Fall back to the LLM, which is
-  // constrained to the same token vocabulary.
-  let tokens = extractSkills(transcript);
-  let matchedByLlm = false;
+  // Let the LLM interpret natural phrasing first when configured. It is still
+  // constrained to known catalogue tokens; keyword and catalogue matching stay
+  // as deterministic fallbacks for local/no-key development.
+  const llmTokens = await classifySkillsWithLlm(transcript);
+  const keywordTokens = extractSkills(transcript);
+  let matchedByLlm = llmTokens.length > 0;
+  let tokens = matchedByLlm ? llmTokens : keywordTokens;
   if (tokens.length === 0) {
-    tokens = await classifySkillsWithLlm(transcript);
-    matchedByLlm = tokens.length > 0;
-  }
-  if (tokens.length === 0) {
+    const { quals, pmajayCourses } = await loadCatalog();
+    const fallback = catalogFallbackMatch(transcript, quals);
+    if (fallback) {
+      const course = pickBestByTitle(
+        pmajayCourses.filter((c) => normalizeSectorForFallback(c.sector) === normalizeSectorForFallback(fallback.match.sector)),
+        fallback.match.title,
+        (c) => c.subCourseName,
+      );
+      return [
+        {
+          rawSkillText: transcript,
+          normalizedSkill: normalizeTitle(fallback.match.title).replace(/\s+/g, "-"),
+          nsqfQualificationId: fallback.match.id,
+          qpCode: fallback.match.qpCode,
+          title: cleanDisplayTitle(fallback.match.title),
+          sector: fallback.match.sector,
+          nsqfLevel: fallback.match.nsqfLevel,
+          confidence: Math.min(0.55, 0.35 + fallback.score * 0.05),
+          method: "keyword",
+          pmajayVerified: Boolean(course),
+          pmajayCourse: course
+            ? { subCourseCode: course.subCourseCode, subCourseName: course.subCourseName, sector: course.sector }
+            : null,
+          nsqfExpired: false,
+          proposedOccupations: fallback.match.proposedOccupations ?? [],
+        },
+      ];
+    }
+
     return [
       {
         rawSkillText: transcript,
@@ -183,16 +298,12 @@ export async function mapTranscriptToNsqf(transcript: string): Promise<MappingRe
     // all real matches, prefer whichever title most directly names the
     // concept, so the qualification actually returned is the most
     // representative one, not just the first row Postgres happened to return.
-    const qualCandidates = quals.filter((q) =>
-      q.keywords.map((k) => k.toLowerCase()).includes(token.toLowerCase()),
-    );
-    let match = pickBestByTitle(qualCandidates, token, (q) => q.title, (q) => q.nsqfLevel);
+    const activeQuals = qualificationCandidates(quals, token);
+    let match = pickBestByTitle(activeQuals.candidates, activeQuals.pickToken, (q) => q.title, (q) => q.nsqfLevel);
     let matchExpired = false;
     if (!match) {
-      const expiredCandidates = expiredQuals.filter((q) =>
-        q.keywords.map((k) => k.toLowerCase()).includes(token.toLowerCase()),
-      );
-      match = pickBestByTitle(expiredCandidates, token, (q) => q.title, (q) => q.nsqfLevel);
+      const expired = qualificationCandidates(expiredQuals, token);
+      match = pickBestByTitle(expired.candidates, expired.pickToken, (q) => q.title, (q) => q.nsqfLevel);
       matchExpired = Boolean(match);
     }
     // Several courses can share a broad concept (e.g. "masonry" also matches
@@ -200,10 +311,8 @@ export async function mapTranscriptToNsqf(transcript: string): Promise<MappingRe
     // whichever course title most directly names the concept itself, so the
     // example surfaced is the most representative one, not just the first
     // row Postgres happened to return.
-    const pmajayCandidates = pmajayCourses.filter((c) =>
-      c.keywords.map((k) => k.toLowerCase()).includes(token.toLowerCase()),
-    );
-    const pmajayMatch = pickBestByTitle(pmajayCandidates, token, (c) => c.subCourseName);
+    const pmajay = courseCandidates(pmajayCourses, token);
+    const pmajayMatch = pickBestByTitle(pmajay.candidates, pmajay.pickToken, (c) => c.subCourseName);
     const pmajayCourse = pmajayMatch
       ? { subCourseCode: pmajayMatch.subCourseCode, subCourseName: pmajayMatch.subCourseName, sector: pmajayMatch.sector }
       : null;
@@ -248,7 +357,7 @@ export async function mapTranscriptToNsqf(transcript: string): Promise<MappingRe
       normalizedSkill: token,
       nsqfQualificationId: match.id,
       qpCode: match.qpCode,
-      title: match.title,
+      title: cleanDisplayTitle(match.title),
       sector: match.sector,
       nsqfLevel: match.nsqfLevel,
       confidence,

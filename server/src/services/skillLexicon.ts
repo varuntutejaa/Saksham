@@ -379,8 +379,11 @@ export const SKILL_LEXICON: LexiconEntry[] = [
   // ── Electronics & Power (expanded) ──────────────────────────────────────
   {
     normalized: "ac-repair",
-    patterns: ["ac repair", "ac mechanic", "cooling machine", "एसी रिपेयर", "एसी मैकेनिक"],
-    titleTerms: ["refrigerat", "air condition", "hvac"],
+    patterns: [
+      "ac repair", "ac mechanic", "air conditioner", "air conditioning",
+      "conditioner repair", "cooling machine", "एसी रिपेयर", "एसी मैकेनिक",
+    ],
+    titleTerms: ["air conditioner", "air condition", "hvac", "refrigerat"],
   },
   {
     normalized: "electronics-repair",
@@ -471,6 +474,14 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     normalized: "insurance-agent",
     patterns: ["insurance agent", "bima agent", "बीमा एजेंट"],
   },
+  {
+    normalized: "accounting",
+    patterns: [
+      "accounting", "accounts", "accountant", "book keeping", "bookkeeping",
+      "tally", "gst filing", "billing accounts", "लेखा", "अकाउंटिंग", "अकाउंटेंट",
+    ],
+    titleTerms: ["account", "tally", "book keeping"],
+  },
 
   // ── Tourism & Hospitality ─────────────────────────────────────────────────
   {
@@ -521,6 +532,14 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     patterns: ["photography", "photo khichna", "photographer", "फोटोग्राफी", "फोटोग्राफर"],
   },
   {
+    normalized: "video-editing",
+    patterns: [
+      "video editing", "video edit", "make videos", "making videos", "video banana",
+      "video banata", "video banati", "content creator", "वीडियो एडिटिंग", "वीडियो बनाना",
+    ],
+    titleTerms: ["video editing", "web video", "video blogger", "editor"],
+  },
+  {
     normalized: "fitness-training",
     patterns: ["gym trainer", "fitness trainer", "yoga instructor", "जिम ट्रेनर", "योगा ट्रेनर"],
   },
@@ -537,6 +556,16 @@ export const SKILL_LEXICON: LexiconEntry[] = [
     normalized: "lab-technician",
     patterns: ["lab technician", "prayogshala", "lab assistant", "प्रयोगशाला सहायक"],
   },
+  {
+    normalized: "teaching",
+    patterns: [
+      "teacher", "teaching", "teach", "tutor", "tuition", "school teacher",
+      "play school", "children ko padhana", "bachchon ko padhana",
+      "adhyapak", "shikshak", "padhata hoon", "padhati hoon", "padhana",
+      "टीचर", "शिक्षक", "अध्यापक", "पढ़ाना", "बच्चों को पढ़ाना",
+    ],
+    titleTerms: ["play school", "school facilitator", "teacher", "tutoring", "tutor", "caregiver"],
+  },
 ];
 
 /** Extract normalized skill tokens from a free-text transcript. */
@@ -550,6 +579,11 @@ export function patternHitCount(transcript: string, normalized: string): number 
   if (!entry) return 0;
   const hay = normalizeText(transcript);
   return entry.patterns.filter((p) => patternMatches(hay, normalizeText(p))).length;
+}
+
+export function titleTermsForSkill(normalized: string): string[] {
+  const entry = SKILL_LEXICON.find((e) => e.normalized === normalized);
+  return entry?.titleTerms ?? [];
 }
 
 export function extractSkills(transcript: string): string[] {

@@ -87,7 +87,8 @@ function languageFromSpeechCode(code: string | null | undefined): LanguageCode |
 }
 
 export function hasSarvamApiKey(): boolean {
-  return Boolean(process.env.EXPO_PUBLIC_SARVAM_API_KEY?.trim());
+  const key = process.env.EXPO_PUBLIC_SARVAM_API_KEY?.trim();
+  return Boolean(key && !/^your[_-]/i.test(key) && !/actual[_-]?key/i.test(key));
 }
 
 export async function transcribeWithSarvam(
@@ -115,12 +116,17 @@ export async function transcribeWithSarvam(
       languageCode: languageFromSpeechCode(body.languageCode ?? body.language ?? body.language_code),
       languageProbability: body.languageProbability ?? body.language_probability ?? null,
     };
-  } catch {
-    // Local development fallback: keep the demo usable even if the API server is down.
+  } catch (err) {
+    if (!hasSarvamApiKey()) {
+      const message = err instanceof Error ? err.message : String(err);
+      throw new Error(
+        `${message || 'Server transcription failed'} Add SARVAM_API_KEY or GROQ_API_KEY to server/.env, then restart the server.`,
+      );
+    }
   }
 
   const apiKey = process.env.EXPO_PUBLIC_SARVAM_API_KEY?.trim();
-  if (!apiKey) {
+  if (!hasSarvamApiKey() || !apiKey) {
     throw new Error('Assistant server is unavailable and EXPO_PUBLIC_SARVAM_API_KEY is missing in app/.env');
   }
 

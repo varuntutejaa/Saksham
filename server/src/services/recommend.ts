@@ -2,6 +2,7 @@ import { prisma } from "../lib/prisma.js";
 import type { Language } from "@prisma/client";
 import { rationalePhrase } from "./i18n.js";
 import type { MappingResult } from "./nsqf.js";
+import { titleTermsForSkill } from "./skillLexicon.js";
 
 export interface CourseRecommendation {
   pmajayCourseId: string;
@@ -95,12 +96,18 @@ export async function recommendCourses(input: RecommendInput): Promise<CourseRec
   // "&"/"and" spellings differ between the two datasets, so widen the SQL filter
   // and settle the real comparison on the normalized form below.
   const sectorVariants = [...new Set(sectors.flatMap((s) => [s, s.replace(/ & /g, " and "), s.replace(/ and /g, " & ")]))];
+  const titleTerms = [...new Set(tokens.flatMap((token) => titleTermsForSkill(token)))];
 
   const candidates = await prisma.pmajayCourse.findMany({
     where: {
       OR: [
         ...(tokens.length ? [{ keywords: { hasSome: tokens } }] : []),
         ...(sectorVariants.length ? [{ sector: { in: sectorVariants } }] : []),
+        ...titleTerms.flatMap((term) => [
+          { subCourseName: { contains: term, mode: "insensitive" as const } },
+          { sector: { contains: term, mode: "insensitive" as const } },
+          { subSector: { contains: term, mode: "insensitive" as const } },
+        ]),
       ],
     },
     take: 300,

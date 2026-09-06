@@ -1,5 +1,10 @@
 import "dotenv/config";
 
+function hasRealValue(value: string): boolean {
+  const clean = value.trim();
+  return Boolean(clean && !/^your[_-]/i.test(clean) && !/actual[_-]?key/i.test(clean));
+}
+
 export const env = {
   port: Number(process.env.PORT ?? 4000),
   jwtSecret: process.env.JWT_SECRET ?? "dev-secret-change-me",
@@ -25,13 +30,13 @@ export const env = {
   stitchHost: process.env.STITCH_HOST ?? "",
 };
 
-export const hasLLM = Boolean(env.anthropicApiKey);
-export const hasSarvam = Boolean(env.sarvamApiKey);
-export const hasGroq = Boolean(env.groqApiKey);
-export const hasBhashini = Boolean(env.bhashiniApiKey && env.bhashiniUserId);
-export const hasSms = Boolean(env.smsApiKey);
+export const hasLLM = hasRealValue(env.anthropicApiKey);
+export const hasSarvam = hasRealValue(env.sarvamApiKey);
+export const hasGroq = hasRealValue(env.groqApiKey);
+export const hasBhashini = hasRealValue(env.bhashiniApiKey) && hasRealValue(env.bhashiniUserId);
+export const hasSms = hasRealValue(env.smsApiKey);
 /** A fixed OTP is only ever acceptable while there is no real SMS provider —
  *  once one is configured, real codes are always used regardless of DEMO_OTP. */
 export const useDemoOtp = env.demoOtp && !hasSms;
-export const hasTwilio = Boolean(env.twilioAccountSid && env.twilioAuthToken);
-export const hasStitch = Boolean(env.stitchApiKey || (env.stitchAccessToken && env.googleCloudProject));
+export const hasTwilio = hasRealValue(env.twilioAccountSid) && hasRealValue(env.twilioAuthToken);
+export const hasStitch = hasRealValue(env.stitchApiKey) || (hasRealValue(env.stitchAccessToken) && hasRealValue(env.googleCloudProject));

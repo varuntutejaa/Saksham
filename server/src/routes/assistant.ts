@@ -2,7 +2,7 @@ import { Router } from "express";
 import multer from "multer";
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
-import { transcribeAudio, synthesizeSpeech } from "../services/speech.js";
+import { transcribeAudio, synthesizeSpeech, TranscriptionUnavailableError } from "../services/speech.js";
 import { mapTranscriptToNsqf } from "../services/nsqf.js";
 import { recommendCourses } from "../services/recommend.js";
 import { matchJobs } from "../services/jobs.js";
@@ -76,11 +76,17 @@ assistantRouter.post("/converse", upload.single("audio"), async (req, res) => {
   let sttProvider: string | undefined;
   let sttConfidence: number | undefined;
   if (!transcript) {
-    const stt = await transcribeAudio(req.file?.buffer, language, {
-      autoDetect: autoDetectLanguage,
-      mimeType: req.file?.mimetype,
-      fileName: req.file?.originalname,
-    });
+    let stt;
+    try {
+      stt = await transcribeAudio(req.file?.buffer, language, {
+        autoDetect: autoDetectLanguage,
+        mimeType: req.file?.mimetype,
+        fileName: req.file?.originalname,
+      });
+    } catch (err) {
+      if (err instanceof TranscriptionUnavailableError) return res.status(503).json({ error: err.message });
+      throw err;
+    }
     transcript = stt.transcript;
     // Auto-detect helps STT transcribe accurately, but it must NOT change the
     // language we answer in: the beneficiary deliberately chose one, and a
@@ -218,11 +224,17 @@ assistantRouter.post("/transcribe", upload.single("audio"), async (req, res) => 
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
   if (!req.file?.buffer) return res.status(400).json({ error: "Audio file is required" });
 
-  const stt = await transcribeAudio(req.file.buffer, parsed.data.language, {
-    autoDetect: parsed.data.autoDetectLanguage,
-    mimeType: req.file?.mimetype,
-    fileName: req.file?.originalname,
-  });
+  let stt;
+  try {
+    stt = await transcribeAudio(req.file.buffer, parsed.data.language, {
+      autoDetect: parsed.data.autoDetectLanguage,
+      mimeType: req.file?.mimetype,
+      fileName: req.file?.originalname,
+    });
+  } catch (err) {
+    if (err instanceof TranscriptionUnavailableError) return res.status(503).json({ error: err.message });
+    throw err;
+  }
 
   res.json({
     transcript: stt.transcript,
@@ -306,4 +318,3 @@ assistantRouter.patch("/recommendations/:id", async (req, res) => {
     res.status(404).json({ error: "Recommendation not found" });
   }
 });
-
