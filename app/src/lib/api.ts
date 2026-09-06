@@ -352,6 +352,76 @@ export async function reprioritise(
 
 export type ProfileField = 'name' | 'gender' | 'age' | 'education';
 
+const HINDI_AGE_WORDS: [RegExp, number][] = [
+  [/\b(das|dus)\b|दस/u, 10],
+  [/\b(gyarah|gyaarah)\b|ग्यारह/u, 11],
+  [/\b(barah|baarah)\b|बारह/u, 12],
+  [/\b(terah|tera)\b|तेरह/u, 13],
+  [/\b(chaudah|choda)\b|चौदह/u, 14],
+  [/\b(pandrah|pandra)\b|पंद्रह/u, 15],
+  [/\b(solah|sola)\b|सोलह/u, 16],
+  [/\b(satrah|satra)\b|सत्रह/u, 17],
+  [/\b(atharah|athara)\b|अठारह/u, 18],
+  [/\b(unnis|unees)\b|उन्नीस/u, 19],
+  [/\b(bees|bis)\b|बीस/u, 20],
+  [/\b(pachis|pachees)\b|पच्चीस/u, 25],
+  [/\b(tis|tees)\b|तीस/u, 30],
+  [/\b(chalis|chaalis)\b|चालीस/u, 40],
+  [/\b(pachas|pachaas)\b|पचास/u, 50],
+  [/\b(sath|saath)\b|साठ/u, 60],
+  [/\b(sattar)\b|सत्तर/u, 70],
+  [/\b(assi|asi)\b|अस्सी/u, 80],
+  [/\b(nabbe)\b|नब्बे/u, 90],
+  [/\b(sau|sao)\b|सौ/u, 100],
+];
+
+function normalizeProfileAnswer(answer: string): string {
+  return answer
+    .toLowerCase()
+    .normalize('NFC')
+    .replace(/[०-९]/g, (digit) => String('०१२३४५६७८९'.indexOf(digit)))
+    .replace(/[।,.;:!?'"()]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function localProfileAnswer(field: ProfileField, answer: string): string | number | null {
+  const text = normalizeProfileAnswer(answer);
+  if (field === 'name') {
+    const cleaned = answer
+      .replace(/^(my name is|i am|i'm|mera naam|मेरा नाम|main|mein|मैं)\s+/i, '')
+      .replace(/\s+(hai|है)$/i, '')
+      .replace(/["'.]/g, '')
+      .trim();
+    return cleaned.length > 1 && cleaned.length <= 80 ? cleaned : null;
+  }
+  if (field === 'age') {
+    const match = text.match(/\d{1,3}/);
+    if (match) {
+      const age = Number(match[0]);
+      if (age >= 10 && age <= 100) return age;
+    }
+    for (const [pattern, age] of HINDI_AGE_WORDS) {
+      if (pattern.test(text)) return age;
+    }
+    return null;
+  }
+  if (field === 'gender') {
+    if (/\b(female|woman|girl|lady|mahila|ladki)\b|महिला|औरत|लड़की|स्त्री/u.test(text)) return 'female';
+    if (/\b(male|man|boy|aadmi|ladka|purush)\b|पुरुष|आदमी|लड़का/u.test(text)) return 'male';
+    if (/\b(other|transgender|non binary|non-binary)\b|अन्य|ट्रांसजेंडर/u.test(text)) return 'other';
+    return null;
+  }
+  if (/\b(postgrad|post graduate|post graduation|masters?|m\.?a|m\.?com|m\.?sc|pg)\b|स्नातकोत्तर|मास्टर/u.test(text)) return 'postgrad';
+  if (/\b(undergrad|graduate|graduation|degree|bachelor|b\.?a|b\.?com|b\.?sc|ba|bcom|bsc)\b|स्नातक|ग्रेजुएट|बीए|बी कॉम|बीएससी/u.test(text)) return 'undergrad';
+  if (/\b(iti|diploma|polytechnic)\b|आईटीआई|डिप्लोमा/u.test(text)) return 'iti_diploma';
+  if (/\b(12th|xii|twelfth|intermediate|senior secondary|barahvi|baarahvi|barvi)\b|बारहवीं|१२वीं|12वीं|12 वीं/u.test(text)) return '12th';
+  if (/\b(10th|xth|tenth|matric|secondary|dasvi|dasveen|daswin)\b|दसवीं|१०वीं|10वीं|10 वीं/u.test(text)) return '10th';
+  if (/\b(1st|2nd|3rd|4th|5th|6th|7th|8th|9th|primary|middle|below tenth|below 10th|ninth|eighth|seventh|sixth|fifth)\b|पहली|दूसरी|तीसरी|चौथी|पांचवीं|छठी|सातवीं|आठवीं|नौवीं/u.test(text)) return 'below_10th';
+  if (/\b(no school|not studied|illiterate|literate|none|nahi padha|nahi padhi)\b|नहीं पढ़ा|नहीं पढ़ी|अनपढ़/u.test(text)) return 'below_10th';
+  return null;
+}
+
 /**
  * Voice onboarding — turns a free-text answer (spoken or typed, any
  * language) into a structured gender/age/education value via an LLM.
@@ -362,13 +432,18 @@ export async function extractProfileAnswer(
   answer: string,
   language: LanguageCode,
 ): Promise<{ value: string | number | null }> {
-  const res = await fetch(`${API_BASE}/api/assistant/extract-profile-answer`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ field, answer, language }),
-  });
-  if (!res.ok) throw new Error(await extractError(res, 'Could not understand that answer'));
-  return res.json();
+  try {
+    const res = await fetch(`${API_BASE}/api/assistant/extract-profile-answer`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ field, answer, language }),
+    });
+    if (!res.ok) return { value: localProfileAnswer(field, answer) };
+    const result = (await res.json()) as { value: string | number | null };
+    return result.value === null ? { value: localProfileAnswer(field, answer) } : result;
+  } catch {
+    return { value: localProfileAnswer(field, answer) };
+  }
 }
 
 export interface TtsResult {
