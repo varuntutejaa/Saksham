@@ -43,9 +43,14 @@ const courses: Course[] = JSON.parse(fs.readFileSync(DATA_PATH, "utf8"));
 
 // Only Latin, reasonably specific patterns (>=4 chars, <=2 words) are usable
 // against English PM-AJAY course titles.
+// Speech patterns describe how a beneficiary TALKS ("madhumakhi palan");
+// titleTerms describe how the catalogue WRITES the same trade ("Honey bee
+// Farmer"). Catalogue rows are titles, so both are needed here — without
+// titleTerms whole trades (beekeeping, sericulture, bar-bending) match no
+// qualification at all and become unreachable for the voice pipeline.
 const conceptPatterns = SKILL_LEXICON.map((entry) => ({
   normalized: entry.normalized,
-  patterns: entry.patterns
+  patterns: [...entry.patterns, ...(entry.titleTerms ?? [])]
     .filter((p) => isLatinText(p) && p.length >= 4 && normalizeText(p).split(" ").length <= 2)
     .map((p) => normalizeText(p).split(" ").filter(Boolean)),
 }));

@@ -81,6 +81,38 @@ export interface NsqfMapping {
    *  (independent of the NSQF match above — see server/prisma/data/README-pmajay-courses.md) */
   pmajayVerified: boolean;
   pmajayCourse: { subCourseCode: string; subCourseName: string; sector: string } | null;
+  /** true when the matched qualification's NQR validity has lapsed. Shown with
+   *  a "certification lapsed" label — many lapsed trades (pottery, basket
+   *  making) still have live PM-AJAY training courses. */
+  nsqfExpired?: boolean;
+  /** Real job titles this qualification leads to (NQR "proposed occupations").
+   *  The catalogue holds no vacancies, so this is what "find work" answers with. */
+  proposedOccupations?: string[];
+}
+
+/** A job vacancy matched to the beneficiary's spoken skill.
+ *  `source` is provenance and MUST be shown: "SAMPLE" rows are demonstration
+ *  vacancies (anchored to real NSQF qualifications and real districts, but not
+ *  live openings); "EMPLOYER" rows were posted through the Saksham portal. */
+export interface JobMatch {
+  jobPostingId: string;
+  title: string;
+  titleHindi: string | null;
+  employerName: string;
+  sector: string | null;
+  nsqfLevel: number | null;
+  state: string | null;
+  district: string | null;
+  wageMin: number | null;
+  wageMax: number | null;
+  positions: number | null;
+  contactPhone: string | null;
+  source: string;
+  score: number;
+  /** job asks a higher NSQF level than the beneficiary has — reachable with training */
+  needsUpskilling: boolean;
+  nsqfQpCode: string | null;
+  nsqfTitle: string | null;
 }
 
 /** A real PM-AJAY course (one of the 2,366 in the government catalogue),
@@ -232,6 +264,7 @@ export interface ConverseResponse {
   stt?: { provider: string; confidence: number; language?: LanguageCode };
   mappings: NsqfMapping[];
   recommendations: CourseRecommendation[];
+  jobs?: JobMatch[];
   reply: { text: string; audioUrl: string; format: string };
 }
 
@@ -283,6 +316,30 @@ export async function converse(input: ConverseInput): Promise<ConverseResponse> 
   } catch {
     if (!input.transcript) throw new Error('Assistant server is unavailable');
     return localConverse(input.transcript, input.language, input.state, input.district, input.history);
+  }
+}
+
+/**
+ * Re-rank an existing session's recommendations for the intent the user picked
+ * on the confirm screen. Not a second converse() — it reuses the stored
+ * transcript server-side, so no duplicate session appears in the admin funnel.
+ * Ranking only: the same courses come back reordered, never filtered.
+ */
+export async function reprioritise(
+  sessionId: string,
+  intent: 'jobs' | 'training' | 'certificate' | 'guidance',
+): Promise<{ mappings: NsqfMapping[]; recommendations: CourseRecommendation[]; jobs?: JobMatch[] } | null> {
+  try {
+    const res = await fetch(`${API_BASE}/api/assistant/reprioritise`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId, intent }),
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    // offline or server down — keep the ordering we already have
+    return null;
   }
 }
 
@@ -459,6 +516,8 @@ function localConverse(
           method: 'local',
           pmajayVerified: false,
           pmajayCourse: null,
+          nsqfExpired: false,
+          proposedOccupations: [],
         }))
       : [
           {

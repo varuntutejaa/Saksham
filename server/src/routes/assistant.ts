@@ -5,6 +5,7 @@ import { prisma } from "../lib/prisma.js";
 import { transcribeAudio, synthesizeSpeech } from "../services/speech.js";
 import { mapTranscriptToNsqf } from "../services/nsqf.js";
 import { recommendCourses } from "../services/recommend.js";
+import { matchJobs } from "../services/jobs.js";
 import { buildSpokenReply } from "../services/reply.js";
 import { answerFromDocuments } from "../services/rag.js";
 import { extractProfileAnswer } from "../services/profileExtract.js";
@@ -57,10 +58,14 @@ assistantRouter.post("/converse", upload.single("audio"), async (req, res) => {
     bandwidthKbps: z.coerce.number().int().positive().optional(),
     history: z.string().optional(),
     autoDetectLanguage: z.coerce.boolean().default(true),
+    /** What the beneficiary said they want on the confirm screen. Steers
+     *  ranking only — the full result set is always returned underneath, so a
+     *  wrong guess never hides an opportunity. */
+    intent: z.enum(["jobs", "training", "certificate", "guidance"]).default("guidance"),
   });
   const parsed = schema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
-  const { language, state, district, userId, channel, bandwidthKbps, autoDetectLanguage } = parsed.data;
+  const { language, state, district, userId, channel, bandwidthKbps, autoDetectLanguage, intent } = parsed.data;
   const history = parseHistory(parsed.data.history);
   let effectiveLanguage = language;
 
@@ -89,7 +94,10 @@ assistantRouter.post("/converse", upload.single("audio"), async (req, res) => {
   const mappings = await mapTranscriptToNsqf(mappingTranscript);
 
   // 3. NSQF match -> real PM-AJAY courses
-  const recommendations = await recommendCourses({ mappings, state, language: effectiveLanguage });
+  const [recommendations, jobs] = await Promise.all([
+    recommendCourses({ mappings, state, language: effectiveLanguage, intent }),
+    matchJobs({ mappings, state, district }),
+  ]);
 
   // 4. Persist the session for the admin dashboard
   const session = await prisma.voiceSession.create({
@@ -144,8 +152,50 @@ assistantRouter.post("/converse", upload.single("audio"), async (req, res) => {
       ...r,
       recommendationId: session.recommendations[i]?.id,
     })),
+    jobs,
     reply: { text: spokenText, audioUrl: audio.audioUrl, format: audio.format },
   });
+});
+
+/**
+ * POST /api/assistant/reprioritise
+ * Re-ranks an existing session's recommendations for the intent the
+ * beneficiary picked on the confirm screen ("find work" / "certify what I
+ * already do" / ...). Deliberately NOT a second /converse: it reuses the
+ * session's stored transcript and creates no new VoiceSession, so the admin
+ * funnel still shows one session per spoken utterance.
+ *
+ * Ranking-only — the same courses come back, reordered. Nothing is filtered
+ * out, so picking the "wrong" option can never hide an opportunity.
+ */
+assistantRouter.post("/reprioritise", async (req, res) => {
+  const schema = z.object({
+    sessionId: z.string().min(1),
+    intent: z.enum(["jobs", "training", "certificate", "guidance"]),
+  });
+  const parsed = schema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+  const { sessionId, intent } = parsed.data;
+
+  const session = await prisma.voiceSession.findUnique({ where: { id: sessionId } });
+  if (!session) return res.status(404).json({ error: "Session not found" });
+
+  // a session recorded with no usable transcript has nothing to re-rank
+  if (!session.rawTranscript) return res.json({ sessionId, intent, mappings: [], recommendations: [], jobs: [] });
+
+  const mappings = await mapTranscriptToNsqf(session.rawTranscript);
+  const [recommendations, jobs] = await Promise.all([
+    recommendCourses({
+      mappings,
+      state: session.state,
+      district: session.district,
+      language: session.language,
+      intent,
+    }),
+    matchJobs({ mappings, state: session.state, district: session.district }),
+  ]);
+
+  res.json({ sessionId, intent, mappings, recommendations, jobs });
 });
 
 /**

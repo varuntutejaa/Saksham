@@ -15,7 +15,7 @@ export function getLastResult(): ConverseResponse | null {
   return lastResult;
 }
 
-export type Intent = 'jobs' | 'training' | 'certificate';
+export type Intent = 'jobs' | 'training' | 'certificate' | 'guidance';
 
 let intent: Intent = 'training';
 

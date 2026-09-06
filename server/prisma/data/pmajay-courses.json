@@ -305,7 +305,9 @@
     "courseName": "Fulfilment Centre Operations, Order Processing",
     "subCourseCode": "LSC/Q2603",
     "subCourseName": "E-commerce Delivery Associate",
-    "keywords": []
+    "keywords": [
+      "delivery-executive"
+    ]
   },
   {
     "srNo": 31,
@@ -336,7 +338,8 @@
     "subCourseCode": "CII/BSC/Q0301",
     "subCourseName": "Sales Executive (Banking & Finance)",
     "keywords": [
-      "retail"
+      "retail",
+      "banking-correspondent"
     ]
   },
   {
@@ -533,7 +536,9 @@
     "courseName": "Technician - Last Mile Active Network",
     "subCourseCode": "TEL/Q6101",
     "subCourseName": "Technician - Last Mile Active Network",
-    "keywords": []
+    "keywords": [
+      "delivery-executive"
+    ]
   },
   {
     "srNo": 53,
@@ -554,7 +559,8 @@
     "subCourseCode": "ASP/CON/Q0101(v2.0)",
     "subCourseName": "Marine Structural Fitter and Fabricator",
     "keywords": [
-      "masonry"
+      "masonry",
+      "fitter"
     ]
   },
   {
@@ -977,7 +983,9 @@
     "courseName": "Assistant Creche Caretaker",
     "subCourseCode": "DWC/Q0207",
     "subCourseName": "Assistant Creche Caretaker",
-    "keywords": []
+    "keywords": [
+      "childcare"
+    ]
   },
   {
     "srNo": 96,
@@ -1520,7 +1528,9 @@
     "courseName": "Original Stain Glass Painting",
     "subCourseCode": "RSETI/610",
     "subCourseName": "Original Stain Glass Painting",
-    "keywords": []
+    "keywords": [
+      "house-painting"
+    ]
   },
   {
     "srNo": 148,
@@ -1570,7 +1580,10 @@
     "courseName": "White washing coloring, wall writing and painting",
     "subCourseCode": "RSETI/246",
     "subCourseName": "White washing coloring, wall writing and painting",
-    "keywords": []
+    "keywords": [
+      "house-painting",
+      "car-wash"
+    ]
   },
   {
     "srNo": 153,
@@ -1914,7 +1927,9 @@
     "courseName": "Mural Painting",
     "subCourseCode": "RSETI/236",
     "subCourseName": "Mural Painting",
-    "keywords": []
+    "keywords": [
+      "house-painting"
+    ]
   },
   {
     "srNo": 185,
@@ -2064,7 +2079,9 @@
     "courseName": "Cotton Ginning Mill Fitter Training",
     "subCourseCode": "RSETI/243",
     "subCourseName": "Cotton Ginning Mill Fitter Training",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 199,
@@ -2109,7 +2126,8 @@
     "subCourseCode": "RSETI/223",
     "subCourseName": "Automobile, Electrical and A/C Repairs & Services",
     "keywords": [
-      "electrical"
+      "electrical",
+      "car-repair"
     ]
   },
   {
@@ -2311,7 +2329,9 @@
     "courseName": "Stained Glass Etching & Painting",
     "subCourseCode": "RSETI/304",
     "subCourseName": "Stained Glass Etching & Painting",
-    "keywords": []
+    "keywords": [
+      "house-painting"
+    ]
   },
   {
     "srNo": 222,
@@ -2528,7 +2548,8 @@
     "subCourseCode": "RSETI/303",
     "subCourseName": "Embroidery & Fabric Painting",
     "keywords": [
-      "embroidery"
+      "embroidery",
+      "house-painting"
     ]
   },
   {
@@ -2801,7 +2822,8 @@
     "subCourseCode": "RSETI/104",
     "subCourseName": "Advanced Dairy Management",
     "keywords": [
-      "dairy-livestock"
+      "dairy-livestock",
+      "dairy-processing"
     ]
   },
   {
@@ -2888,7 +2910,8 @@
     "subCourseName": "Dairy Farming",
     "keywords": [
       "agriculture",
-      "dairy-livestock"
+      "dairy-livestock",
+      "dairy-processing"
     ]
   },
   {
@@ -3073,7 +3096,9 @@
     "courseName": "MECHANIC TWO &THREEWHEELER",
     "subCourseCode": "DGT/1068",
     "subCourseName": "MECHANIC TWO &THREEWHEELER",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 294,
@@ -3332,7 +3357,8 @@
     "subCourseName": "Dairy Farming and Vermi Compost Making",
     "keywords": [
       "agriculture",
-      "dairy-livestock"
+      "dairy-livestock",
+      "dairy-processing"
     ]
   },
   {
@@ -3699,7 +3725,9 @@
     "courseName": "Customer Service",
     "subCourseCode": "THC/Q2901",
     "subCourseName": "Order Taker Home Delivery",
-    "keywords": []
+    "keywords": [
+      "delivery-executive"
+    ]
   },
   {
     "srNo": 353,
@@ -3886,7 +3914,8 @@
     "subCourseCode": "THC/Q0201",
     "subCourseName": "House keeping Supervisor",
     "keywords": [
-      "housekeeping"
+      "housekeeping",
+      "hotel-housekeeping"
     ]
   },
   {
@@ -3898,7 +3927,8 @@
     "subCourseCode": "THC/Q0202",
     "subCourseName": "Room Attendant",
     "keywords": [
-      "housekeeping"
+      "housekeeping",
+      "hotel-housekeeping"
     ]
   },
   {
@@ -3910,7 +3940,8 @@
     "subCourseCode": "THC/Q0203",
     "subCourseName": "Housekeeping Attendant (Manual Cleaner)",
     "keywords": [
-      "housekeeping"
+      "housekeeping",
+      "hotel-housekeeping"
     ]
   },
   {
@@ -3922,7 +3953,8 @@
     "subCourseCode": "THC/Q0204",
     "subCourseName": "Laundry Valet",
     "keywords": [
-      "housekeeping"
+      "housekeeping",
+      "hotel-housekeeping"
     ]
   },
   {
@@ -3934,7 +3966,8 @@
     "subCourseCode": "THC/Q0205",
     "subCourseName": "Laundry Machine Operator",
     "keywords": [
-      "housekeeping"
+      "housekeeping",
+      "hotel-housekeeping"
     ]
   },
   {
@@ -3946,7 +3979,8 @@
     "subCourseCode": "THC/Q0206",
     "subCourseName": "Executive Housekeeper",
     "keywords": [
-      "housekeeping"
+      "housekeeping",
+      "hotel-housekeeping"
     ]
   },
   {
@@ -3958,7 +3992,8 @@
     "subCourseCode": "THC/Q0207",
     "subCourseName": "House keeping Manager",
     "keywords": [
-      "housekeeping"
+      "housekeeping",
+      "hotel-housekeeping"
     ]
   },
   {
@@ -3970,7 +4005,8 @@
     "subCourseCode": "THC/Q0208",
     "subCourseName": "House keeping Executive",
     "keywords": [
-      "housekeeping"
+      "housekeeping",
+      "hotel-housekeeping"
     ]
   },
   {
@@ -3982,7 +4018,8 @@
     "subCourseCode": "THC/Q0209",
     "subCourseName": "Housekeeping Trainee",
     "keywords": [
-      "housekeeping"
+      "housekeeping",
+      "hotel-housekeeping"
     ]
   },
   {
@@ -3994,7 +4031,8 @@
     "subCourseCode": "THC/Q0210",
     "subCourseName": "Laundry Supervisor",
     "keywords": [
-      "housekeeping"
+      "housekeeping",
+      "hotel-housekeeping"
     ]
   },
   {
@@ -4576,7 +4614,8 @@
     "subCourseCode": "TSC/Q2404",
     "subCourseName": "Fitter - Shuttleless Weaving Machine: Projectile",
     "keywords": [
-      "handloom-weaving"
+      "handloom-weaving",
+      "fitter"
     ]
   },
   {
@@ -4588,7 +4627,8 @@
     "subCourseCode": "TSC/Q2405",
     "subCourseName": "Fitter - Shuttleless Weaving Machine: Air-Jet",
     "keywords": [
-      "handloom-weaving"
+      "handloom-weaving",
+      "fitter"
     ]
   },
   {
@@ -4600,7 +4640,8 @@
     "subCourseCode": "TSC/Q2406",
     "subCourseName": "Fitter Helper - Weaving",
     "keywords": [
-      "handloom-weaving"
+      "handloom-weaving",
+      "fitter"
     ]
   },
   {
@@ -4828,7 +4869,8 @@
     "subCourseCode": "TSC/Q2401",
     "subCourseName": "Fitter Weaving Preparatory",
     "keywords": [
-      "handloom-weaving"
+      "handloom-weaving",
+      "fitter"
     ]
   },
   {
@@ -4972,7 +5014,8 @@
     "subCourseCode": "TSC/Q2401",
     "subCourseName": "Fitter Weaving Preparatory",
     "keywords": [
-      "handloom-weaving"
+      "handloom-weaving",
+      "fitter"
     ]
   },
   {
@@ -4984,7 +5027,8 @@
     "subCourseCode": "TSC/Q2402",
     "subCourseName": "Fitter - Autoloom Weaving Machine",
     "keywords": [
-      "handloom-weaving"
+      "handloom-weaving",
+      "fitter"
     ]
   },
   {
@@ -4996,7 +5040,8 @@
     "subCourseCode": "TSC/Q2403",
     "subCourseName": "Fitter - Shuttleless Weaving Machine: Rapier",
     "keywords": [
-      "handloom-weaving"
+      "handloom-weaving",
+      "fitter"
     ]
   },
   {
@@ -5008,7 +5053,8 @@
     "subCourseCode": "TSC/Q2404",
     "subCourseName": "Fitter - Shuttleless Weaving Machine: Projectile",
     "keywords": [
-      "handloom-weaving"
+      "handloom-weaving",
+      "fitter"
     ]
   },
   {
@@ -5020,7 +5066,8 @@
     "subCourseCode": "TSC/Q2405",
     "subCourseName": "Fitter - Shuttleless Weaving Machine: Air-Jet",
     "keywords": [
-      "handloom-weaving"
+      "handloom-weaving",
+      "fitter"
     ]
   },
   {
@@ -5044,7 +5091,8 @@
     "subCourseCode": "TSC/Q2407",
     "subCourseName": "Shutttleless Loom Fitter - Water Jet",
     "keywords": [
-      "handloom-weaving"
+      "handloom-weaving",
+      "fitter"
     ]
   },
   {
@@ -5395,7 +5443,9 @@
     "courseName": "Spinning Preparatory",
     "subCourseCode": "TSC/Q0903",
     "subCourseName": "Assistant Ginning Fitter",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 508,
@@ -5455,7 +5505,9 @@
     "courseName": "Ginning",
     "subCourseCode": "TSC/Q0903",
     "subCourseName": "Assistant Ginning Fitter",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 514,
@@ -5475,7 +5527,9 @@
     "courseName": "Maintenance-Spinning Machines",
     "subCourseCode": "TSC/Q0401",
     "subCourseName": "Fitter Spinning Preparatory",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 516,
@@ -5485,7 +5539,9 @@
     "courseName": "Maintenance-Spinning Machines",
     "subCourseCode": "TSC/Q0402",
     "subCourseName": "Fitter - Ring Spinning",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 517,
@@ -5495,7 +5551,9 @@
     "courseName": "Maintenance-Spinning Machines",
     "subCourseCode": "TSC/Q0403",
     "subCourseName": "Fitter - Post Spinning",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 518,
@@ -5595,7 +5653,9 @@
     "courseName": "Spinning maintenance",
     "subCourseCode": "TSC/Q0401",
     "subCourseName": "Fitter Spinning Preparatory",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 528,
@@ -5605,7 +5665,9 @@
     "courseName": "Spinning maintenance",
     "subCourseCode": "TSC/Q0402",
     "subCourseName": "Fitter - Ring Spinning",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 529,
@@ -5615,7 +5677,9 @@
     "courseName": "Spinning maintenance",
     "subCourseCode": "TSC/Q0403",
     "subCourseName": "Fitter - Post Spinning",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 530,
@@ -5645,7 +5709,9 @@
     "courseName": "Maintenance - Processing Machines",
     "subCourseCode": "TSC/Q5701",
     "subCourseName": "Fitter - Chemical Processing (Textiles)",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 533,
@@ -5770,7 +5836,8 @@
     "subCourseCode": "TSC/Q7101",
     "subCourseName": "Cocoon tester cum purchaser",
     "keywords": [
-      "handloom-weaving"
+      "handloom-weaving",
+      "sericulture"
     ]
   },
   {
@@ -5782,7 +5849,8 @@
     "subCourseCode": "TSC/Q7102",
     "subCourseName": "Mulberry cocoon sorter, drier cum grader",
     "keywords": [
-      "handloom-weaving"
+      "handloom-weaving",
+      "sericulture"
     ]
   },
   {
@@ -5919,7 +5987,9 @@
     "courseName": "Knitting maintenance",
     "subCourseCode": "TSC/Q4201",
     "subCourseName": "Knitting Machine Fitter",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 557,
@@ -5959,7 +6029,9 @@
     "courseName": "Post Processing",
     "subCourseCode": "TSC/Q5301",
     "subCourseName": "Washing Range Operator",
-    "keywords": []
+    "keywords": [
+      "car-wash"
+    ]
   },
   {
     "srNo": 561,
@@ -6093,7 +6165,9 @@
     "courseName": "Processing maintenance",
     "subCourseCode": "TSC/Q5701",
     "subCourseName": "Fitter - Processing",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 574,
@@ -6604,6 +6678,7 @@
     "subCourseCode": "TEL/Q2101",
     "subCourseName": "In-Store Promoter",
     "keywords": [
+      "mobile-repair",
       "retail"
     ]
   },
@@ -6616,6 +6691,7 @@
     "subCourseCode": "TEL/Q2100",
     "subCourseName": "Distributor Sales Representative",
     "keywords": [
+      "mobile-repair",
       "retail"
     ]
   },
@@ -6628,6 +6704,7 @@
     "subCourseCode": "TEL/Q2101",
     "subCourseName": "In-Store Promoter",
     "keywords": [
+      "mobile-repair",
       "retail"
     ]
   },
@@ -6653,7 +6730,9 @@
     "courseName": "Terminal Equipment Application Developer",
     "subCourseCode": "TEL/Q2300",
     "subCourseName": "Telecom Terminal Equipment Application Developer (Android)",
-    "keywords": []
+    "keywords": [
+      "mobile-repair"
+    ]
   },
   {
     "srNo": 625,
@@ -6663,7 +6742,9 @@
     "courseName": "Terminal Equipment Application Developer",
     "subCourseCode": "TEL/Q2301",
     "subCourseName": "Telecom Terminal Equipment Application Developer (Native)",
-    "keywords": []
+    "keywords": [
+      "mobile-repair"
+    ]
   },
   {
     "srNo": 626,
@@ -6673,7 +6754,9 @@
     "courseName": "Terminal Equipment Application Developer",
     "subCourseCode": "TEL/Q2303",
     "subCourseName": "Telecom Embedded Hardware Developer",
-    "keywords": []
+    "keywords": [
+      "mobile-repair"
+    ]
   },
   {
     "srNo": 627,
@@ -6828,7 +6911,9 @@
     "courseName": "Customer Service - Handset Segment",
     "subCourseCode": "TEL/Q2201",
     "subCourseName": "Handheld Devices (Handset & Tablet) Technician",
-    "keywords": []
+    "keywords": [
+      "mobile-repair"
+    ]
   },
   {
     "srNo": 642,
@@ -6838,7 +6923,9 @@
     "courseName": "E-Waste Management",
     "subCourseCode": "TEL/Q2400",
     "subCourseName": "E-Waste Collector",
-    "keywords": []
+    "keywords": [
+      "mobile-repair"
+    ]
   },
   {
     "srNo": 643,
@@ -6849,6 +6936,7 @@
     "subCourseCode": "TEL/Q2100",
     "subCourseName": "Distributor Sales Representative",
     "keywords": [
+      "mobile-repair",
       "retail"
     ]
   },
@@ -6860,7 +6948,9 @@
     "courseName": "Reclaim Rubber",
     "subCourseCode": "RSC/Q3702",
     "subCourseName": "Rubber Product Reclaim Operator",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 645,
@@ -6880,7 +6970,9 @@
     "courseName": "Storage & Warehousing",
     "subCourseCode": "RSC/Q1605",
     "subCourseName": "Warehouse Supervisor",
-    "keywords": []
+    "keywords": [
+      "warehouse-operations"
+    ]
   },
   {
     "srNo": 647,
@@ -6900,7 +6992,9 @@
     "courseName": "Calendaring",
     "subCourseCode": "RSC/Q2702",
     "subCourseName": "Rubber Calendering Supervisor",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 649,
@@ -7056,7 +7150,9 @@
     "courseName": "Communication Electronics",
     "subCourseCode": "TEL/Q2500",
     "subCourseName": "Hand Soldering Technician Telecom Board",
-    "keywords": []
+    "keywords": [
+      "mobile-repair"
+    ]
   },
   {
     "srNo": 664,
@@ -7066,7 +7162,9 @@
     "courseName": "Communication Electronics",
     "subCourseCode": "TEL/Q2501",
     "subCourseName": "Telecom Surface Mount Technology (SMT) Technician",
-    "keywords": []
+    "keywords": [
+      "mobile-repair"
+    ]
   },
   {
     "srNo": 665,
@@ -7076,7 +7174,9 @@
     "courseName": "Communication Electronics",
     "subCourseCode": "TEL/Q2502",
     "subCourseName": "Line Assembler - Telecom Products",
-    "keywords": []
+    "keywords": [
+      "mobile-repair"
+    ]
   },
   {
     "srNo": 666,
@@ -7086,7 +7186,9 @@
     "courseName": "Quality Assurance",
     "subCourseCode": "RSC/Q2401",
     "subCourseName": "Rubber Product-Quality Assurance Supervisor",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 667,
@@ -7096,7 +7198,9 @@
     "courseName": "Reclaim Rubber",
     "subCourseCode": "RSC/Q3701",
     "subCourseName": "Whole Tyre Reclaim Operator",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 668,
@@ -7116,7 +7220,9 @@
     "courseName": "Moulding/Curing",
     "subCourseCode": "RSC/Q2201",
     "subCourseName": "Rubber Curing Operator",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 670,
@@ -7126,7 +7232,9 @@
     "courseName": "Production",
     "subCourseCode": "RSC/Q0831",
     "subCourseName": "Junior Rubber Technician/Technical Assistant",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 671,
@@ -7196,7 +7304,9 @@
     "courseName": "Tyre Cord Dipping",
     "subCourseCode": "RSC/Q2901",
     "subCourseName": "Rubber Adhesive Fabric Dipping Operator",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 678,
@@ -7226,7 +7336,9 @@
     "courseName": "Tyre Servicing/Maintenance",
     "subCourseCode": "RSC/Q3601",
     "subCourseName": "Tyre Fitter-Servicing and Maintenance",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 681,
@@ -7246,7 +7358,9 @@
     "courseName": "Calendering",
     "subCourseCode": "RSC/Q2701",
     "subCourseName": "Rubber Calendering Operator",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 683,
@@ -7256,7 +7370,9 @@
     "courseName": "Extrusion",
     "subCourseCode": "RSC/Q2601",
     "subCourseName": "Rubber Extruder Operator",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 684,
@@ -7266,7 +7382,9 @@
     "courseName": "Extrusion",
     "subCourseCode": "RSC/Q2602",
     "subCourseName": "Rubber Tube Extruder Operator",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 685,
@@ -7276,7 +7394,9 @@
     "courseName": "Final Finish",
     "subCourseCode": "RSC/Q3201",
     "subCourseName": "Rubber Product Finishing Operator",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 686,
@@ -7286,7 +7406,9 @@
     "courseName": "Final Finish",
     "subCourseCode": "RSC/Q3202",
     "subCourseName": "Rubber Product Finishing Supervisor",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 687,
@@ -7296,7 +7418,9 @@
     "courseName": "Lab Chemist",
     "subCourseCode": "RSC/Q2301",
     "subCourseName": "Lab Chemist-Rubber",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 688,
@@ -7306,7 +7430,9 @@
     "courseName": "Mixing",
     "subCourseCode": "RSC/Q0101",
     "subCourseName": "Rubber Mill Operator",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 689,
@@ -7316,7 +7442,9 @@
     "courseName": "Mixing",
     "subCourseCode": "RSC/Q0110",
     "subCourseName": "Rubber Adhesive/Cement Mixing Operator",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 690,
@@ -7336,7 +7464,9 @@
     "courseName": "Mixing",
     "subCourseCode": "RSC/Q0112",
     "subCourseName": "Rubber Internal Mixer Operator",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 692,
@@ -7346,7 +7476,9 @@
     "courseName": "Mixing",
     "subCourseCode": "RSC/Q0113",
     "subCourseName": "Rubber Pre-Mixing Operator",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 693,
@@ -7356,7 +7488,9 @@
     "courseName": "Moulding/Curing",
     "subCourseCode": "RSC/Q0205",
     "subCourseName": "Rubber Compression Moulding Operator",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 694,
@@ -7376,7 +7510,9 @@
     "courseName": "Moulding/Curing",
     "subCourseCode": "RSC/Q0207",
     "subCourseName": "Rubber Injection Moulding Operator",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 696,
@@ -7386,7 +7522,9 @@
     "courseName": "Moulding/Curing",
     "subCourseCode": "RSC/Q0210",
     "subCourseName": "Rubber Autoclave Operator",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 697,
@@ -7668,7 +7806,9 @@
     "courseName": "Extrusion",
     "subCourseCode": "RSC/Q2603",
     "subCourseName": "Rubber Extrusion Supervisor",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 725,
@@ -7879,7 +8019,8 @@
     "subCourseCode": "RSC/Q6004",
     "subCourseName": "Rubber Nursery Worker-Budder",
     "keywords": [
-      "horticulture"
+      "horticulture",
+      "rubber-processing"
     ]
   },
   {
@@ -7891,7 +8032,8 @@
     "subCourseCode": "RSC/Q6005",
     "subCourseName": "Rubber Nursery Worker-General",
     "keywords": [
-      "horticulture"
+      "horticulture",
+      "rubber-processing"
     ]
   },
   {
@@ -7903,7 +8045,8 @@
     "subCourseCode": "RSC/Q6301",
     "subCourseName": "Officer (Purchase/Sale) Technically Specified Rubber",
     "keywords": [
-      "retail"
+      "retail",
+      "rubber-processing"
     ]
   },
   {
@@ -7915,7 +8058,8 @@
     "subCourseCode": "RSC/Q6302",
     "subCourseName": "Market Analyst cum Supervisior (Ribbed smoked sheet Trading)",
     "keywords": [
-      "retail"
+      "retail",
+      "rubber-processing"
     ]
   },
   {
@@ -7958,7 +8102,9 @@
     "courseName": "Production - Natural Rubber",
     "subCourseCode": "RSC/Q6101",
     "subCourseName": "General Worker ( CENEX )",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 753,
@@ -7968,7 +8114,9 @@
     "courseName": "Production - Natural Rubber",
     "subCourseCode": "RSC/Q6102",
     "subCourseName": "General Worker (Ribbed smoked sheet Trading)",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 754,
@@ -7978,7 +8126,9 @@
     "courseName": "Production - Natural Rubber",
     "subCourseCode": "RSC/Q6103",
     "subCourseName": "Latex Harvest Technician (Tapper)",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 755,
@@ -7988,7 +8138,9 @@
     "courseName": "Production - Natural Rubber",
     "subCourseCode": "RSC/Q6104",
     "subCourseName": "Storage Assistant (Ribbed smoked sheet Trading)",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 756,
@@ -7998,7 +8150,9 @@
     "courseName": "Production - Natural Rubber",
     "subCourseCode": "RSC/Q6105",
     "subCourseName": "Rubber Plantation Manager",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 757,
@@ -8008,7 +8162,9 @@
     "courseName": "Production - Natural Rubber",
     "subCourseCode": "RSC/Q6106",
     "subCourseName": "Rubber Plantation Supervisor",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 758,
@@ -8018,7 +8174,9 @@
     "courseName": "Production - Natural Rubber",
     "subCourseCode": "RSC/Q6107",
     "subCourseName": "General Worker-Rubber Plantation",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 759,
@@ -8028,7 +8186,9 @@
     "courseName": "Production - Natural Rubber",
     "subCourseCode": "RSC/Q6109",
     "subCourseName": "Field Supervisor (Latex Harvest)",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 760,
@@ -8038,7 +8198,9 @@
     "courseName": "Production - Natural Rubber",
     "subCourseCode": "RSC/Q6110",
     "subCourseName": "Manager Production (CENEX)",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 761,
@@ -8048,7 +8210,9 @@
     "courseName": "Production - Natural Rubber",
     "subCourseCode": "RSC/Q6111",
     "subCourseName": "Supervisor (CENEX)",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 762,
@@ -8058,7 +8222,9 @@
     "courseName": "Production - Natural Rubber",
     "subCourseCode": "RSC/Q6112",
     "subCourseName": "Factory Manager Technically Specified Rubber",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 763,
@@ -8068,7 +8234,9 @@
     "courseName": "Production - Natural Rubber",
     "subCourseCode": "RSC/Q6113",
     "subCourseName": "Supervisor-Technically Specified Rubber",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 764,
@@ -8078,7 +8246,9 @@
     "courseName": "Production - Natural Rubber",
     "subCourseCode": "RSC/Q6114",
     "subCourseName": "Processing Assistant Technically Specified Rubber",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 765,
@@ -8088,7 +8258,9 @@
     "courseName": "Production - Natural Rubber",
     "subCourseCode": "RSC/Q6115",
     "subCourseName": "Manager Rubber Sheeting",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 766,
@@ -8098,7 +8270,9 @@
     "courseName": "Production - Natural Rubber",
     "subCourseCode": "RSC/Q6116",
     "subCourseName": "Processing Supervisor-Rubber Sheeting",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 767,
@@ -8108,7 +8282,9 @@
     "courseName": "Production - Natural Rubber",
     "subCourseCode": "RSC/Q6117",
     "subCourseName": "Processing Technician-Rubber Sheeting",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 768,
@@ -8118,7 +8294,9 @@
     "courseName": "Production - Natural Rubber",
     "subCourseCode": "RSC/Q6125",
     "subCourseName": "Grader (Ribbed smoked sheet Trading)",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 769,
@@ -8128,7 +8306,9 @@
     "courseName": "Quality Control",
     "subCourseCode": "RSC/Q0403",
     "subCourseName": "Manager QA (CENEX)",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 770,
@@ -8138,7 +8318,9 @@
     "courseName": "Quality Control",
     "subCourseCode": "RSC/Q0404",
     "subCourseName": "Quality Controller-Technically Specified Rubber",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 771,
@@ -8149,7 +8331,8 @@
     "subCourseCode": "RSC/Q6001",
     "subCourseName": "Rubber Nursery Manager",
     "keywords": [
-      "horticulture"
+      "horticulture",
+      "rubber-processing"
     ]
   },
   {
@@ -8161,7 +8344,8 @@
     "subCourseCode": "RSC/Q6002",
     "subCourseName": "Rubber Nursery Supervisor",
     "keywords": [
-      "horticulture"
+      "horticulture",
+      "rubber-processing"
     ]
   },
   {
@@ -8263,6 +8447,7 @@
     "subCourseCode": "RSC/Q0303",
     "subCourseName": "Laboratory Assistant/Chemist",
     "keywords": [
+      "rubber-processing",
       "lab-technician"
     ]
   },
@@ -8316,7 +8501,9 @@
     "courseName": "Latex Product Manufacturing",
     "subCourseCode": "RSC/Q3403",
     "subCourseName": "Rubber Foaming Machine Operator",
-    "keywords": []
+    "keywords": [
+      "rubber-processing"
+    ]
   },
   {
     "srNo": 788,
@@ -8534,7 +8721,9 @@
     "courseName": "Training Delivery",
     "subCourseCode": "PWD/Q0101",
     "subCourseName": "Trainer- Persons with Disability",
-    "keywords": []
+    "keywords": [
+      "delivery-executive"
+    ]
   },
   {
     "srNo": 808,
@@ -8664,7 +8853,9 @@
     "courseName": "Operation and Maintenance - Distribution",
     "subCourseCode": "PSS/Q2407",
     "subCourseName": "Electric Vehicle (EV) Charging Station- Technician (Operation and Maintenance)",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 819,
@@ -8719,7 +8910,8 @@
     "subCourseCode": "PSS/Q0201",
     "subCourseName": "Pipe Fitter (Power Plant)",
     "keywords": [
-      "plumbing"
+      "plumbing",
+      "fitter"
     ]
   },
   {
@@ -8770,7 +8962,9 @@
     "courseName": "Plant & Equipment Maintenance",
     "subCourseCode": "PSS/Q0301",
     "subCourseName": "Power Plant Millwright Fitter",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 829,
@@ -8834,7 +9028,9 @@
     "courseName": "Erection, Installation and Commissioning - Distribution",
     "subCourseCode": "PSS/Q2503",
     "subCourseName": "Electric Vehicle (EV) Charging Station - Technician (Installation & Commissioning)",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 835,
@@ -9107,7 +9303,9 @@
     "courseName": "Decorative and Industrial Paint Application",
     "subCourseCode": "PCS/Q5005",
     "subCourseName": "Painting Helper",
-    "keywords": []
+    "keywords": [
+      "house-painting"
+    ]
   },
   {
     "srNo": 859,
@@ -9614,7 +9812,9 @@
     "courseName": "Field Services MechanicalWorkshop Mechanical",
     "subCourseCode": "MIN/Q0304",
     "subCourseName": "Mechanic/Fitter",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 902,
@@ -9646,7 +9846,9 @@
     "courseName": "Mechanical Services",
     "subCourseCode": "MIN/Q3203",
     "subCourseName": "Mine Mechanic/Fitter",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 905,
@@ -10086,7 +10288,9 @@
     "courseName": "Training Delivery",
     "subCourseCode": "MEP/Q2601",
     "subCourseName": "Trainer",
-    "keywords": []
+    "keywords": [
+      "delivery-executive"
+    ]
   },
   {
     "srNo": 948,
@@ -10096,7 +10300,9 @@
     "courseName": "Training Delivery",
     "subCourseCode": "MEP/Q2602",
     "subCourseName": "Master Trainer",
-    "keywords": []
+    "keywords": [
+      "delivery-executive"
+    ]
   },
   {
     "srNo": 949,
@@ -10106,7 +10312,9 @@
     "courseName": "Training Delivery",
     "subCourseCode": "MEP/Q2603",
     "subCourseName": "Demonstrator cum Instructor",
-    "keywords": []
+    "keywords": [
+      "delivery-executive"
+    ]
   },
   {
     "srNo": 950,
@@ -10636,7 +10844,9 @@
     "courseName": "Port Operations Coordination, Liquid transport operations, Engineering/maintenance",
     "subCourseCode": "LSC/Q3511",
     "subCourseName": "Tank Farm Associate",
-    "keywords": []
+    "keywords": [
+      "ecommerce-logistics"
+    ]
   },
   {
     "srNo": 1000,
@@ -10696,7 +10906,9 @@
     "courseName": "Claims Management",
     "subCourseCode": "LSC/Q2117",
     "subCourseName": "Warehouse Claims Coordinator",
-    "keywords": []
+    "keywords": [
+      "warehouse-operations"
+    ]
   },
   {
     "srNo": 1006,
@@ -10716,7 +10928,9 @@
     "courseName": "Documentation and Reporting",
     "subCourseCode": "LSC/Q2306",
     "subCourseName": "Data Feeder - Warehouse",
-    "keywords": []
+    "keywords": [
+      "warehouse-operations"
+    ]
   },
   {
     "srNo": 1008,
@@ -10766,7 +10980,9 @@
     "courseName": "Operations (Quality)",
     "subCourseCode": "LSC/Q2313",
     "subCourseName": "Warehouse Quality Checker",
-    "keywords": []
+    "keywords": [
+      "warehouse-operations"
+    ]
   },
   {
     "srNo": 1013,
@@ -10786,7 +11002,9 @@
     "courseName": "Packaging",
     "subCourseCode": "LSC/Q2102",
     "subCourseName": "Warehouse Picker",
-    "keywords": []
+    "keywords": [
+      "warehouse-operations"
+    ]
   },
   {
     "srNo": 1015,
@@ -10806,7 +11024,9 @@
     "courseName": "Packaging",
     "subCourseCode": "LSC/Q2303",
     "subCourseName": "Warehouse Packer",
-    "keywords": []
+    "keywords": [
+      "warehouse-operations"
+    ]
   },
   {
     "srNo": 1017,
@@ -10826,7 +11046,9 @@
     "courseName": "Packaging",
     "subCourseCode": "LSC/Q2307",
     "subCourseName": "Warehouse Supervisor",
-    "keywords": []
+    "keywords": [
+      "warehouse-operations"
+    ]
   },
   {
     "srNo": 1019,
@@ -10836,7 +11058,9 @@
     "courseName": "Storage",
     "subCourseCode": "LSC/Q2105",
     "subCourseName": "Warehouse Binner",
-    "keywords": []
+    "keywords": [
+      "warehouse-operations"
+    ]
   },
   {
     "srNo": 1020,
@@ -10846,7 +11070,9 @@
     "courseName": "Warehousing operations, Documentation and Reporting",
     "subCourseCode": "LSC/Q0301",
     "subCourseName": "Warehouse Executive",
-    "keywords": []
+    "keywords": [
+      "warehouse-operations"
+    ]
   },
   {
     "srNo": 1021,
@@ -10856,7 +11082,9 @@
     "courseName": "Warehousing Operations, Packaging",
     "subCourseCode": "LSC/Q0101",
     "subCourseName": "Warehouse Associate",
-    "keywords": []
+    "keywords": [
+      "warehouse-operations"
+    ]
   },
   {
     "srNo": 1022,
@@ -10866,7 +11094,9 @@
     "courseName": "Warehousing operations, Packaging, Documentation and Reporting",
     "subCourseCode": "LSC/Q0102",
     "subCourseName": "Warehouse Supervisor",
-    "keywords": []
+    "keywords": [
+      "warehouse-operations"
+    ]
   },
   {
     "srNo": 1023,
@@ -10876,7 +11106,9 @@
     "courseName": "Warehousing Operations, Packaging, Documentation and Reporting, Engineering/Maintenance",
     "subCourseCode": "LSC/Q0103",
     "subCourseName": "Warehouse Manager",
-    "keywords": []
+    "keywords": [
+      "warehouse-operations"
+    ]
   },
   {
     "srNo": 1024,
@@ -10896,7 +11128,9 @@
     "courseName": "Warehousing Operations, Packaging, Documentation and Reporting, Engineering/Maintenance",
     "subCourseCode": "LSC/Q0105",
     "subCourseName": "Warehouse, Inventory and Transport Manager",
-    "keywords": []
+    "keywords": [
+      "warehouse-operations"
+    ]
   },
   {
     "srNo": 1026,
@@ -11252,7 +11486,9 @@
     "courseName": "Customer Support",
     "subCourseCode": "LSC/Q3032",
     "subCourseName": "Delivery Management Cell Agent",
-    "keywords": []
+    "keywords": [
+      "delivery-executive"
+    ]
   },
   {
     "srNo": 1061,
@@ -11302,7 +11538,9 @@
     "courseName": "Ground Operations (Delivery and Pickup)",
     "subCourseCode": "LSC/Q3023",
     "subCourseName": "Courier Delivery Executive",
-    "keywords": []
+    "keywords": [
+      "delivery-executive"
+    ]
   },
   {
     "srNo": 1066,
@@ -11846,7 +12084,9 @@
     "courseName": "Manufacturing",
     "subCourseCode": "LFS/Q0209",
     "subCourseName": "Maintenance Supervisor/In Charge HVAC Life Sciences",
-    "keywords": []
+    "keywords": [
+      "ac-repair"
+    ]
   },
   {
     "srNo": 1119,
@@ -11886,7 +12126,9 @@
     "courseName": "Manufacturing",
     "subCourseCode": "LFS/Q0213",
     "subCourseName": "Fitter Mechanical - Life Sciences",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 1123,
@@ -12225,7 +12467,10 @@
     "courseName": "Sample Making",
     "subCourseCode": "LSS/Q5201",
     "subCourseName": "Sample Maker (Goods and Garments)",
-    "keywords": []
+    "keywords": [
+      "garment-quality-check",
+      "leather-goods"
+    ]
   },
   {
     "srNo": 1155,
@@ -12429,7 +12674,9 @@
     "courseName": "Product Development and Delivery",
     "subCourseCode": "SSC/Q6702",
     "subCourseName": "Software Developer",
-    "keywords": []
+    "keywords": [
+      "delivery-executive"
+    ]
   },
   {
     "srNo": 1175,
@@ -13308,7 +13555,9 @@
     "courseName": "Mechanical Maintenance",
     "subCourseCode": "ISC/Q0903",
     "subCourseName": "Fitter: Hydraulic & Pneumatic System",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 1260,
@@ -13318,7 +13567,9 @@
     "courseName": "Mechanical Maintenance",
     "subCourseCode": "ISC/Q0905",
     "subCourseName": "Fitter : Levelling, Alignment & Balancing",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 1261,
@@ -13657,7 +13908,8 @@
     "subCourseCode": "ISC/Q1001",
     "subCourseName": "Fitter Electrical Assembly",
     "keywords": [
-      "electrical"
+      "electrical",
+      "fitter"
     ]
   },
   {
@@ -13668,7 +13920,9 @@
     "courseName": "Electronics & Instrumentation Maintenance",
     "subCourseCode": "ISC/Q1101",
     "subCourseName": "Fitter Electronic Assembly",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 1295,
@@ -13678,7 +13932,9 @@
     "courseName": "Electronics & Instrumentation Maintenance",
     "subCourseCode": "ISC/Q1102",
     "subCourseName": "Fitter Instrumentation",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 1296,
@@ -14342,7 +14598,8 @@
     "subCourseCode": "HYC/Q6102",
     "subCourseName": "Pipe Fitter - City Gas Distribution",
     "keywords": [
-      "plumbing"
+      "plumbing",
+      "fitter"
     ]
   },
   {
@@ -14354,7 +14611,8 @@
     "subCourseCode": "HYC/Q6103",
     "subCourseName": "Pipe Fitter (Oil & Gas)",
     "keywords": [
-      "plumbing"
+      "plumbing",
+      "fitter"
     ]
   },
   {
@@ -14366,7 +14624,8 @@
     "subCourseCode": "HYC/Q6103",
     "subCourseName": "Pipe Fitter â€“ Oil & Gas/City Gas Distribution",
     "keywords": [
-      "plumbing"
+      "plumbing",
+      "fitter"
     ]
   },
   {
@@ -14410,7 +14669,9 @@
     "courseName": "LPG Distribution",
     "subCourseCode": "HYC/Q3201",
     "subCourseName": "LPG Delivery Personnel",
-    "keywords": []
+    "keywords": [
+      "delivery-executive"
+    ]
   },
   {
     "srNo": 1366,
@@ -14518,7 +14779,9 @@
     "courseName": "Ayurveda Therapy",
     "subCourseCode": "HSS/Q3603",
     "subCourseName": "Panchakarma Assistant",
-    "keywords": []
+    "keywords": [
+      "spa-therapy"
+    ]
   },
   {
     "srNo": 1376,
@@ -14578,7 +14841,9 @@
     "courseName": "Unani",
     "subCourseCode": "HSS/Q4101",
     "subCourseName": "Cupping Therapy Assistant",
-    "keywords": []
+    "keywords": [
+      "spa-therapy"
+    ]
   },
   {
     "srNo": 1382,
@@ -14588,7 +14853,9 @@
     "courseName": "Yoga",
     "subCourseCode": "HSS/Q4001",
     "subCourseName": "Yoga Therapy Assistant",
-    "keywords": []
+    "keywords": [
+      "spa-therapy"
+    ]
   },
   {
     "srNo": 1383,
@@ -14914,7 +15181,9 @@
     "courseName": "Production-Woodware",
     "subCourseCode": "HCS/Q6704",
     "subCourseName": "Assistant Wooden Toy Maker",
-    "keywords": []
+    "keywords": [
+      "wood-carving"
+    ]
   },
   {
     "srNo": 1415,
@@ -14946,7 +15215,9 @@
     "courseName": "Generic",
     "subCourseCode": "HCS/Q9002",
     "subCourseName": "Kolhapuri Chappal Maker",
-    "keywords": []
+    "keywords": [
+      "carpet-weaving"
+    ]
   },
   {
     "srNo": 1418,
@@ -14956,7 +15227,9 @@
     "courseName": "Natural Fibre Maker",
     "subCourseCode": "HCS/Q4405",
     "subCourseName": "Natural Fibre Maker",
-    "keywords": []
+    "keywords": [
+      "carpet-weaving"
+    ]
   },
   {
     "srNo": 1419,
@@ -14966,7 +15239,10 @@
     "courseName": "Traditional Painting",
     "subCourseCode": "HCS/Q0805",
     "subCourseName": "Traditional Painting Maker - Artisan",
-    "keywords": []
+    "keywords": [
+      "carpet-weaving",
+      "house-painting"
+    ]
   },
   {
     "srNo": 1420,
@@ -14990,7 +15266,8 @@
     "subCourseCode": "HCS/Q3002",
     "subCourseName": "Polisher (Metalware)",
     "keywords": [
-      "housekeeping"
+      "housekeeping",
+      "metal-craft"
     ]
   },
   {
@@ -15002,7 +15279,8 @@
     "subCourseCode": "HCS/Q3001",
     "subCourseName": "Acid Cleaner (Metalware)",
     "keywords": [
-      "housekeeping"
+      "housekeeping",
+      "metal-craft"
     ]
   },
   {
@@ -15013,7 +15291,9 @@
     "courseName": "Metal Casting and Stamping",
     "subCourseCode": "HCS/Q2801",
     "subCourseName": "Casting Operator (Metal Handicrafts)",
-    "keywords": []
+    "keywords": [
+      "metal-craft"
+    ]
   },
   {
     "srNo": 1424,
@@ -15023,7 +15303,9 @@
     "courseName": "Metal Casting and Stamping",
     "subCourseCode": "HCS/Q2802",
     "subCourseName": "Stamping Operator (Metal Handicrafts)",
-    "keywords": []
+    "keywords": [
+      "metal-craft"
+    ]
   },
   {
     "srNo": 1425,
@@ -15033,7 +15315,9 @@
     "courseName": "Metal Craft Making",
     "subCourseCode": "HCS/Q2802",
     "subCourseName": "Engraving and Stamping Artisan",
-    "keywords": []
+    "keywords": [
+      "metal-craft"
+    ]
   },
   {
     "srNo": 1426,
@@ -15043,7 +15327,9 @@
     "courseName": "Metal Craft Making",
     "subCourseCode": "HCS/Q2901",
     "subCourseName": "Embossing Artisan (Metalware)",
-    "keywords": []
+    "keywords": [
+      "metal-craft"
+    ]
   },
   {
     "srNo": 1427,
@@ -15053,7 +15339,9 @@
     "courseName": "Metal Craft Making",
     "subCourseCode": "HCS/Q2902",
     "subCourseName": "Engraving Artisan (Metal Handicrafts)",
-    "keywords": []
+    "keywords": [
+      "metal-craft"
+    ]
   },
   {
     "srNo": 1428,
@@ -15063,7 +15351,9 @@
     "courseName": "Metal Craft Making",
     "subCourseCode": "HCS/Q2903",
     "subCourseName": "Inlay Artisan (Metalware)",
-    "keywords": []
+    "keywords": [
+      "metal-craft"
+    ]
   },
   {
     "srNo": 1429,
@@ -15073,7 +15363,9 @@
     "courseName": "Metal Craft Making",
     "subCourseCode": "HCS/Q2909",
     "subCourseName": "Etching Artisan - Metalware",
-    "keywords": []
+    "keywords": [
+      "metal-craft"
+    ]
   },
   {
     "srNo": 1430,
@@ -15083,7 +15375,9 @@
     "courseName": "Metal Craft Making",
     "subCourseCode": "HCS/Q2911",
     "subCourseName": "Cutting and Threading Operator (Metalware)",
-    "keywords": []
+    "keywords": [
+      "metal-craft"
+    ]
   },
   {
     "srNo": 1431,
@@ -15093,7 +15387,9 @@
     "courseName": "Metal Craft Making",
     "subCourseCode": "HCS/Q2912",
     "subCourseName": "Planishing Artisan (Metalware)",
-    "keywords": []
+    "keywords": [
+      "metal-craft"
+    ]
   },
   {
     "srNo": 1432,
@@ -15104,6 +15400,7 @@
     "subCourseCode": "HCS/Q3101",
     "subCourseName": "Painter (Metal Handicrafts)",
     "keywords": [
+      "metal-craft",
       "house-painting"
     ]
   },
@@ -15116,6 +15413,7 @@
     "subCourseCode": "HCS/Q3101",
     "subCourseName": "Painter (Metal Handicrafts)",
     "keywords": [
+      "metal-craft",
       "house-painting"
     ]
   },
@@ -15167,7 +15465,9 @@
     "courseName": "Product Designing and Development-Paper Mache",
     "subCourseCode": "HCS/Q4404",
     "subCourseName": "Fitter and Rubbing Operator (Paper Mache)",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 1439,
@@ -15309,7 +15609,9 @@
     "courseName": "Stone Crafting",
     "subCourseCode": "HCS/Q1504",
     "subCourseName": "Inlay Artisan - Stonecraft",
-    "keywords": []
+    "keywords": [
+      "stone-carving"
+    ]
   },
   {
     "srNo": 1453,
@@ -15383,7 +15685,9 @@
     "courseName": "Finishing and Painting",
     "subCourseCode": "HCS/Q0801",
     "subCourseName": "Colour mixing operator (Ceramics)",
-    "keywords": []
+    "keywords": [
+      "house-painting"
+    ]
   },
   {
     "srNo": 1460,
@@ -15393,7 +15697,9 @@
     "courseName": "Finishing and Painting",
     "subCourseCode": "HCS/Q0802",
     "subCourseName": "Sketching and painting artisan (Ceramics)",
-    "keywords": []
+    "keywords": [
+      "house-painting"
+    ]
   },
   {
     "srNo": 1461,
@@ -15403,7 +15709,9 @@
     "courseName": "Finishing and Painting",
     "subCourseCode": "HCS/Q0803",
     "subCourseName": "Glazing operator (Ceramics)",
-    "keywords": []
+    "keywords": [
+      "house-painting"
+    ]
   },
   {
     "srNo": 1462,
@@ -15647,7 +15955,9 @@
     "courseName": "Stone Crafting",
     "subCourseCode": "HCS/Q1401",
     "subCourseName": "Stone Preparation Artisan",
-    "keywords": []
+    "keywords": [
+      "stone-carving"
+    ]
   },
   {
     "srNo": 1486,
@@ -15793,7 +16103,8 @@
     "subCourseCode": "HCS/Q0804",
     "subCourseName": "Leather Toy Maker - Artisan",
     "keywords": [
-      "leatherwork"
+      "leatherwork",
+      "house-painting"
     ]
   },
   {
@@ -15905,7 +16216,9 @@
     "courseName": "Processing",
     "subCourseCode": "HCS/Q5301",
     "subCourseName": "Washer (Carpets)",
-    "keywords": []
+    "keywords": [
+      "carpet-weaving"
+    ]
   },
   {
     "srNo": 1509,
@@ -15980,7 +16293,9 @@
     "courseName": "Product Development and Design-Carpets",
     "subCourseCode": "HCS/Q5205",
     "subCourseName": "Designer & Shade Writer (Carpets)",
-    "keywords": []
+    "keywords": [
+      "carpet-weaving"
+    ]
   },
   {
     "srNo": 1515,
@@ -15990,7 +16305,9 @@
     "courseName": "Product Development and Design-Carpets",
     "subCourseCode": "HCS/Q5206",
     "subCourseName": "Namda Craft Maker",
-    "keywords": []
+    "keywords": [
+      "carpet-weaving"
+    ]
   },
   {
     "srNo": 1516,
@@ -16001,7 +16318,8 @@
     "subCourseCode": "HCS/Q5409",
     "subCourseName": "Tufting Gun Master (Carpets)",
     "keywords": [
-      "handloom-weaving"
+      "handloom-weaving",
+      "carpet-weaving"
     ]
   },
   {
@@ -16026,7 +16344,8 @@
     "subCourseCode": "HCS/Q5701",
     "subCourseName": "Carpet Weaver Knotted",
     "keywords": [
-      "handloom-weaving"
+      "handloom-weaving",
+      "carpet-weaving"
     ]
   },
   {
@@ -16038,7 +16357,8 @@
     "subCourseCode": "HCS/Q5702",
     "subCourseName": "Carpet Weaver Tufted",
     "keywords": [
-      "handloom-weaving"
+      "handloom-weaving",
+      "carpet-weaving"
     ]
   },
   {
@@ -16142,7 +16462,9 @@
     "courseName": "Decoration (Etching, Pasting & Painting) and Finishing- Glassware",
     "subCourseCode": "HCS/Q2304",
     "subCourseName": "Abrasion & Grinding Machine Operator",
-    "keywords": []
+    "keywords": [
+      "house-painting"
+    ]
   },
   {
     "srNo": 1529,
@@ -16152,7 +16474,9 @@
     "courseName": "Decoration (Etching, Pasting & Painting) and Finishing- Glassware",
     "subCourseCode": "HCS/Q2501",
     "subCourseName": "Decorative Cutter (Glassware)",
-    "keywords": []
+    "keywords": [
+      "house-painting"
+    ]
   },
   {
     "srNo": 1530,
@@ -16185,6 +16509,7 @@
     "subCourseCode": "HCS/Q2502",
     "subCourseName": "Decorative Painter Glassware",
     "keywords": [
+      "metal-craft",
       "house-painting"
     ]
   },
@@ -16276,7 +16601,9 @@
     "courseName": "Production-Woodware",
     "subCourseCode": "HCS/Q6703",
     "subCourseName": "Wooden Toy Maker - Artisan",
-    "keywords": []
+    "keywords": [
+      "wood-carving"
+    ]
   },
   {
     "srNo": 1541,
@@ -16286,7 +16613,9 @@
     "courseName": "Designing",
     "subCourseCode": "HCS/Q5202",
     "subCourseName": "CAD Designer for Carpets",
-    "keywords": []
+    "keywords": [
+      "carpet-weaving"
+    ]
   },
   {
     "srNo": 1542,
@@ -16296,7 +16625,9 @@
     "courseName": "Designing",
     "subCourseCode": "HCS/Q5203",
     "subCourseName": "Color Quality Incharge/Shade Supervisor (Carpets)",
-    "keywords": []
+    "keywords": [
+      "carpet-weaving"
+    ]
   },
   {
     "srNo": 1543,
@@ -16306,7 +16637,9 @@
     "courseName": "Finishing",
     "subCourseCode": "HCS/Q5402",
     "subCourseName": "Latexing Man (Carpets)",
-    "keywords": []
+    "keywords": [
+      "carpet-weaving"
+    ]
   },
   {
     "srNo": 1544,
@@ -16316,7 +16649,9 @@
     "courseName": "Finishing",
     "subCourseCode": "HCS/Q5407",
     "subCourseName": "Finisher (Carpets)",
-    "keywords": []
+    "keywords": [
+      "carpet-weaving"
+    ]
   },
   {
     "srNo": 1545,
@@ -16374,7 +16709,8 @@
     "subCourseCode": "SGJ/Q6102",
     "subCourseName": "Safai Karamchari (Elective: Wet Cleaning/Mechanized Cleaning)",
     "keywords": [
-      "housekeeping"
+      "housekeeping",
+      "hotel-housekeeping"
     ]
   },
   {
@@ -16875,7 +17211,9 @@
     "courseName": "Gold Smithy (Basic)",
     "subCourseCode": "G&J/Q0604",
     "subCourseName": "Goldsmith: Frame Maker",
-    "keywords": []
+    "keywords": [
+      "jewellery-making"
+    ]
   },
   {
     "srNo": 1597,
@@ -17027,7 +17365,9 @@
     "courseName": "Gold Smithy (Basic)",
     "subCourseCode": "G&J/Q0603",
     "subCourseName": "Goldsmith: Component Maker",
-    "keywords": []
+    "keywords": [
+      "jewellery-making"
+    ]
   },
   {
     "srNo": 1612,
@@ -17545,7 +17885,8 @@
     "subCourseCode": "G&J/Q2603",
     "subCourseName": "Rubber Mould Maker",
     "keywords": [
-      "jewellery-making"
+      "jewellery-making",
+      "rubber-processing"
     ]
   },
   {
@@ -17629,7 +17970,8 @@
     "subCourseCode": "FIC/Q2008",
     "subCourseName": "Artisanal Cheese Maker- Entrepreneur",
     "keywords": [
-      "dairy-livestock"
+      "dairy-livestock",
+      "dairy-processing"
     ]
   },
   {
@@ -17805,7 +18147,8 @@
     "keywords": [
       "dairy-livestock",
       "poultry",
-      "bakery"
+      "bakery",
+      "dairy-processing"
     ]
   },
   {
@@ -17830,7 +18173,8 @@
     "subCourseName": "Cold Storage Technician",
     "keywords": [
       "dairy-livestock",
-      "poultry"
+      "poultry",
+      "dairy-processing"
     ]
   },
   {
@@ -17844,7 +18188,8 @@
     "keywords": [
       "dairy-livestock",
       "poultry",
-      "bakery"
+      "bakery",
+      "dairy-processing"
     ]
   },
   {
@@ -17858,7 +18203,8 @@
     "keywords": [
       "dairy-livestock",
       "poultry",
-      "bakery"
+      "bakery",
+      "dairy-processing"
     ]
   },
   {
@@ -17873,6 +18219,7 @@
       "dairy-livestock",
       "poultry",
       "bakery",
+      "dairy-processing",
       "lab-technician"
     ]
   },
@@ -17887,7 +18234,8 @@
     "keywords": [
       "dairy-livestock",
       "poultry",
-      "bakery"
+      "bakery",
+      "dairy-processing"
     ]
   },
   {
@@ -17901,7 +18249,8 @@
     "keywords": [
       "dairy-livestock",
       "poultry",
-      "bakery"
+      "bakery",
+      "dairy-processing"
     ]
   },
   {
@@ -17915,7 +18264,8 @@
     "keywords": [
       "dairy-livestock",
       "poultry",
-      "bakery"
+      "bakery",
+      "dairy-processing"
     ]
   },
   {
@@ -17929,7 +18279,8 @@
     "keywords": [
       "dairy-livestock",
       "poultry",
-      "bakery"
+      "bakery",
+      "dairy-processing"
     ]
   },
   {
@@ -17943,7 +18294,8 @@
     "keywords": [
       "dairy-livestock",
       "poultry",
-      "bakery"
+      "bakery",
+      "dairy-processing"
     ]
   },
   {
@@ -17957,7 +18309,8 @@
     "keywords": [
       "dairy-livestock",
       "poultry",
-      "bakery"
+      "bakery",
+      "dairy-processing"
     ]
   },
   {
@@ -17971,7 +18324,8 @@
     "keywords": [
       "dairy-livestock",
       "poultry",
-      "bakery"
+      "bakery",
+      "dairy-processing"
     ]
   },
   {
@@ -17985,7 +18339,8 @@
     "keywords": [
       "dairy-livestock",
       "poultry",
-      "bakery"
+      "bakery",
+      "dairy-processing"
     ]
   },
   {
@@ -17999,7 +18354,8 @@
     "keywords": [
       "dairy-livestock",
       "poultry",
-      "bakery"
+      "bakery",
+      "dairy-processing"
     ]
   },
   {
@@ -18045,7 +18401,8 @@
     "subCourseCode": "FIC/Q2001",
     "subCourseName": "Dairy Products Processor",
     "keywords": [
-      "dairy-livestock"
+      "dairy-livestock",
+      "dairy-processing"
     ]
   },
   {
@@ -18057,7 +18414,8 @@
     "subCourseCode": "FIC/Q2002",
     "subCourseName": "Dairy Processing Equipment Operator",
     "keywords": [
-      "dairy-livestock"
+      "dairy-livestock",
+      "dairy-processing"
     ]
   },
   {
@@ -18069,7 +18427,8 @@
     "subCourseCode": "FIC/Q2003",
     "subCourseName": "Butter and Ghee Processing Operator",
     "keywords": [
-      "dairy-livestock"
+      "dairy-livestock",
+      "dairy-processing"
     ]
   },
   {
@@ -18081,7 +18440,8 @@
     "subCourseCode": "FIC/Q2004",
     "subCourseName": "Ice Cream Processing Technician",
     "keywords": [
-      "dairy-livestock"
+      "dairy-livestock",
+      "dairy-processing"
     ]
   },
   {
@@ -18093,7 +18453,8 @@
     "subCourseCode": "FIC/Q2005",
     "subCourseName": "Cottage Cheese Maker",
     "keywords": [
-      "dairy-livestock"
+      "dairy-livestock",
+      "dairy-processing"
     ]
   },
   {
@@ -18372,7 +18733,9 @@
     "courseName": "Production",
     "subCourseCode": "ELE/Q0108",
     "subCourseName": "Silicone Painting Operator",
-    "keywords": []
+    "keywords": [
+      "house-painting"
+    ]
   },
   {
     "srNo": 1734,
@@ -18624,7 +18987,9 @@
     "courseName": "Assembly And Integration",
     "subCourseCode": "ELE/Q6302",
     "subCourseName": "Mechanical Fitter",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 1758,
@@ -18943,7 +19308,8 @@
     "subCourseCode": "ELE/Q3112",
     "subCourseName": "HVAC Technician",
     "keywords": [
-      "retail"
+      "retail",
+      "ac-repair"
     ]
   },
   {
@@ -19269,7 +19635,9 @@
     "courseName": "Child Care (Non - Clinical)",
     "subCourseCode": "DWC/Q0201",
     "subCourseName": "Child Caretaker (Non Clinical)",
-    "keywords": []
+    "keywords": [
+      "childcare"
+    ]
   },
   {
     "srNo": 1818,
@@ -19279,7 +19647,9 @@
     "courseName": "Child Care (Non-Clinical)",
     "subCourseCode": "DWC/Q0202",
     "subCourseName": "Baby Caregiver",
-    "keywords": []
+    "keywords": [
+      "childcare"
+    ]
   },
   {
     "srNo": 1819,
@@ -19289,7 +19659,9 @@
     "courseName": "Child Care (Non-Clinical)",
     "subCourseCode": "DWC/Q0203",
     "subCourseName": "Caregiver - Mother & Newborn",
-    "keywords": []
+    "keywords": [
+      "childcare"
+    ]
   },
   {
     "srNo": 1820,
@@ -19312,7 +19684,8 @@
     "subCourseCode": "DWC/Q0102",
     "subCourseName": "General Housekeeper (Household and Small Establishment)",
     "keywords": [
-      "housekeeping"
+      "housekeeping",
+      "hotel-housekeeping"
     ]
   },
   {
@@ -19324,7 +19697,8 @@
     "subCourseCode": "DWC/Q0101",
     "subCourseName": "Housekeeper cum Cook (Household and Small Establishment)",
     "keywords": [
-      "housekeeping"
+      "housekeeping",
+      "hotel-housekeeping"
     ]
   },
   {
@@ -19336,7 +19710,8 @@
     "subCourseCode": "DWC/Q0103",
     "subCourseName": "Household Multipurpose Executive",
     "keywords": [
-      "housekeeping"
+      "housekeeping",
+      "hotel-housekeeping"
     ]
   },
   {
@@ -19348,7 +19723,8 @@
     "subCourseCode": "DWC/Q1701",
     "subCourseName": "Home Cook",
     "keywords": [
-      "housekeeping"
+      "housekeeping",
+      "hotel-housekeeping"
     ]
   },
   {
@@ -19911,6 +20287,7 @@
     "subCourseName": "Construction Fitter",
     "keywords": [
       "masonry",
+      "fitter",
       "fabrication"
     ]
   },
@@ -20234,6 +20611,7 @@
     "subCourseName": "Assistant Construction Fitter",
     "keywords": [
       "masonry",
+      "fitter",
       "fabrication"
     ]
   },
@@ -20260,7 +20638,8 @@
     "subCourseName": "Reinforcement Fitter",
     "keywords": [
       "masonry",
-      "bar-bending"
+      "bar-bending",
+      "fitter"
     ]
   },
   {
@@ -20334,7 +20713,8 @@
     "subCourseCode": "CSC/Q0901",
     "subCourseName": "Maintenance Fitter - Mechanical",
     "keywords": [
-      "electrical"
+      "electrical",
+      "fitter"
     ]
   },
   {
@@ -20576,7 +20956,8 @@
     "subCourseCode": "CSC/Q0703",
     "subCourseName": "Polisher - Manual",
     "keywords": [
-      "electrical"
+      "electrical",
+      "house-painting"
     ]
   },
   {
@@ -20830,7 +21211,8 @@
     "subCourseCode": "BSC/Q8401",
     "subCourseName": "Business Correspondent & Business Facilitator",
     "keywords": [
-      "retail"
+      "retail",
+      "banking-correspondent"
     ]
   },
   {
@@ -20842,7 +21224,8 @@
     "subCourseCode": "BSC/Q8401",
     "subCourseName": "Business Correspondent/Facilitator",
     "keywords": [
-      "retail"
+      "retail",
+      "banking-correspondent"
     ]
   },
   {
@@ -20943,7 +21326,8 @@
     "subCourseCode": "CSC/Q0113",
     "subCourseName": "Polisher",
     "keywords": [
-      "electrical"
+      "electrical",
+      "house-painting"
     ]
   },
   {
@@ -21218,7 +21602,9 @@
     "courseName": "Spa Services",
     "subCourseCode": "BWS/Q1001",
     "subCourseName": "Assistant Spa Therapist",
-    "keywords": []
+    "keywords": [
+      "spa-therapy"
+    ]
   },
   {
     "srNo": 1979,
@@ -21330,7 +21716,9 @@
     "courseName": "Skincare Services",
     "subCourseCode": "BWS/Q0101",
     "subCourseName": "Assistant Beauty Therapist",
-    "keywords": []
+    "keywords": [
+      "spa-therapy"
+    ]
   },
   {
     "srNo": 1989,
@@ -21340,7 +21728,9 @@
     "courseName": "Skincare Services",
     "subCourseCode": "BWS/Q0102",
     "subCourseName": "Beauty Therapist",
-    "keywords": []
+    "keywords": [
+      "spa-therapy"
+    ]
   },
   {
     "srNo": 1990,
@@ -21350,7 +21740,9 @@
     "courseName": "Skincare Services",
     "subCourseCode": "BWS/Q0104",
     "subCourseName": "Senior Beauty Therapist",
-    "keywords": []
+    "keywords": [
+      "spa-therapy"
+    ]
   },
   {
     "srNo": 1991,
@@ -21370,7 +21762,9 @@
     "courseName": "Plant and Equipment Maintenance",
     "subCourseCode": "ASC/Q6809",
     "subCourseName": "Electric Vehicle Maintenance Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 1993,
@@ -21380,7 +21774,9 @@
     "courseName": "Plastic Moulding Operation",
     "subCourseCode": "ASC/Q4401",
     "subCourseName": "Automotive Plastic Moulding Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 1994,
@@ -21390,7 +21786,9 @@
     "courseName": "Plastic Moulding Operation",
     "subCourseCode": "ASC/Q4402",
     "subCourseName": "Automotive Plastic Moulding Assistant",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 1995,
@@ -21400,7 +21798,9 @@
     "courseName": "Production Engineering",
     "subCourseCode": "ASC/Q6410",
     "subCourseName": "Automotive Additive Manufacturing Operator",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 1996,
@@ -21410,7 +21810,9 @@
     "courseName": "Production Engineering",
     "subCourseCode": "ASC/Q6411",
     "subCourseName": "Automotive Additive Manufacturing Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 1997,
@@ -21420,7 +21822,9 @@
     "courseName": "Production Engineering",
     "subCourseCode": "ASC/Q6412",
     "subCourseName": "Automotive IIOT Application Engineer",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 1998,
@@ -21430,7 +21834,9 @@
     "courseName": "Production Engineering",
     "subCourseCode": "ASC/Q6413",
     "subCourseName": "Automotive IIOT Application Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 1999,
@@ -21441,7 +21847,8 @@
     "subCourseCode": "ASC/Q3401",
     "subCourseName": "Automotive Press Shop Assistant",
     "keywords": [
-      "retail"
+      "retail",
+      "car-repair"
     ]
   },
   {
@@ -21453,7 +21860,8 @@
     "subCourseCode": "ASC/Q3402",
     "subCourseName": "Automotive Press Shop Technician",
     "keywords": [
-      "retail"
+      "retail",
+      "car-repair"
     ]
   },
   {
@@ -21464,7 +21872,9 @@
     "courseName": "Supply Chain Management",
     "subCourseCode": "ASC/Q6101",
     "subCourseName": "Automotive Material Handling Assistant",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2002,
@@ -21474,7 +21884,9 @@
     "courseName": "Supply Chain Management",
     "subCourseCode": "ASC/Q6102",
     "subCourseName": "Automotive Packing Assistant",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2003,
@@ -21484,7 +21896,9 @@
     "courseName": "Supply Chain Management",
     "subCourseCode": "ASC/Q6103",
     "subCourseName": "Automotive Material Handling Operator",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2004,
@@ -21504,7 +21918,9 @@
     "courseName": "Tool Room Operation",
     "subCourseCode": "ASC/Q4101",
     "subCourseName": "Automotive Tool Room Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2006,
@@ -21514,7 +21930,9 @@
     "courseName": "Tool Room Operation",
     "subCourseCode": "ASC/Q4102",
     "subCourseName": "Automotive Tool Room Lead Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2007,
@@ -21524,7 +21942,9 @@
     "courseName": "Quality Assurance",
     "subCourseCode": "ASC/Q6303",
     "subCourseName": "Automotive Quality Control Inspector",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2008,
@@ -21546,7 +21966,9 @@
     "courseName": "Automotive Product Designing",
     "subCourseCode": "ASC/Q6405",
     "subCourseName": "Automotive Production Equipment Design Engineer",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2010,
@@ -21556,7 +21978,9 @@
     "courseName": "Automotive Product Designing",
     "subCourseCode": "ASC/Q8102",
     "subCourseName": "Automotive Product Design Lead Engineer",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2011,
@@ -21566,7 +21990,9 @@
     "courseName": "Automotive Product Designing",
     "subCourseCode": "ASC/Q8104",
     "subCourseName": "Electric Vehicle Product Design Engineer",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2012,
@@ -21576,7 +22002,9 @@
     "courseName": "Automotive Product Designing",
     "subCourseCode": "ASC/Q8201",
     "subCourseName": "Automotive CAD Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2013,
@@ -21586,7 +22014,9 @@
     "courseName": "Automotive Product Development",
     "subCourseCode": "ASC/Q6501",
     "subCourseName": "Automotive Prototype Manufacturing Lead Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2014,
@@ -21596,7 +22026,9 @@
     "courseName": "Automotive Product Development",
     "subCourseCode": "ASC/Q8303",
     "subCourseName": "Automotive Automation and Robotics Engineer",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2015,
@@ -21606,7 +22038,9 @@
     "courseName": "Automotive Product Testing and Validation",
     "subCourseCode": "ASC/Q6504",
     "subCourseName": "Automotive Material Testing Incharge",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2016,
@@ -21616,7 +22050,9 @@
     "courseName": "Automotive Product Testing and Validation",
     "subCourseCode": "ASC/Q8406",
     "subCourseName": "Electric Vehicle Test Engineer",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2017,
@@ -21677,7 +22113,8 @@
     "subCourseCode": "ASC/Q9605",
     "subCourseName": "Two Wheeler Delivery Associate",
     "keywords": [
-      "driving"
+      "driving",
+      "delivery-executive"
     ]
   },
   {
@@ -21688,7 +22125,10 @@
     "courseName": "Painting & Surface Treatment Operation",
     "subCourseCode": "ASC/Q3303",
     "subCourseName": "Automotive Body Painting Operator",
-    "keywords": []
+    "keywords": [
+      "house-painting",
+      "car-repair"
+    ]
   },
   {
     "srNo": 2024,
@@ -21698,7 +22138,10 @@
     "courseName": "Painting & Surface Treatment Operation",
     "subCourseCode": "ASC/Q3304",
     "subCourseName": "Automotive Body Painting Technician",
-    "keywords": []
+    "keywords": [
+      "house-painting",
+      "car-repair"
+    ]
   },
   {
     "srNo": 2025,
@@ -21709,7 +22152,8 @@
     "subCourseCode": "ASC/Q6801",
     "subCourseName": "Automotive Maintenance Lead Technician-Electrical",
     "keywords": [
-      "electrical"
+      "electrical",
+      "car-repair"
     ]
   },
   {
@@ -21720,7 +22164,9 @@
     "courseName": "Plant and Equipment Maintenance",
     "subCourseCode": "ASC/Q6802",
     "subCourseName": "Automotive Maintenance Technician-Mechanical",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2027,
@@ -21731,7 +22177,8 @@
     "subCourseCode": "ASC/Q6803",
     "subCourseName": "Automotive Maintenance Technician- Electrical",
     "keywords": [
-      "electrical"
+      "electrical",
+      "car-repair"
     ]
   },
   {
@@ -21742,7 +22189,9 @@
     "courseName": "Plant and Equipment Maintenance",
     "subCourseCode": "ASC/Q6806",
     "subCourseName": "Automotive Maintenance Assistant",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2029,
@@ -21752,7 +22201,9 @@
     "courseName": "Plant and Equipment Maintenance",
     "subCourseCode": "ASC/Q6807",
     "subCourseName": "Automotive Automation Specialist",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2030,
@@ -21762,7 +22213,9 @@
     "courseName": "Plant and Equipment Maintenance",
     "subCourseCode": "ASC/Q6808",
     "subCourseName": "Automotive Maintenance Lead Technician- Mechanical",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2031,
@@ -21772,7 +22225,9 @@
     "courseName": "Machining Operation",
     "subCourseCode": "ASC/Q3501",
     "subCourseName": "Automotive Machining Operator",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2032,
@@ -21782,7 +22237,9 @@
     "courseName": "Machining Operation",
     "subCourseCode": "ASC/Q3502",
     "subCourseName": "Automotive Machining Assistant",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2033,
@@ -21792,7 +22249,9 @@
     "courseName": "Machining Operation",
     "subCourseCode": "ASC/Q3503",
     "subCourseName": "Automotive CNC Machining Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2034,
@@ -21802,7 +22261,9 @@
     "courseName": "Machining Operation",
     "subCourseCode": "ASC/Q3505",
     "subCourseName": "Automotive Machining Lead Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2035,
@@ -21812,7 +22273,9 @@
     "courseName": "Machining Operation",
     "subCourseCode": "ASC/Q3506",
     "subCourseName": "Automotive Machining Master Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2036,
@@ -21822,7 +22285,9 @@
     "courseName": "Machining Operation",
     "subCourseCode": "ASC/Q3510",
     "subCourseName": "Automotive Conventional Machining Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2037,
@@ -21832,7 +22297,9 @@
     "courseName": "Machining Operation",
     "subCourseCode": "ASC/Q3511",
     "subCourseName": "Automotive Machining Trainer",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2038,
@@ -21843,7 +22310,8 @@
     "subCourseCode": "ASC/Q3101",
     "subCourseName": "Automotive Welding Machine Assistant",
     "keywords": [
-      "welding"
+      "welding",
+      "car-repair"
     ]
   },
   {
@@ -21855,7 +22323,8 @@
     "subCourseCode": "ASC/Q3102",
     "subCourseName": "Automotive Welding Machine Operator (Manual and Robotics)",
     "keywords": [
-      "welding"
+      "welding",
+      "car-repair"
     ]
   },
   {
@@ -21867,7 +22336,8 @@
     "subCourseCode": "ASC/Q3103",
     "subCourseName": "Automotive Welding Machine Technician",
     "keywords": [
-      "welding"
+      "welding",
+      "car-repair"
     ]
   },
   {
@@ -21879,7 +22349,8 @@
     "subCourseCode": "ASC/Q3104",
     "subCourseName": "Automotive Welding Machine Lead Technician",
     "keywords": [
-      "welding"
+      "welding",
+      "car-repair"
     ]
   },
   {
@@ -21891,7 +22362,8 @@
     "subCourseCode": "ASC/Q3105",
     "subCourseName": "Automotive Welding Machine Master Technician",
     "keywords": [
-      "welding"
+      "welding",
+      "car-repair"
     ]
   },
   {
@@ -21903,7 +22375,8 @@
     "subCourseCode": "ASC/Q3110",
     "subCourseName": "Automotive Welding Machine Trainer",
     "keywords": [
-      "welding"
+      "welding",
+      "car-repair"
     ]
   },
   {
@@ -21914,7 +22387,10 @@
     "courseName": "Painting & Surface Treatment Operation",
     "subCourseCode": "ASC/Q3302",
     "subCourseName": "Automotive Body Painting Assistant",
-    "keywords": []
+    "keywords": [
+      "house-painting",
+      "car-repair"
+    ]
   },
   {
     "srNo": 2045,
@@ -21924,7 +22400,9 @@
     "courseName": "Technical Service & Repair",
     "subCourseCode": "ASC/Q1402",
     "subCourseName": "Four Wheeler Service Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2046,
@@ -21934,7 +22412,9 @@
     "courseName": "Technical Service & Repair",
     "subCourseCode": "ASC/Q1403",
     "subCourseName": "Four Wheeler Service Lead Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2047,
@@ -21944,7 +22424,9 @@
     "courseName": "Technical Service & Repair",
     "subCourseCode": "ASC/Q1411",
     "subCourseName": "Two Wheeler Service Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2048,
@@ -21954,7 +22436,9 @@
     "courseName": "Technical Service & Repair",
     "subCourseCode": "ASC/Q1421",
     "subCourseName": "Automotive Washer",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2049,
@@ -21964,7 +22448,10 @@
     "courseName": "Technical Service & Repair",
     "subCourseCode": "ASC/Q1422",
     "subCourseName": "Automotive Accessory Fitter",
-    "keywords": []
+    "keywords": [
+      "fitter",
+      "car-repair"
+    ]
   },
   {
     "srNo": 2050,
@@ -21974,7 +22461,9 @@
     "courseName": "Technical Service & Repair",
     "subCourseCode": "ASC/Q1423",
     "subCourseName": "Two Wheeler Service Assistant",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2051,
@@ -21985,7 +22474,8 @@
     "subCourseCode": "ASC/Q1424",
     "subCourseName": "Electric Vehicle Service Lead Technician",
     "keywords": [
-      "electrical"
+      "electrical",
+      "car-repair"
     ]
   },
   {
@@ -21996,7 +22486,9 @@
     "courseName": "Technical Service & Repair",
     "subCourseCode": "ASC/Q1426",
     "subCourseName": "Automotive Service Advisor",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2053,
@@ -22006,7 +22498,9 @@
     "courseName": "Technical Service & Repair",
     "subCourseCode": "ASC/Q1427",
     "subCourseName": "Automotive Service Quality Controller",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2054,
@@ -22016,7 +22510,9 @@
     "courseName": "Technical Service & Repair",
     "subCourseCode": "ASC/Q1428",
     "subCourseName": "Automotive Warranty Processor",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2055,
@@ -22027,7 +22523,8 @@
     "subCourseCode": "ASC/Q1429",
     "subCourseName": "Electric Vehicle Service Technician",
     "keywords": [
-      "electrical"
+      "electrical",
+      "car-repair"
     ]
   },
   {
@@ -22038,7 +22535,9 @@
     "courseName": "Technical Service & Repair",
     "subCourseCode": "ASC/Q1430",
     "subCourseName": "CNG Kit Fitment Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2057,
@@ -22048,7 +22547,9 @@
     "courseName": "Technical Service & Repair",
     "subCourseCode": "ASC/Q1431",
     "subCourseName": "Automotive Detailer Assistant",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2058,
@@ -22058,7 +22559,9 @@
     "courseName": "Technical Service and Repair",
     "subCourseCode": "ASC/Q1404",
     "subCourseName": "Four Wheeler Service Master Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2059,
@@ -22068,7 +22571,9 @@
     "courseName": "Technical Service and Repair",
     "subCourseCode": "ASC/Q1405",
     "subCourseName": "Automotive Body Repair Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2060,
@@ -22078,7 +22583,9 @@
     "courseName": "Technical Service and Repair",
     "subCourseCode": "ASC/Q1406",
     "subCourseName": "Automotive Paint Repair Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2061,
@@ -22088,7 +22595,9 @@
     "courseName": "Technical Service and Repair",
     "subCourseCode": "ASC/Q1407",
     "subCourseName": "Automotive Paint Repair Assistant",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2062,
@@ -22099,7 +22608,8 @@
     "subCourseCode": "ASC/Q1408",
     "subCourseName": "Automotive Electrician",
     "keywords": [
-      "electrical"
+      "electrical",
+      "car-repair"
     ]
   },
   {
@@ -22110,7 +22620,9 @@
     "courseName": "Technical Service and Repair",
     "subCourseCode": "ASC/Q1409",
     "subCourseName": "Automotive Engine Repair Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2064,
@@ -22120,7 +22632,9 @@
     "courseName": "Technical Service and Repair",
     "subCourseCode": "ASC/Q1410",
     "subCourseName": "Automotive Body Repair Assistant",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2065,
@@ -22130,7 +22644,9 @@
     "courseName": "Technical Service and Repair",
     "subCourseCode": "ASC/Q1412",
     "subCourseName": "Automotive Service Supervisor",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2066,
@@ -22141,7 +22657,8 @@
     "subCourseCode": "ASC/Q1416",
     "subCourseName": "Automotive AC Technician",
     "keywords": [
-      "ac-repair"
+      "ac-repair",
+      "car-repair"
     ]
   },
   {
@@ -22152,7 +22669,9 @@
     "courseName": "Workshop operations",
     "subCourseCode": "ASC/Q1601",
     "subCourseName": "Maintenance Technician- Service Workshop",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2068,
@@ -22162,7 +22681,9 @@
     "courseName": "Workshop operations",
     "subCourseCode": "ASC/Q1604",
     "subCourseName": "Warranty Incharge",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2069,
@@ -22172,7 +22693,9 @@
     "courseName": "Assembly",
     "subCourseCode": "ASC/Q3602",
     "subCourseName": "Automotive Assembly Lead Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2070,
@@ -22182,7 +22705,9 @@
     "courseName": "Assembly",
     "subCourseCode": "ASC/Q3701",
     "subCourseName": "Auto Component Assembly Fitter",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 2071,
@@ -22192,7 +22717,9 @@
     "courseName": "Assembly Operation",
     "subCourseCode": "ASC/Q3601",
     "subCourseName": "Automotive Assembly Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2072,
@@ -22202,7 +22729,9 @@
     "courseName": "Assembly Operation",
     "subCourseCode": "ASC/Q3603",
     "subCourseName": "Automotive Assembly Master Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2073,
@@ -22212,7 +22741,9 @@
     "courseName": "Assembly Operation",
     "subCourseCode": "ASC/Q3604",
     "subCourseName": "Automotive Assembly Operator",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2074,
@@ -22222,7 +22753,9 @@
     "courseName": "Assembly Operation",
     "subCourseCode": "ASC/Q3605",
     "subCourseName": "Electric Vehicle Assembly Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2075,
@@ -22242,7 +22775,9 @@
     "courseName": "Assembly Operation",
     "subCourseCode": "ASC/Q3607",
     "subCourseName": "Automotive Assembly Assistant",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2077,
@@ -22252,7 +22787,9 @@
     "courseName": "Automotive Quality Assurance",
     "subCourseCode": "ASC/Q6301",
     "subCourseName": "Automotive Quality Control Assistant",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2078,
@@ -22262,7 +22799,9 @@
     "courseName": "Automotive Quality Assurance",
     "subCourseCode": "ASC/Q6305",
     "subCourseName": "Automotive Quality Control Lead Inspector",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2079,
@@ -22272,7 +22811,9 @@
     "courseName": "Automotive Quality Assurance",
     "subCourseCode": "ASC/Q6307",
     "subCourseName": "Electric Vehicle Quality Control Inspector",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2080,
@@ -22282,7 +22823,9 @@
     "courseName": "Casting Operation",
     "subCourseCode": "ASC/Q3202",
     "subCourseName": "Automotive Casting Operator",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2081,
@@ -22292,7 +22835,9 @@
     "courseName": "Casting Operation",
     "subCourseCode": "ASC/Q3205",
     "subCourseName": "Automotive Casting Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2082,
@@ -22302,7 +22847,9 @@
     "courseName": "Forging Operation",
     "subCourseCode": "ASC/Q4501",
     "subCourseName": "Automotive Forging Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2083,
@@ -22312,7 +22859,9 @@
     "courseName": "Heat Treatment",
     "subCourseCode": "ASC/Q3901",
     "subCourseName": "Automotive Heat Treatment Technician",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2084,
@@ -22404,7 +22953,9 @@
     "courseName": "Sampling",
     "subCourseCode": "AMH/Q1810",
     "subCourseName": "Washing Machine Operator",
-    "keywords": []
+    "keywords": [
+      "car-wash"
+    ]
   },
   {
     "srNo": 2093,
@@ -22457,7 +23008,8 @@
     "subCourseCode": "ASC/Q1103",
     "subCourseName": "Automotive Showroom Host",
     "keywords": [
-      "retail"
+      "retail",
+      "car-repair"
     ]
   },
   {
@@ -22469,7 +23021,8 @@
     "subCourseCode": "ASC/Q1104",
     "subCourseName": "Automotive Customer Relationship Manager",
     "keywords": [
-      "retail"
+      "retail",
+      "car-repair"
     ]
   },
   {
@@ -22481,7 +23034,8 @@
     "subCourseCode": "ASC/Q1105",
     "subCourseName": "Automotive Telecaller",
     "keywords": [
-      "retail"
+      "retail",
+      "car-repair"
     ]
   },
   {
@@ -22493,7 +23047,8 @@
     "subCourseCode": "ASC/Q1109",
     "subCourseName": "Automotive Sales Trainer",
     "keywords": [
-      "retail"
+      "retail",
+      "car-repair"
     ]
   },
   {
@@ -22505,7 +23060,8 @@
     "subCourseCode": "ASC/Q1109",
     "subCourseName": "Sales/Service Trainer (Dealer)",
     "keywords": [
-      "retail"
+      "retail",
+      "car-repair"
     ]
   },
   {
@@ -22517,7 +23073,8 @@
     "subCourseCode": "ASC/Q1001",
     "subCourseName": "Sales Consultant Level 4",
     "keywords": [
-      "retail"
+      "retail",
+      "car-repair"
     ]
   },
   {
@@ -22529,7 +23086,8 @@
     "subCourseCode": "ASC/Q1003",
     "subCourseName": "Sales Consultant (Pre-owned Vehicles)",
     "keywords": [
-      "retail"
+      "retail",
+      "car-repair"
     ]
   },
   {
@@ -22541,7 +23099,8 @@
     "subCourseCode": "ASC/Q1005",
     "subCourseName": "Automotive Sales Consultant",
     "keywords": [
-      "retail"
+      "retail",
+      "car-repair"
     ]
   },
   {
@@ -22553,7 +23112,8 @@
     "subCourseCode": "ASC/Q1007",
     "subCourseName": "Automotive Sales Leader",
     "keywords": [
-      "retail"
+      "retail",
+      "car-repair"
     ]
   },
   {
@@ -22565,7 +23125,8 @@
     "subCourseCode": "ASC/Q1010",
     "subCourseName": "Automotive Sales Assistant",
     "keywords": [
-      "retail"
+      "retail",
+      "car-repair"
     ]
   },
   {
@@ -22576,7 +23137,9 @@
     "courseName": "Spare Parts Operations",
     "subCourseCode": "ASC/Q1501",
     "subCourseName": "Automotive Spare Parts Operations Assistant",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2108,
@@ -22586,7 +23149,9 @@
     "courseName": "Spare Parts Operations",
     "subCourseCode": "ASC/Q1502",
     "subCourseName": "Spare Parts Operations Executive Level 5",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2109,
@@ -22596,7 +23161,9 @@
     "courseName": "Technical Service & Repair",
     "subCourseCode": "ASC/Q1401",
     "subCourseName": "Four Wheeler Service Assistant",
-    "keywords": []
+    "keywords": [
+      "car-repair"
+    ]
   },
   {
     "srNo": 2110,
@@ -23453,7 +24020,8 @@
     "subCourseName": "Dairy Farmer/Entrepreneur",
     "keywords": [
       "agriculture",
-      "dairy-livestock"
+      "dairy-livestock",
+      "dairy-processing"
     ]
   },
   {
@@ -23465,7 +24033,8 @@
     "subCourseCode": "AGR/Q4102",
     "subCourseName": "Dairy Worker",
     "keywords": [
-      "dairy-livestock"
+      "dairy-livestock",
+      "dairy-processing"
     ]
   },
   {
@@ -23477,7 +24046,8 @@
     "subCourseCode": "AGR/Q4103",
     "subCourseName": "Dairy Farm Supervisor",
     "keywords": [
-      "dairy-livestock"
+      "dairy-livestock",
+      "dairy-processing"
     ]
   },
   {
@@ -23971,7 +24541,8 @@
     "subCourseCode": "AGR/Q7502",
     "subCourseName": "Warehouse Worker",
     "keywords": [
-      "agriculture"
+      "agriculture",
+      "warehouse-operations"
     ]
   },
   {
@@ -24055,7 +24626,8 @@
     "subCourseCode": "AGR/Q7510",
     "subCourseName": "Agri Warehouse Supervisor",
     "keywords": [
-      "agriculture"
+      "agriculture",
+      "warehouse-operations"
     ]
   },
   {
@@ -24413,7 +24985,8 @@
     "subCourseCode": "AGR/Q1001",
     "subCourseName": "Greenhouse Fitter",
     "keywords": [
-      "agriculture"
+      "agriculture",
+      "fitter"
     ]
   },
   {
@@ -24770,7 +25343,8 @@
     "subCourseCode": "AGR/Q5201",
     "subCourseName": "Sericulturist",
     "keywords": [
-      "agriculture"
+      "agriculture",
+      "sericulture"
     ]
   },
   {
@@ -25285,7 +25859,9 @@
     "courseName": "Cargo Terminal Operations",
     "subCourseCode": "AAS/Q4303",
     "subCourseName": "Airport Warehouse Coordinator",
-    "keywords": []
+    "keywords": [
+      "warehouse-operations"
+    ]
   },
   {
     "srNo": 2341,
@@ -25431,7 +26007,9 @@
     "courseName": "Aircraft Assembling and Testing",
     "subCourseCode": "AAS/Q1602",
     "subCourseName": "Aerospace Structural Fitter",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 2355,
@@ -25441,7 +26019,9 @@
     "courseName": "Aircraft Assembling and Testing",
     "subCourseCode": "AAS/Q1608",
     "subCourseName": "Aerospace Precision Mechanical Assembly Fitter",
-    "keywords": []
+    "keywords": [
+      "fitter"
+    ]
   },
   {
     "srNo": 2356,

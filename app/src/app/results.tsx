@@ -4,7 +4,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 
-import { setRecommendationStatus, type NsqfMapping, type CourseRecommendation } from '@/lib/api';
+import { setRecommendationStatus, type NsqfMapping, type CourseRecommendation, type JobMatch } from '@/lib/api';
 import { UI_STRINGS } from '@/constants/languages';
 import { getIntent, getLastResult } from '@/lib/session';
 import { speak, stopSpeaking } from '@/lib/speech';
@@ -18,7 +18,14 @@ export default function ResultsScreen() {
   const result = getLastResult();
   const intent = getIntent();
   const t = language ? UI_STRINGS[language] : UI_STRINGS.hi;
-  const sectionTitle = intent === 'jobs' ? t.jobsTitle : intent === 'certificate' ? t.certTitle : t.recommended;
+  const sectionTitle =
+    intent === 'jobs'
+      ? t.jobsTitle
+      : intent === 'certificate'
+        ? t.certTitle
+        : intent === 'guidance'
+          ? t.guidanceTitle
+          : t.recommended;
 
   // the admin funnel is SUGGESTED -> VIEWED -> ... ; reaching this screen is
   // what "viewed" means, now that courses carry no call-to-action of their own
@@ -92,6 +99,24 @@ export default function ResultsScreen() {
               {t.noMatch}
             </Txt>
           </Card>
+        )}
+
+        {/* jobs — real vacancies matched to the spoken skill */}
+        {(result.jobs?.length ?? 0) > 0 && (
+          <View style={{ gap: 12, marginTop: 4 }}>
+            <View style={styles.sectionHead}>
+              <Ionicons name="briefcase" size={18} color={c.primary} />
+              <Txt variant="h2">{t.jobsAvailable}</Txt>
+              <View style={[styles.countPill, { backgroundColor: c.primarySoft }]}>
+                <Txt variant="caption" style={{ color: c.primary }}>
+                  {result.jobs!.length}
+                </Txt>
+              </View>
+            </View>
+            {result.jobs!.map((j, i) => (
+              <JobCard key={j.jobPostingId} j={j} t={t} index={i + 2} />
+            ))}
+          </View>
         )}
 
         {/* recommendations */}
@@ -170,6 +195,82 @@ function NsqfCard({
   );
 }
 
+
+function JobCard({
+  j,
+  t,
+  index,
+}: {
+  j: JobMatch;
+  t: (typeof UI_STRINGS)['hi'];
+  index: number;
+}) {
+  const { c, radius } = useTheme();
+  const wage =
+    j.wageMin && j.wageMax ? `₹${j.wageMin.toLocaleString('en-IN')} – ₹${j.wageMax.toLocaleString('en-IN')}` : null;
+  return (
+    <Card index={index} style={{ gap: 10 }}>
+      <View style={styles.progHead}>
+        <View style={{ flex: 1, gap: 4 }}>
+          <Txt variant="h2" style={{ lineHeight: 24 }}>
+            {j.titleHindi ?? j.title}
+          </Txt>
+          <Txt variant="body" tone="dim">
+            {j.employerName}
+          </Txt>
+        </View>
+        <Meter value={j.score} size={44} />
+      </View>
+
+      <View style={styles.jobMetaRow}>
+        {!!(j.district || j.state) && (
+          <View style={styles.jobMeta}>
+            <Ionicons name="location-outline" size={14} color={c.textFaint} />
+            <Txt variant="caption" tone="dim">
+              {[j.district, j.state].filter(Boolean).join(', ')}
+            </Txt>
+          </View>
+        )}
+        {!!wage && (
+          <View style={styles.jobMeta}>
+            <Ionicons name="cash-outline" size={14} color={c.textFaint} />
+            <Txt variant="caption" tone="dim">
+              {wage} {t.jobPerMonth}
+            </Txt>
+          </View>
+        )}
+        {!!j.positions && (
+          <View style={styles.jobMeta}>
+            <Ionicons name="people-outline" size={14} color={c.textFaint} />
+            <Txt variant="caption" tone="dim">
+              {j.positions} {t.jobPositions}
+            </Txt>
+          </View>
+        )}
+      </View>
+
+      {j.needsUpskilling && (
+        <View style={[styles.why, { backgroundColor: c.surfaceAlt, borderRadius: radius.md }]}>
+          <Ionicons name="school-outline" size={14} color={c.accent} />
+          <Txt variant="caption" tone="dim" style={{ flex: 1 }}>
+            {t.jobNeedsTraining}
+          </Txt>
+        </View>
+      )}
+
+      {/* provenance — a SAMPLE row is demonstration data, never a live vacancy */}
+      {j.source === 'SAMPLE' && (
+        <View style={styles.jobMeta}>
+          <Ionicons name="information-circle-outline" size={13} color={c.textFaint} />
+          <Txt variant="caption" tone="faint">
+            {t.jobSample}
+          </Txt>
+        </View>
+      )}
+    </Card>
+  );
+}
+
 function CourseCard({
   r,
   t,
@@ -236,6 +337,8 @@ const styles = StyleSheet.create({
   nsqfRow: { flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 8 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 },
   sectionHead: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 },
+  jobMetaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  jobMeta: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   countPill: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999 },
   progHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   schemeBadge: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 },

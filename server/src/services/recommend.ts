@@ -19,11 +19,16 @@ export interface CourseRecommendation {
   rationale: string;
 }
 
+export type Intent = "jobs" | "training" | "certificate" | "guidance";
+
 interface RecommendInput {
   mappings: MappingResult[];
   state?: string | null;
   district?: string | null;
   language?: Language;
+  /** What the beneficiary asked for. Re-weights the ranking; never filters, so
+   *  the full livelihood map stays visible whichever option they picked. */
+  intent?: Intent;
 }
 
 /** The two real datasets spell sectors differently — NSQF says
@@ -79,7 +84,7 @@ function normalizeLocation(value: string | null | undefined): string | null {
  *   0.05  the skill mapped to an NSQF qualification at all (auditable match)
  */
 export async function recommendCourses(input: RecommendInput): Promise<CourseRecommendation[]> {
-  const { mappings, state, language = "hi" } = input;
+  const { mappings, state, language = "hi", intent = "guidance" } = input;
 
   const matched = mappings.filter((m) => m.normalizedSkill !== "unknown");
   const tokens = [...new Set(matched.map((m) => m.normalizedSkill.toLowerCase()))];
@@ -149,6 +154,21 @@ export async function recommendCourses(input: RecommendInput): Promise<CourseRec
     }
 
     if (source?.nsqfQualificationId) score += 0.05;
+
+    // Intent re-weighting. Deliberately small (max 0.1) and additive: it
+    // reorders the same candidate set rather than filtering it, so a
+    // beneficiary who picked the "wrong" option still sees every option.
+    if (intent === "jobs") {
+      // Prefer courses whose title names one of the occupations this
+      // qualification actually leads to — the closest thing to an employment
+      // signal the catalogue holds (PmajayCourse has no vacancy/placement data).
+      const occupations = (source?.proposedOccupations ?? []).map((o) => o.toLowerCase());
+      if (occupations.some((o) => o && courseTitle.includes(o))) score += 0.1;
+    } else if (intent === "certificate") {
+      // Certifying an existing skill: prefer the course that names the trade
+      // they already practise, over adjacent ones in the same sector.
+      if (hitToken && courseTitle.includes(hitToken)) score += 0.1;
+    }
 
     return {
       pmajayCourseId: course.id,

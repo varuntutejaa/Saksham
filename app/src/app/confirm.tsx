@@ -1,11 +1,12 @@
 import { Redirect, router } from 'expo-router';
-import { useEffect } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
+import { reprioritise } from '@/lib/api';
 import { UI_STRINGS } from '@/constants/languages';
-import { getLastResult } from '@/lib/session';
+import { getLastResult, setLastResult } from '@/lib/session';
 import type { Intent } from '@/lib/session';
 import { setIntent } from '@/lib/session';
 import { speak, stopSpeaking } from '@/lib/speech';
@@ -17,12 +18,17 @@ const OPTIONS: { intent: Intent; icon: keyof typeof Ionicons.glyphMap }[] = [
   { intent: 'jobs', icon: 'briefcase' },
   { intent: 'training', icon: 'school' },
   { intent: 'certificate', icon: 'ribbon' },
+  // Many beneficiaries don't yet know whether they need training or just
+  // certification for work they already do — this option skips the choice
+  // and shows the full livelihood map instead of a narrowed view.
+  { intent: 'guidance', icon: 'help-circle' },
 ];
 
 export default function ConfirmScreen() {
   const { language } = useStore();
   const { c, radius, elevation } = useTheme();
   const result = getLastResult();
+  const [busy, setBusy] = useState<Intent | null>(null);
 
   const t = language ? UI_STRINGS[language] : UI_STRINGS.hi;
   const known = (result?.mappings ?? [])
@@ -35,7 +41,14 @@ export default function ConfirmScreen() {
 
   useEffect(() => {
     if (language && confirmation) {
-      const timer = setTimeout(() => speak(confirmation, language), 350);
+      // Voice-first: read the confirmation, then the question itself — a
+      // beneficiary who cannot read the option labels still learns what is
+      // being asked. speak() stops any in-flight utterance, so the question
+      // has to wait for onDone rather than being fired alongside it.
+      const timer = setTimeout(
+        () => speak(confirmation, language, { onDone: () => speak(t.whatNext, language) }),
+        350,
+      );
       return () => {
         clearTimeout(timer);
         stopSpeaking();
@@ -46,8 +59,26 @@ export default function ConfirmScreen() {
   if (!language) return <Redirect href="/" />;
   if (!result) return <Redirect href="/main/speak" />;
 
-  function choose(intent: Intent) {
+  async function choose(intent: Intent) {
+    if (busy) return;
     setIntent(intent);
+    setBusy(intent);
+    stopSpeaking();
+    // Re-rank server-side for what they actually asked for. Best-effort: if
+    // the network is down reprioritise() returns null and we simply keep the
+    // ordering we already have, so the flow never blocks on it.
+    const current = getLastResult();
+    if (current?.sessionId) {
+      const ranked = await reprioritise(current.sessionId, intent);
+      if (ranked?.recommendations?.length) {
+        setLastResult({
+          ...current,
+          recommendations: ranked.recommendations,
+          jobs: ranked.jobs ?? current.jobs,
+        });
+      }
+    }
+    setBusy(null);
     router.push('/results');
   }
 
@@ -55,6 +86,7 @@ export default function ConfirmScreen() {
     jobs: t.optionJobs,
     training: t.optionTraining,
     certificate: t.optionCertificate,
+    guidance: t.optionGuidance,
   };
 
   return (
@@ -113,9 +145,12 @@ export default function ConfirmScreen() {
               <Animated.View key={o.intent} entering={FadeInDown.delay(360 + i * 70).duration(300)}>
                 <Pressable
                   onPress={() => choose(o.intent)}
+                  disabled={busy !== null}
                   style={({ pressed }) => [
                     styles.option,
                     { borderRadius: radius.lg, borderColor: pressed ? c.primary : c.border, backgroundColor: c.surface },
+                    // dim the options not being loaded, so the tap clearly registered
+                    busy !== null && busy !== o.intent && { opacity: 0.45 },
                     elevation('card'),
                   ]}>
                   <View style={[styles.optionIconBadge, { backgroundColor: c.primarySoft }]}>
@@ -124,7 +159,11 @@ export default function ConfirmScreen() {
                   <Txt variant="bodyLg" style={{ flex: 1, fontWeight: '500' }}>
                     {optionLabel[o.intent]}
                   </Txt>
-                  <Ionicons name="chevron-forward" size={20} color={c.textFaint} />
+                  {busy === o.intent ? (
+                    <ActivityIndicator size="small" color={c.primary} />
+                  ) : (
+                    <Ionicons name="chevron-forward" size={20} color={c.textFaint} />
+                  )}
                 </Pressable>
               </Animated.View>
             ))}

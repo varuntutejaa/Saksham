@@ -12,6 +12,16 @@ export interface LexiconEntry {
   normalized: string;
   /** substrings (lowercased, transliteration-tolerant) that indicate this skill */
   patterns: string[];
+  /**
+   * Formal vocabulary as it appears in NQR qualification and PM-AJAY course
+   * TITLES — e.g. pottery is "Kumhar"/"terracotta" in speech but "Potter" in a
+   * title, and beekeeping is "madhumakhi palan" in speech but "Honey bee
+   * Farmer" in a title. Used only by scripts/link-*-keywords.ts to attach this
+   * concept to catalogue rows; never used to interpret what a beneficiary says
+   * (that is what `patterns` is for), so adding a term here cannot change
+   * speech recognition behaviour.
+   */
+  titleTerms?: string[];
 }
 
 export const SKILL_LEXICON: LexiconEntry[] = [
@@ -26,6 +36,7 @@ export const SKILL_LEXICON: LexiconEntry[] = [
       "ಕುಂಬಾರ", "માટીના વાસણ", "કુંભાર", "ਮਿੱਟੀ ਦੇ ਭਾਂਡੇ", "ਘੁਮਿਆਰ",
       "ମାଟି ପାତ୍ର", "କୁମ୍ଭାର",
     ],
+    titleTerms: ["potter", "terracotta", "ceramic"],
   },
   {
     normalized: "tailoring",
@@ -38,6 +49,7 @@ export const SKILL_LEXICON: LexiconEntry[] = [
       "शिलाई", "शिंपी", "ಹೊಲಿಗೆ", "ಟೈಲರ್", "સિલાઈ", "દરજી",
       "ਸਿਲਾਈ", "ਦਰਜ਼ੀ", "ସିଲାଇ", "ଦରଜି",
     ],
+    titleTerms: ["tailor", "darzi", "sewing"],
   },
   {
     normalized: "handloom-weaving",
@@ -48,6 +60,7 @@ export const SKILL_LEXICON: LexiconEntry[] = [
       "నేయడం", "చేనేత", "विणकाम", "हातमाग", "ನೇಯ್ಗೆ", "ಕೈಮಗ್ಗ",
       "વણાટ", "હાથવણાટ", "ਬੁਣਾਈ", "ਹੱਥਕੱਤਾ", "ବୁଣା", "ହସ୍ତତନ୍ତ",
     ],
+    titleTerms: ["loom", "weaver", "weaving"],
   },
   {
     normalized: "leatherwork",
@@ -58,6 +71,7 @@ export const SKILL_LEXICON: LexiconEntry[] = [
       "செருப்பு", "తోలు పని", "చెప్పులు", "चामडे", "चप्पल", "ಚರ್ಮ ಕೆಲಸ",
       "ಚಪ್ಪಲಿ", "ચામડું", "ચંપલ", "ਚਮੜਾ", "ਜੁੱਤੀ", "ଚମଡ଼ା", "ଜୋତା",
     ],
+    titleTerms: ["leather", "footwear", "cobbler"],
   },
   {
     normalized: "carpentry",
@@ -69,6 +83,7 @@ export const SKILL_LEXICON: LexiconEntry[] = [
       "ಬಡಗಿ", "ಮರದ ಕೆಲಸ", "સુથાર", "લાકડાનું કામ", "ਤਰਖਾਣ", "ਲੱਕੜ ਦਾ ਕੰਮ",
       "ବଢ଼େଇ", "କାଠ କାମ",
     ],
+    titleTerms: ["carpenter", "wood work"],
   },
   {
     normalized: "masonry",
@@ -80,6 +95,7 @@ export const SKILL_LEXICON: LexiconEntry[] = [
       "ఇటుక పని", "गवंडी", "बांधकाम", "ಮೇಸ್ತ್ರಿ", "ಕಟ್ಟಡ ಕೆಲಸ",
       "કડિયો", "બાંધકામ", "ਰਾਜ ਮਿਸਤਰੀ", "ਇੱਟਾਂ ਦਾ ਕੰਮ", "ରାଜମିସ୍ତ୍ରୀ", "ଇଟା କାମ",
     ],
+    titleTerms: ["mason", "bricklayer"],
   },
   {
     normalized: "agriculture",
@@ -144,6 +160,7 @@ export const SKILL_LEXICON: LexiconEntry[] = [
       "ప్లంబర్", "పైపు", "नळ", "प्लंबिंग", "ಪ್ಲಂಬರ್", "ಪೈಪ್",
       "પ્લમ્બર", "પાઈપ", "ਪਲੰਬਰ", "ਪਾਈਪ", "ପ୍ଲମ୍ବର", "ପାଇପ",
     ],
+    titleTerms: ["plumber"],
   },
   {
     normalized: "welding",
@@ -153,6 +170,7 @@ export const SKILL_LEXICON: LexiconEntry[] = [
       "iron welding", "metal joining", "ওয়েল্ডিং", "வெல்டிங்", "వెల్డింగ్",
       "वेल्डर", "ವೆಲ್ಡಿಂಗ್", "વેલ્ડિંગ", "ਵੈਲਡਿੰਗ", "ୱେଲ୍ଡିଂ",
     ],
+    titleTerms: ["welder", "welding"],
   },
   {
     normalized: "mobile-repair",
@@ -163,6 +181,7 @@ export const SKILL_LEXICON: LexiconEntry[] = [
       "మొబైల్ రిపేర్", "मोबाईल दुरुस्ती", "ಮೊಬೈಲ್ ರಿಪೇರಿ",
       "મોબાઇલ રિપેર", "ਮੋਬਾਈਲ ਰਿਪੇਅਰ", "ମୋବାଇଲ ରିପେୟାର",
     ],
+    titleTerms: ["handheld device", "mobile & accessor", "handheld device", "mobile & accessor", "handset"],
   },
   {
     normalized: "driving",
@@ -184,6 +203,7 @@ export const SKILL_LEXICON: LexiconEntry[] = [
       "బుట్ట", "बांबू", "टोपली", "ಬಿದಿರು", "ಬುಟ್ಟಿ", "વાંસ", "ટોપલી",
       "ਬਾਂਸ", "ਟੋਕਰੀ", "ବାଂଶ", "ଟୋକେଇ",
     ],
+    titleTerms: ["basket maker", "bamboo", "cane"],
   },
   {
     normalized: "embroidery",
@@ -194,6 +214,7 @@ export const SKILL_LEXICON: LexiconEntry[] = [
       "ఎంబ్రాయిడరీ", "भरतकाम", "ಜರಿ", "ಕಸೂತಿ", "ભરતકામ", "જરી",
       "ਕਢਾਈ", "ਜ਼ਰੀ", "ଏମ୍ବ୍ରୋଇଡରି", "ଜରି",
     ],
+    titleTerms: ["embroider"],
   },
   {
     normalized: "housekeeping",
@@ -240,40 +261,49 @@ export const SKILL_LEXICON: LexiconEntry[] = [
   {
     normalized: "beekeeping",
     patterns: ["madhumakhi palan", "shahad", "honey farming", "मधुमक्खी पालन", "beekeeping"],
+    titleTerms: ["honey bee", "apiculture", "beekeeper"],
   },
   {
     normalized: "sericulture",
     patterns: ["resham keet palan", "silk farming", "sericulture", "रेशम पालन", "रेशम कीट"],
+    titleTerms: ["silkworm", "silk reeling", "cocoon"],
   },
 
   // ── Handicrafts (expanded) ──────────────────────────────────────────────
   {
     normalized: "wood-carving",
     patterns: ["lakdi ki nakkashi", "wood carving", "काष्ठ नक्काशी", "लकड़ी की नक्काशी", "murti lakdi"],
+    titleTerms: ["wood carv", "wooden toy", "artisan wood"],
   },
   {
     normalized: "stone-carving",
     patterns: ["patthar ki nakkashi", "stone carving", "पत्थर की नक्काशी", "murti patthar", "sangtarashi"],
+    titleTerms: ["stone carv", "sculpt", "stone artisan"],
   },
   {
     normalized: "metal-craft",
     patterns: ["pital ka kaam", "dhatu shilp", "brass work", "bell metal", "पीतल का काम", "धातु शिल्प"],
+    titleTerms: ["metalware", "planishing", "acid cleaner", "metal craft", "brass", "artware", "metal artisan"],
   },
   {
     normalized: "carpet-weaving",
     patterns: ["kaleen bunai", "carpet weaving", "galeecha", "कालीन बुनाई", "गलीचा"],
+    titleTerms: ["carpet", "durrie", "rug weav"],
   },
   {
     normalized: "jewellery-making",
     patterns: ["jewellery banana", "sunar", "gehna banana", "jewellery making", "जौहरी", "सुनार", "गहना बनाना"],
+    titleTerms: ["goldsmith", "jewell", "sunar"],
   },
   {
     normalized: "pattern-making",
     patterns: ["pattern banana", "cutting master", "pattern making", "कटिंग मास्टर"],
+    titleTerms: ["pattern master", "pattern maker"],
   },
   {
     normalized: "garment-quality-check",
     patterns: ["quality check kapde", "garment checking", "गारमेंट चेकिंग", "क्वालिटी चेकर"],
+    titleTerms: ["sample maker", "inline checker"],
   },
   {
     normalized: "fabric-dyeing",
@@ -282,28 +312,34 @@ export const SKILL_LEXICON: LexiconEntry[] = [
   {
     normalized: "leather-goods",
     patterns: ["chamde ka samaan", "bag banana chamda", "leather bag", "leather goods", "चमड़े का सामान"],
+    titleTerms: ["leather goods", "leather accessor", "sample maker"],
   },
   {
     normalized: "furniture-polishing",
     patterns: ["furniture polish", "polish karna", "फर्नीचर पॉलिश", "पॉलिश का काम"],
+    titleTerms: ["polish", "rubberwood"],
   },
 
   // ── Construction (expanded) ─────────────────────────────────────────────
   {
     normalized: "bar-bending",
     patterns: ["sariya modna", "bar bending", "सरिया मोड़ना", "सरिया बेंडर"],
+    titleTerms: ["bar bender", "steel fixer", "rebar"],
   },
   {
     normalized: "tile-laying",
     patterns: ["tile lagana", "tiles fitting", "टाइल लगाना", "टाइल फिटिंग"],
+    titleTerms: ["tile mason", "tile fixer"],
   },
   {
     normalized: "house-painting",
     patterns: ["painting ka kaam", "rang rogan", "painter", "पेंटिंग", "रंग रोगन", "भवन पेंटर"],
+    titleTerms: ["painter", "painting"],
   },
   {
     normalized: "scaffolding",
     patterns: ["scaffolding", "बांस बल्ली", "स्कैफोल्डिंग"],
+    titleTerms: ["scaffold"],
   },
 
   // ── Beauty & Wellness (expanded) ────────────────────────────────────────
@@ -318,6 +354,7 @@ export const SKILL_LEXICON: LexiconEntry[] = [
   {
     normalized: "spa-therapy",
     patterns: ["spa", "massage therapy", "स्पा", "मसाज थेरेपी"],
+    titleTerms: ["beauty therapist", "spa", "therapy assistant"],
   },
 
   // ── Food (expanded) ──────────────────────────────────────────────────────
@@ -328,6 +365,7 @@ export const SKILL_LEXICON: LexiconEntry[] = [
   {
     normalized: "dairy-processing",
     patterns: ["paneer banana", "ghee banana", "doodh processing", "पनीर बनाना", "घी बनाना"],
+    titleTerms: ["dairy", "milk product"],
   },
   {
     normalized: "domestic-cooking",
@@ -342,6 +380,7 @@ export const SKILL_LEXICON: LexiconEntry[] = [
   {
     normalized: "ac-repair",
     patterns: ["ac repair", "ac mechanic", "cooling machine", "एसी रिपेयर", "एसी मैकेनिक"],
+    titleTerms: ["refrigerat", "air condition", "hvac"],
   },
   {
     normalized: "electronics-repair",
@@ -364,6 +403,7 @@ export const SKILL_LEXICON: LexiconEntry[] = [
   {
     normalized: "fitter",
     patterns: ["fitter ka kaam", "machine fitting", "फिटर"],
+    titleTerms: ["fitter"],
   },
   {
     normalized: "fabrication",
@@ -378,16 +418,19 @@ export const SKILL_LEXICON: LexiconEntry[] = [
   {
     normalized: "car-repair",
     patterns: ["car mechanic", "gaadi ka mechanic", "car repair", "कार मैकेनिक"],
+    titleTerms: ["automotive", "automobile", "vehicle technician"],
   },
   {
     normalized: "car-wash",
     patterns: ["car washing", "gaadi dhona", "car wash", "गाड़ी धोना"],
+    titleTerms: ["washerman", "dhobi", "washing"],
   },
 
   // ── Domestic Work (expanded) ─────────────────────────────────────────────
   {
     normalized: "childcare",
     patterns: ["bachon ki dekhbhal", "nanny", "babysitting", "बच्चों की देखभाल"],
+    titleTerms: ["creche", "anganwadi", "child care"],
   },
   {
     normalized: "elderly-care",
@@ -402,12 +445,14 @@ export const SKILL_LEXICON: LexiconEntry[] = [
   {
     normalized: "phlebotomy",
     patterns: ["khoon nikalna", "blood sample", "phlebotomy", "लैब सैंपल", "खून निकालना"],
+    titleTerms: ["phlebotom"],
   },
 
   // ── Retail / IT-ITeS / BFSI ──────────────────────────────────────────────
   {
     normalized: "ecommerce-logistics",
     patterns: ["ecommerce packing", "online order packing", "amazon flipkart kaam", "ई-कॉमर्स पैकिंग"],
+    titleTerms: ["e-commerce", "logistics associate"],
   },
   {
     normalized: "computer-operator",
@@ -420,6 +465,7 @@ export const SKILL_LEXICON: LexiconEntry[] = [
   {
     normalized: "banking-correspondent",
     patterns: ["bank correspondent", "banking sakhi", "बैंक सखी", "बिजनेस कॉरेस्पॉन्डेंट"],
+    titleTerms: ["banking", "business correspondent"],
   },
   {
     normalized: "insurance-agent",
@@ -434,6 +480,7 @@ export const SKILL_LEXICON: LexiconEntry[] = [
   {
     normalized: "hotel-housekeeping",
     patterns: ["hotel housekeeping", "hotel safai", "होटल हाउसकीपिंग"],
+    titleTerms: ["housekeeper", "housekeeping"],
   },
   {
     normalized: "tour-guide",
@@ -444,10 +491,12 @@ export const SKILL_LEXICON: LexiconEntry[] = [
   {
     normalized: "warehouse-operations",
     patterns: ["warehouse ka kaam", "godam", "packing warehouse", "गोदाम", "वेयरहाउस"],
+    titleTerms: ["warehouse"],
   },
   {
     normalized: "delivery-executive",
     patterns: ["delivery boy", "delivery ka kaam", "parcel delivery", "डिलीवरी", "स्विगी ज़ोमैटो"],
+    titleTerms: ["last mile", "delivery"],
   },
   {
     normalized: "forklift-operator",
@@ -478,6 +527,7 @@ export const SKILL_LEXICON: LexiconEntry[] = [
   {
     normalized: "rubber-processing",
     patterns: ["rubber tapping", "rubber ka kaam", "रबर टैपिंग"],
+    titleTerms: ["rubber"],
   },
   {
     normalized: "mining-helper",
@@ -517,10 +567,23 @@ function patternMatches(hay: string, pattern: string): boolean {
 
   const patternWords = pattern.split(" ").filter(Boolean);
   if (patternWords.length > 1 && patternWords.every((word) => hay.includes(word))) return true;
+  // Hindi/Urdu verbs conjugate by gender and number — a lexicon written as
+  // "tokri banana" must still match "tokri banata/banati/banate/banaya hoon".
+  // Compare the verb stem instead of the full infinitive.
+  if (patternWords.length > 1 && patternWords.every((word) => hay.includes(verbStem(word)))) return true;
   if (!isLatinText(pattern)) return false;
 
   const hayWords = hay.split(" ").filter((word) => word.length >= 4);
   return hayWords.some((word) => isCloseWord(word, pattern));
+}
+
+
+/** Strips the Hindi/Urdu verb ending from a transliterated word so
+ *  "banana"/"banata"/"banati"/"banaye" all reduce to "bana". Only applied to
+ *  words long enough that the stem stays meaningful. */
+function verbStem(word: string): string {
+  if (word.length < 6) return word;
+  return word.replace(/(na|ta|ti|te|ya|ye|yi|ne)$/u, "");
 }
 
 function isLatinText(value: string): boolean {

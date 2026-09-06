@@ -100,12 +100,42 @@ export default function DashboardScreen() {
   const [locating, setLocating] = useState(false);
   const [locationDenied, setLocationDenied] = useState(false);
   const [recommended, setRecommended] = useState<RecommendedItem[] | null>(null);
+  // The livelihood map summarises the beneficiary's last conversation: the
+  // skills we mapped, and how many real jobs/courses those unlocked.
+  const [map, setMap] = useState<{
+    jobs: number;
+    training: number;
+    skills: { label: string; confidence: number }[];
+    path: { title: string; level: number | null; roles: number; expired: boolean } | null;
+  } | null>(null);
 
   // Refetched on focus so a programme scored against the conversation the
   // beneficiary just had replaces the generic nearby list.
   useFocusEffect(
     useCallback(() => {
-      const scored = getLastResult()?.recommendations;
+      const last = getLastResult();
+      if (last) {
+        const known = (last.mappings ?? []).filter((m) => m.normalizedSkill !== 'unknown');
+        const primary = known.find((m) => m.title) ?? known[0];
+        setMap({
+          jobs: last.jobs?.length ?? 0,
+          training: last.recommendations?.length ?? 0,
+          skills: known.slice(0, 4).map((m) => ({
+            label: m.normalizedSkill.replace(/-/g, ' '),
+            confidence: m.confidence,
+          })),
+          path: primary?.title
+            ? {
+                title: primary.title,
+                level: primary.nsqfLevel,
+                // real count of occupations this qualification leads to
+                roles: primary.proposedOccupations?.length ?? 0,
+                expired: Boolean(primary.nsqfExpired),
+              }
+            : null,
+        });
+      }
+      const scored = last?.recommendations;
       if (scored?.length) {
         setRecommended(
           scored.slice(0, 3).map((r) => ({
@@ -250,6 +280,100 @@ export default function DashboardScreen() {
           )}
         </Animated.View>
 
+        {/* Livelihood map — only after a conversation has produced real data.
+            Counts come straight from the last converse response, so a tile
+            never claims matches the results screen wouldn't show. */}
+        {map && (map.jobs > 0 || map.training > 0 || map.skills.length > 0) && (
+          <Animated.View entering={FadeInDown.delay(165).duration(400)} style={{ gap: 10 }}>
+            <Txt variant="overline" tone="faint">
+              {t.livelihoodMap}
+            </Txt>
+
+            <View style={styles.tileRow}>
+              <Pressable
+                onPress={() => router.push('/results')}
+                style={({ pressed }) => [{ flex: 1, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+                <Card index={0} tint="violet" style={{ gap: 6 }}>
+                  <Ionicons name="briefcase" size={20} color={c.primary} />
+                  <Txt variant="title">{map.jobs}</Txt>
+                  <Txt variant="caption" tone="dim">
+                    {t.mapJobs} · {t.mapMatches}
+                  </Txt>
+                </Card>
+              </Pressable>
+              <Pressable
+                onPress={() => router.push('/results')}
+                style={({ pressed }) => [{ flex: 1, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+                <Card index={1} tint="info" style={{ gap: 6 }}>
+                  <Ionicons name="school" size={20} color={c.accentDark} />
+                  <Txt variant="title">{map.training}</Txt>
+                  <Txt variant="caption" tone="dim">
+                    {t.mapTraining} · {t.mapForYou}
+                  </Txt>
+                </Card>
+              </Pressable>
+            </View>
+
+            {map.skills.length > 0 && (
+              <Card index={2} style={{ gap: 12 }}>
+                <View style={styles.row}>
+                  <Ionicons name="extension-puzzle" size={18} color={c.primary} />
+                  <Txt variant="h2" style={{ flex: 1 }}>
+                    {t.yourSkills}
+                  </Txt>
+                </View>
+                {map.skills.map((sk) => (
+                  <View key={sk.label} style={styles.skillRow}>
+                    <Txt variant="body" style={{ flex: 1, textTransform: 'capitalize' }} numberOfLines={1}>
+                      {sk.label}
+                    </Txt>
+                    <View style={styles.dots}>
+                      {[0, 1, 2, 3, 4].map((n) => (
+                        <View
+                          key={n}
+                          style={[
+                            styles.dot,
+                            { backgroundColor: n < Math.round(sk.confidence * 5) ? c.primary : c.surfaceAlt },
+                          ]}
+                        />
+                      ))}
+                    </View>
+                  </View>
+                ))}
+                <Pressable onPress={() => router.push('/main/profile')} hitSlop={8}>
+                  <Txt variant="label" tone="primary">
+                    {t.completeProfile} →
+                  </Txt>
+                </Pressable>
+              </Card>
+            )}
+
+            {map.path && (
+              <Card index={3} style={{ gap: 8 }}>
+                <Txt variant="overline" tone="faint">
+                  {t.recommendedPath}
+                </Txt>
+                <Txt variant="h2">{map.path.title}</Txt>
+                <View style={styles.chipRow}>
+                  {map.path.level != null && <Chip label={`NSQF ${map.path.level}`} icon="layers" tone="primary" />}
+                  {/* a lapsed NQR qualification is still shown, but never as current */}
+                  {map.path.expired && <Chip label={t.qualLapsed} icon="alert-circle" tone="sun" />}
+                </View>
+                {map.path.roles > 0 && (
+                  <Txt variant="caption" tone="dim">
+                    {map.path.roles} {t.potentialRoles}
+                  </Txt>
+                )}
+                <Pressable onPress={() => router.push('/results')} hitSlop={8}>
+                  <Txt variant="label" tone="primary">
+                    {t.viewPathway} →
+                  </Txt>
+                </Pressable>
+              </Card>
+            )}
+          </Animated.View>
+        )}
+
         {recommended !== null && recommended.length > 0 && (
           <Animated.View entering={FadeInDown.delay(170).duration(400)} style={{ gap: 10 }}>
             <View style={styles.sectionHead}>
@@ -377,6 +501,10 @@ const styles = StyleSheet.create({
   chipRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   sectionHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  tileRow: { flexDirection: 'row', gap: 12 },
+  skillRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  dots: { flexDirection: 'row', gap: 4 },
+  dot: { width: 8, height: 8, borderRadius: 4 },
   locCardInner: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, flex: 1 },
   locBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   comingSoonPill: {

@@ -135,7 +135,10 @@ model NsqfQualification {
 
   mappings         SkillMapping[]
   trainingPrograms TrainingProgram[]
+  /// eligibility: which job roles require this qualification (services/eligibility.ts)
   jobRequirements  JobRequirement[]
+  /// vacancies: open postings aligned to this qualification (services/jobs.ts)
+  jobPostings      JobPosting[]
 }
 
 /// A course/QP code actually eligible for PM-AJAY skilling funding, scraped
@@ -228,6 +231,55 @@ model TrainingProgram {
   updatedAt           DateTime           @updatedAt
 
   recommendations Recommendation[]
+}
+
+/// A job vacancy a beneficiary can apply to.
+///
+/// PROVENANCE MATTERS: `source` records where a row came from and must always
+/// be surfaced to the user. SAMPLE rows are demonstration data seeded from
+/// prisma/data/job-postings.json — realistic, tied to real NSQF qualifications
+/// and real districts, but NOT live vacancies. EMPLOYER rows are posted through
+/// the portal by a real employer. NCS is reserved for a future National Career
+/// Service integration (their vacancy API requires credentials we don't hold).
+/// Never present a SAMPLE row as a live opening.
+model JobPosting {
+  id                  String             @id @default(cuid())
+  title               String
+  titleHindi          String?
+  employerName        String
+  /// The normalized skill token this job serves (services/skillLexicon.ts) —
+  /// the SAME vocabulary the voice pipeline emits, so a spoken skill matches a
+  /// job directly rather than through fuzzy title comparison.
+  skillTokens         String[]
+  nsqfQualificationId String?
+  nsqfQualification   NsqfQualification? @relation(fields: [nsqfQualificationId], references: [id], onDelete: SetNull)
+  sector              String?
+  /// NSQF level the employer expects; compared against the beneficiary's mapped
+  /// level so an out-of-reach posting can be shown as a "with training" step.
+  nsqfLevel           Int?
+  state               String?
+  district            String?
+  wageMin             Int? // ₹ per month
+  wageMax             Int?
+  positions           Int?               @default(1)
+  contactPhone        String?
+  description         String?
+  source              JobPostingSource   @default(SAMPLE)
+  active              Boolean            @default(true)
+  postedAt            DateTime           @default(now())
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  @@index([active, source])
+}
+
+/// Provenance of a JobPosting row. Distinct from `JobSource` (used by the
+/// eligibility feature's `Job` model) because these describe how a *vacancy*
+/// reached us, not how a job role was defined.
+enum JobPostingSource {
+  SAMPLE // demonstration vacancy from scripts/generate-job-seed.ts — NOT a live opening
+  EMPLOYER // posted through the Saksham employer portal
+  NCS // reserved for a future National Career Service vacancy feed
 }
 
 /// A programme recommended to a specific beneficiary in a session.
