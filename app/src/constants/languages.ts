@@ -517,7 +517,7 @@ const en: Strings = {
   devOtpNotice: 'Demo code: {otp} (no SMS is being sent right now)',
   otpPlaceholder: '4-digit code',
   newPasswordPlaceholder: 'New password',
-  confirmPasswordPlaceholder: 'Confirm new password',
+  confirmPasswordPlaceholder: 'Re-enter password',
   sendOtp: 'Send code',
   resetPasswordBtn: 'Reset password',
   invalidOtp: 'Please enter the correct 6-digit code',
