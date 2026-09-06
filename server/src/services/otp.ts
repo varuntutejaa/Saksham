@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "../lib/prisma.js";
-import { hasSms } from "../lib/env.js";
+import { env, hasSms, useDemoOtp } from "../lib/env.js";
 
 /**
  * One-time codes for signup phone verification and password reset.
@@ -27,8 +27,15 @@ const MAX_ATTEMPTS = 5;
 
 /** 4 digits: materially easier to hear, remember and type for a beneficiary
  *  reading an SMS aloud or using a feature phone. Brute force stays bounded by
- *  MAX_ATTEMPTS and the TTL above. */
+ *  MAX_ATTEMPTS and the TTL above.
+ *
+ *  In demo mode every code is DEMO_OTP_CODE (default "1234") so the signup and
+ *  reset flows can be shown without SMS or a handset. This is safe only
+ *  because it cannot coexist with a real provider: `useDemoOtp` is false the
+ *  moment SMS_API_KEY is set, so a deployment that really texts people can
+ *  never be handing out a fixed code. */
 function generateCode(): string {
+  if (useDemoOtp) return env.demoOtpCode;
   return String(Math.floor(1000 + Math.random() * 9000));
 }
 
@@ -56,7 +63,11 @@ export async function requestOtp(phone: string): Promise<RequestOtpResult> {
     // await deliverOtp(phone, code) — wire a real SMS provider here.
     return { provider: "sms" };
   }
-  console.log(`[otp:mock] OTP for ${phone}: ${code} (no SMS_API_KEY set)`);
+  console.log(
+    useDemoOtp
+      ? `[otp:demo] OTP for ${phone}: ${code} (fixed demo code — set DEMO_OTP=false or SMS_API_KEY for real codes)`
+      : `[otp:mock] OTP for ${phone}: ${code} (no SMS_API_KEY set)`,
+  );
   return { provider: "mock", devOtp: code };
 }
 
