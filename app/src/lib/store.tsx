@@ -8,8 +8,11 @@ interface Profile {
   district?: string;
 }
 
-// Voice-onboarding answers for a guest (no account). Kept in memory only —
-// it lives for the current app session and is gone on restart.
+// Voice-onboarding answers for a guest (no account). Persisted on-device so a
+// returning guest is greeted by name and doesn't re-answer every question on
+// each launch — re-asking four questions by voice is a real cost for the
+// low-literacy users this app serves. Stored only in this app's local
+// AsyncStorage, never sent anywhere; `reset()` erases it.
 export interface GuestProfile {
   name?: string;
   gender?: Gender;
@@ -28,6 +31,7 @@ interface StoreValue extends Profile {
 }
 
 const KEY = 'saksham.profile.v1';
+const GUEST_KEY = 'saksham.guestProfile.v1';
 const StoreContext = createContext<StoreValue | null>(null);
 
 export function StoreProvider({ children }: { children: ReactNode }) {
@@ -36,8 +40,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    AsyncStorage.getItem(KEY)
-      .then((raw) => raw && setProfile(JSON.parse(raw)))
+    Promise.all([AsyncStorage.getItem(KEY), AsyncStorage.getItem(GUEST_KEY)])
+      .then(([rawProfile, rawGuest]) => {
+        // parse independently: a corrupt guest record must not also discard
+        // the language the user already chose
+        try {
+          if (rawProfile) setProfile(JSON.parse(rawProfile));
+        } catch {
+          /* keep defaults */
+        }
+        try {
+          if (rawGuest) setGuestProfileState(JSON.parse(rawGuest));
+        } catch {
+          /* onboarding will re-collect */
+        }
+      })
       .catch(() => {})
       .finally(() => setReady(true));
   }, []);
@@ -55,10 +72,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       guestOnboarded: guestProfile !== null,
       setLanguage: (language) => persist({ ...profile, language }),
       setLocation: (state, district) => persist({ ...profile, state, district }),
-      setGuestProfile: (p) => setGuestProfileState(p),
-      reset: () => {
+      setGuestProfile: (p) => {
+        setGuestProfileState(p);
+        // best-effort: a storage failure must not block onboarding
+        AsyncStorage.setItem(GUEST_KEY, JSON.stringify(p)).catch(() => {});
+      },
+      reset: async () => {
         setGuestProfileState(null);
-        return persist({ language: null });
+        await AsyncStorage.removeItem(GUEST_KEY).catch(() => {});
+        await persist({ language: null });
       },
     }),
     [profile, ready, guestProfile],

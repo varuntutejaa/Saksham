@@ -3,7 +3,8 @@ import { useAuth } from '@/lib/auth';
 
 export default function OnboardingLayout() {
   // Guests (no token) go through voice profiling too — their answers are kept
-  // locally for the session (see useStore().guestProfile).
+  // on-device (see useStore().guestProfile), so a returning guest is greeted
+  // by name instead of re-answering every question.
   const { ready } = useAuth();
   if (!ready) return null;
 
